@@ -1,6 +1,7 @@
 type RootStackParamList = {
     home: undefined;
-    "review-detail": { id: number; title: string; star: number } | undefined;
+    order: { id: number };
+    cart: undefined;
     // Feed: { sort: 'latest' | 'top' } | undefined;
 };
 
