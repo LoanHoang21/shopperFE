@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from '../screens/Home';
 import Order from '../screens/Order';
+import HeaderHome from './HeaderHome';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -10,7 +11,7 @@ const RouterMain = () => {
             <Stack.Screen
                 name="home"
                 component={Home}
-            // options={{ header: () => <AppHeader /> }}
+                options={{ header: () =>  <HeaderHome /> }}
             />
             <Stack.Screen
                 name="order"
