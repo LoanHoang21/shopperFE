@@ -1,7 +1,9 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from '../screens/Home';
 import Order from '../screens/Order';
-import HeaderHome from './HeaderHome';
+import HeaderHome from './header/HeaderHome';
+import CartScreen from '../screens/Cart';
+import CartHeader from './header/HeaderCart';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -20,8 +22,8 @@ const RouterMain = () => {
             />
             <Stack.Screen
                 name="cart"
-                component={Order}
-            // options={{ title: 'Chi tiết Review' }}
+                component={CartScreen}
+                options={{ headerShown: false }}
             />
         </Stack.Navigator>
     );

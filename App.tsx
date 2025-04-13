@@ -2,20 +2,23 @@ import React from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import AppNavigation from './src/components/navigation/AppNavigation';
+import { CartProvider } from './src/context/CartContext';
 
 const App = () => {
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
-      <StatusBar
-        backgroundColor="#ffffff"
-        barStyle="dark-content"
-        animated={true}
-      />
-      <NavigationContainer>
-        <AppNavigation />
-      </NavigationContainer>
-    </SafeAreaView>
+    <CartProvider>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
+        <StatusBar
+          backgroundColor="#ffffff"
+          barStyle="dark-content"
+          animated={true}
+        />
+        <NavigationContainer>
+          <AppNavigation />
+        </NavigationContainer>
+      </SafeAreaView>
+    </CartProvider>
   );
 };
 
