@@ -1,4 +1,7 @@
 type RootStackParamList = {
+    beforeLogin: undefined;
+    login: undefined;
+    register: undefined;
     home: undefined;
     order: { id: number };
     cart: undefined;
