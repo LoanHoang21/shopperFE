@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import ScanAndTrackBar from './ScanAndTrackBar';
-
+import ScanAndTrackBar from '../ScanAndTrackBar';
+import { useNavigation } from '@react-navigation/native';
 
 const HeaderHome: React.FC = () => {
+
+    const navigation = useNavigation();
+
   return (
     <LinearGradient
   colors={[
@@ -19,24 +22,24 @@ const HeaderHome: React.FC = () => {
   <View style={styles.contentRow}>
     {/* Search Input - chiếm toàn bộ còn lại */}
     <View style={styles.searchWrapper}>
-      <Image source={require('../assets/search.png')} style={styles.iconLeft} />
+      <Image source={require('../../assets/search.png')} style={styles.iconLeft} />
       <TextInput
         placeholder="Happy Bedding"
         placeholderTextColor="#999"
         style={styles.input}
       />
       <TouchableOpacity>
-        <Image source={require('../assets/camera.png')} style={styles.iconRight} />
+        <Image source={require('../../assets/camera.png')} style={styles.iconRight} />
       </TouchableOpacity>
     </View>
 
     {/* 2 icon bên ngoài */}
     <View style={styles.rightIcons}>
-      <TouchableOpacity >
-        <Image source={require('../assets/cart.png')} style={styles.outIconImg} />
+      <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
+        <Image source={require('../../assets/cart.png')} style={styles.outIconImg} />
       </TouchableOpacity>
       <TouchableOpacity style={styles.outIcon}>
-        <Image source={require('../assets/icon_bell_on.png')} style={styles.outIconImg} />
+        <Image source={require('../../assets/icon_bell_on.png')} style={styles.outIconImg} />
       </TouchableOpacity>
     </View>
   </View>
