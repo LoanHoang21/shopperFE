@@ -2,8 +2,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from '../screens/Home';
 import Order from '../screens/Order';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
+import CompareScreen from '../screens/CompareScreen';
+import CompareResultScreen from '../screens/CompareResultScreen';
+import SearchScreen from '../components/HeaderHome'
 import HeaderHome from './HeaderHome';
 import Icon from '@react-native-vector-icons/ant-design';
+import { RootStackParamList } from '../types/route';
+
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -12,7 +17,7 @@ const RouterMain = () => {
             <Stack.Screen
                 name="home"
                 component={Home}
-                options={{ header: () =>  <HeaderHome /> }}
+                options={{ header: () => <HeaderHome /> }}
             />
             <Stack.Screen
                 name="order"
@@ -44,6 +49,20 @@ const RouterMain = () => {
                     ),
                 }}
             />
+            <Stack.Screen
+                name="compare"
+                component={CompareScreen}
+                options={{ title: 'So sánh' }}
+            />
+            <Stack.Screen
+                name="compareResult"
+                component={CompareResultScreen}
+                options={{ title: 'Kết quả so sánh' }}
+            />
+            <Stack.Screen name="search" component={SearchScreen} />
+
+
+
         </Stack.Navigator>
     );
 };

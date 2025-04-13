@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../components/navigation/AppNavigation';
+// import { RootStackParamList } from '../components/navigation/AppNavigation';
 
 type OrderRouteProp = RouteProp<RootStackParamList, 'order'>;
 

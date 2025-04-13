@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 export interface Product {
   title: string;
@@ -12,23 +13,34 @@ export interface Product {
 
 interface Props {
   item: Product;
+  onPress?: () => void;
 }
 
-const ProductCard: React.FC<Props> = ({ item }) => {
+const ProductCard: React.FC<Props> = ({ item, onPress }) => {
+  const navigation = useNavigation();
+
+  const handlePress = () => {
+    if (onPress) {
+      onPress(); // ưu tiên dùng prop nếu có
+    } else {
+      navigation.navigate('productDetail', { product: item });
+    }
+  };
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={handlePress}>
       <Image source={{ uri: item.image }} style={styles.image} />
-      <Text numberOfLines={2} style={styles.title}>{item.title}</Text>
-      <Text style={styles.price}>
-        đ{item.price} <Text style={styles.oldPrice}>đ{item.oldPrice}</Text>
-      </Text>
+      <Text style={styles.title}>{item.title}</Text>
+      <Text style={styles.price}>đ{item.price}</Text>
+      <Text style={styles.oldPrice}>đ{item.oldPrice}</Text>
       <View style={styles.meta}>
         <Text style={styles.tag}>{item.tag}</Text>
         <Text style={styles.rating}>⭐ {item.rating}/5</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
+
 
 export default ProductCard;
 

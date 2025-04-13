@@ -1,8 +1,14 @@
+import { Product } from '../components/ProductCard';
+
 type RootStackParamList = {
     home: undefined;
     order: { id: number };
     cart: undefined;
-    productDetail: undefined;
+    productDetail: { product: Product };    
+    compare: { products: Product[] };
+    compareResult: { products: Product[] };
+    search: undefined;
+
     // Feed: { sort: 'latest' | 'top' } | undefined;
 };
 

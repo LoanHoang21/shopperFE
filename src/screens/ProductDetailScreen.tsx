@@ -10,149 +10,176 @@ import {
     Dimensions
 } from 'react-native';
 import Icon from '@react-native-vector-icons/ant-design';
-const productWidth = (Dimensions.get('window').width - 48) / 2;
+import ProductCard from '../components/ProductCard';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../types/route';
 
+type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
+
+
+const productWidth = (Dimensions.get('window').width - 48) / 2;
 const sampleProducts = [
     {
         id: '1',
-        image: require('../assets/images/product_image.png'),
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
         title: 'Bộ ga gối và vỏ chăn Cotton',
         price: '169.000₫',
         oldPrice: '300.000₫',
         shop: 'Happy Bedding',
         rating: '4.5',
+        tag: 'Cotton cao cấp'
     },
     {
         id: '2',
-        image: require('../assets/images/product_image.png'),
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
         title: 'Bộ ga mẫu mới 2024',
         price: '169.000₫',
         oldPrice: '300.000₫',
         shop: 'Chăn ga HD',
         rating: '4.5',
+        tag: 'Cotton cao cấp'
     },
     {
         id: '3',
-        image: require('../assets/images/product_image.png'),
-        title: 'Chăn cotton mềm mại',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
+        title: 'Bộ ga gối và vỏ chăn Cotton',
         price: '169.000₫',
         oldPrice: '300.000₫',
-        shop: 'Bad Bedding',
+        shop: 'Happy Bedding',
         rating: '4.5',
+        tag: 'Cotton cao cấp'
     },
     {
         id: '4',
-        image: require('../assets/images/product_image.png'),
-        title: 'Set chăn gối cute',
+        image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
+        title: 'Bộ ga mẫu mới 2024',
         price: '169.000₫',
         oldPrice: '300.000₫',
-        shop: 'Chăn ga Pre',
+        shop: 'Chăn ga HD',
         rating: '4.5',
+        tag: 'Cotton cao cấp'
     },
 ];
 
-const ProductCard = ({ item }: { item: any }) => (
-    <View style={styles.card}>
-        <Image source={item.image} style={styles.cardImage} />
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <Text style={styles.cardPrice}>
-            {item.price}{' '}
-            <Text style={styles.oldPrice}>{item.oldPrice}</Text>
-        </Text>
-        <View style={styles.cardFooter}>
-            <Text style={styles.cardShop}>{item.shop}</Text>
-            <Text style={styles.cardRating}>⭐ {item.rating}</Text>
-        </View>
-    </View>
-);
-
-
 
 const ProductDetailScreen = () => {
+    const scrollRef = React.useRef<ScrollView>(null);
+    const route = useRoute<ProductDetailRouteProp>();
+    const { product } = route.params;
+    React.useEffect(() => {
+        if (scrollRef.current) {
+          scrollRef.current.scrollTo({ y: 0, animated: true });
+        }
+      }, [product]);
+      
+    const navigation = useNavigation();
+    const [showAlert, setShowAlert] = React.useState(false);
+
+    const handleAddToCart = () => {
+        setShowAlert(true);
+        setTimeout(() => setShowAlert(false), 2000); // Ẩn sau 2 giây
+    };
+
+    const handleCompare = () => {
+        navigation.navigate('compare', { products: [product] });
+    };
+
     return (
-        <ScrollView style={styles.container}>
-            {/* Hình ảnh sản phẩm */}
-            <Image source={require('../assets/images/product_image.png')} style={styles.image} />
+        <View style={{ flex: 1 }}>
+            <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
+                {/* Phần nội dung cuộn */}
+                <Image source={{ uri: product.image }} style={styles.image} />
 
-            {/* Thông tin sản phẩm */}
-            <View style={styles.infoContainer}>
-                {/* Giá sản phẩm */}
-                <View style={styles.priceRow}>
-                    <Text style={styles.salePrice}>169.000₫</Text>
-                    <Text style={styles.oldPrice}>300.000₫</Text>
-                </View>
+                {/* Thông tin sản phẩm */}
+                <View style={styles.infoContainer}>
+                    <View style={styles.priceRow}>
+                        <Text style={styles.salePrice}>đ{product.price}</Text>
+                        <Text style={styles.oldPrice}>đ{product.oldPrice}</Text>
+                    </View>
 
-                {/* Tên sản phẩm */}
-                <Text style={styles.name}>Bộ ga gối và vỏ chăn Cotton</Text>
+                    <Text style={styles.name}>{product.title}</Text>
 
-                {/* Tên shop */}
-                <View style={styles.iconRow}>
-                    <Icon name="shop" size={16} color="#f50057" />
-                    <Text style={styles.shop}> ONATEX VN Cosmetics & Candles</Text>
+                    <View style={styles.iconRow}>
+                        <Icon name="shop" size={20} color="#f50057" />
+                        <Text style={styles.shop}> {product.tag}</Text>
+                    </View>
+
+                    <View style={styles.separator} />
+
+                    <View style={styles.deliveryRow}>
+                        <Icon name="car" size={24} color="#00c853" />
+                        <View style={styles.deliveryTextBlock}>
+                            <Text style={styles.deliveryLine1}>Nhận hàng từ 2 Th03 - 6 Th03</Text>
+                            <Text style={styles.deliveryLine2}>Miễn phí vận chuyển</Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.separator} />
+
+                    <View style={styles.iconRow}>
+                        <Icon name="star" size={18} color="#fdd835" />
+                        <Text style={{ marginLeft: 10 }}>4.9/5   Đánh giá sản phẩm (256)</Text>
+                    </View>
+
+                    <View style={styles.separator} />
+
+                    <Text style={styles.bold}>Mô tả chi tiết về sản phẩm</Text>
+                    <View style={styles.separator} />
+                    <Text style={styles.description}>Sản phẩm được làm từ cotton cao cấp, mềm mại, thấm hút tốt và thân thiện với da. Thiết kế sang trọng, phù hợp mọi không gian phòng ngủ.</Text>
                 </View>
 
                 <View style={styles.separator} />
 
-                {/* Giao hàng */}
-                <View style={styles.deliveryRow}>
-                    <Icon name="car" size={24} color="#00c853" />
-                    <View style={styles.deliveryTextBlock}>
-                        <Text style={styles.deliveryLine1}>Nhận hàng từ 2 Th03 - 6 Th03</Text>
-                        <Text style={styles.deliveryLine2}>Miễn phí vận chuyển</Text>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Sản phẩm tương tự</Text>
+                    <FlatList
+                        data={sampleProducts}
+                        numColumns={2}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => <ProductCard item={item}
+                            onPress={() => navigation.navigate('productDetail', { product: item })} />}
+                        columnWrapperStyle={{ justifyContent: 'space-between' }}
+                        scrollEnabled={false}
+                    />
+                </View>
+
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Sản phẩm nổi bật</Text>
+                    <FlatList
+                        data={sampleProducts}
+                        numColumns={2}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => <ProductCard item={item} onPress={() => navigation.navigate('productDetail', { product: item })} />}
+                        columnWrapperStyle={{ justifyContent: 'space-between' }}
+                        scrollEnabled={false}
+                    />
+                </View>
+            </ScrollView>
+            <View style={styles.fixedBottomBar}>
+                <TouchableOpacity style={styles.buyBtn} onPress={handleCompare}>
+                    <Text style={{ color: 'white' }}>So sánh thêm</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.buyBtn}>
+                    <Text style={{ color: 'white' }}>Mua hàng</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.cartIconBtn} onPress={handleAddToCart}>
+                    <Icon name="shopping-cart" size={22} color="white" />
+                </TouchableOpacity>
+            </View>
+            {showAlert && (
+                <View style={styles.overlay}>
+                    <View style={styles.popup}>
+                        <Text style={styles.popupTitle}>Thông báo</Text>
+                        <Text style={styles.popupText}>✅ Thêm sản phẩm vào giỏ hàng thành công</Text>
                     </View>
                 </View>
+            )}
 
-
-                <View style={styles.separator} />
-
-                {/* Đánh giá */}
-                <View style={styles.iconRow}>
-                    <Icon name="star" size={18} color="#fdd835" />
-                    <Text style={{ marginLeft: 10 }}>4.9/5   Đánh giá sản phẩm (256)</Text>
-                </View>
-
-                <View style={styles.separator} />
-
-                {/* Mô tả sản phẩm */}
-                <Text style={styles.bold}>Mô tả chi tiết về sản phẩm</Text>
-                <View style={styles.separator} />
-                <Text style={styles.description}>Sản phẩm được làm từ cotton cao cấp, mềm mại, thấm hút tốt và thân thiện với da. Thiết kế sang trọng, phù hợp mọi không gian phòng ngủ.</Text>
-            </View>
-
-            {/* Nút hành động */}
-            <View style={styles.buttonRow}>
-                <TouchableOpacity style={styles.compareBtn}><Text>So sánh thêm</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.buyBtn}><Text style={{ color: 'white' }}>Mua hàng</Text></TouchableOpacity>
-            </View>
-
-            {/* Sản phẩm tương tự */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Sản phẩm tương tự</Text>
-                <FlatList
-                    data={sampleProducts}
-                    numColumns={2}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => <ProductCard item={item} />}
-                    columnWrapperStyle={{ justifyContent: 'space-between' }}
-                    scrollEnabled={false}
-                />
-            </View>
-
-            {/* Sản phẩm nổi bật */}
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Sản phẩm nổi bật</Text>
-                <FlatList
-                    data={sampleProducts}
-                    numColumns={2}
-                    keyExtractor={(item) => item.id + '-hot'}
-                    renderItem={({ item }) => <ProductCard item={item} />}
-                    columnWrapperStyle={{ justifyContent: 'space-between' }}
-                    scrollEnabled={false}
-                />
-            </View>
-        </ScrollView>
+        </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: { backgroundColor: 'white' },
@@ -174,6 +201,28 @@ const styles = StyleSheet.create({
     },
     section: { marginTop: 24, paddingHorizontal: 16 },
     sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 8 },
+
+    fixedBottomBar: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+        backgroundColor: 'white',
+        borderTopWidth: 1,
+        borderColor: '#ddd',
+    },
+
+    cartIconBtn: {
+        backgroundColor: '#f50057',
+        padding: 10,
+        borderRadius: 8,
+        marginLeft: 8,
+    },
+
 
     card: {
         backgroundColor: '#fff',
@@ -257,7 +306,7 @@ const styles = StyleSheet.create({
     },
     shop: {
         color: '#f50057',
-        fontSize: 14,
+        fontSize: 20,
         fontWeight: '500',
     },
     bold: {
@@ -270,6 +319,38 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 20,
     },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 100,
+    },
+
+    popup: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderRadius: 10,
+        elevation: 10,
+        minWidth: 250,
+        alignItems: 'center',
+    },
+
+    popupTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 8,
+    },
+
+    popupText: {
+        fontSize: 14,
+        color: 'green',
+    },
+
     priceRow: {
         flexDirection: 'row',
         alignItems: 'center',
