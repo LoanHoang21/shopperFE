@@ -2,6 +2,7 @@ type RootStackParamList = {
     home: undefined;
     order: { id: number };
     cart: undefined;
+    productDetail: undefined;
     // Feed: { sort: 'latest' | 'top' } | undefined;
 };
 
