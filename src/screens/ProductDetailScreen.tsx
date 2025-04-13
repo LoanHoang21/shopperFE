@@ -69,10 +69,10 @@ const ProductDetailScreen = () => {
     const { product } = route.params;
     React.useEffect(() => {
         if (scrollRef.current) {
-          scrollRef.current.scrollTo({ y: 0, animated: true });
+            scrollRef.current.scrollTo({ y: 0, animated: true });
         }
-      }, [product]);
-      
+    }, [product]);
+
     const navigation = useNavigation();
     const [showAlert, setShowAlert] = React.useState(false);
 

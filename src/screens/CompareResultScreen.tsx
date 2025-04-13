@@ -15,7 +15,7 @@ import { Product } from '../components/ProductCard';
 
 const screenWidth = Dimensions.get('window').width;
 const CARD_MARGIN = 8;
-const CARD_WIDTH = (screenWidth - CARD_MARGIN * 2) / 2;
+
 
 type ResultRouteProp = RouteProp<RootStackParamList, 'compareResult'>;
 
@@ -28,7 +28,13 @@ const CompareResultScreen = () => {
             parseInt(a.price.replace(/\D/g, '')) -
             parseInt(b.price.replace(/\D/g, ''))
     );
+    const CARD_WIDTH = sorted.length <= 2
+        ? (screenWidth - CARD_MARGIN * (sorted.length + 1)) / sorted.length
+        : (screenWidth - CARD_MARGIN * 2) / 2;
     const cheapestProduct = sorted[0];
+    const columnWidth = 120; // hoặc tuỳ bạn muốn rộng bao nhiêu mỗi cột
+    const tableWidth = 100 + sorted.length * columnWidth;
+
     const [selectedShop, setSelectedShop] = React.useState<string>(
         sorted[0]?.tag
     );
@@ -41,7 +47,11 @@ const CompareResultScreen = () => {
                 horizontal
                 keyExtractor={(item, index) => index.toString()}
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{ paddingLeft: 0, paddingRight: 0 }}
+                contentContainerStyle={{
+                    paddingLeft: CARD_MARGIN,
+                    paddingRight: CARD_MARGIN,
+                    justifyContent: sorted.length <= 2 ? 'center' : 'flex-start',
+                }}
                 renderItem={({ item }) => (
                     <View style={{ width: CARD_WIDTH, marginRight: CARD_MARGIN }}>
                         <ProductCardCompare
@@ -97,8 +107,8 @@ const CompareResultScreen = () => {
             </View>
 
             {/* Bảng so sánh thông tin */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                <View style={styles.compareTable}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 16 }}>
+                <View style={[styles.compareTable, { width: tableWidth }]}>
                     <View style={styles.tableRow}>
                         <Text style={styles.cellHeader}>Cửa hàng</Text>
                         {sorted.map((item, idx) => (
@@ -175,38 +185,39 @@ const styles = StyleSheet.create({
     },
     promoList: { gap: 4 },
     compareTable: {
-        marginTop: 24,
         borderWidth: 1,
         borderColor: '#ddd',
         borderRadius: 6,
         overflow: 'hidden',
+        backgroundColor: 'white',
+        padding: 12,
     },
     tableRow: { flexDirection: 'row', padding: 8, backgroundColor: '#fff' },
     cellHeader: { width: 100, fontWeight: 'bold' },
     cell: {
-        minWidth: 100,  // 👈 thêm để đảm bảo đủ khoảng trống
-        fontSize: 13,
-        paddingHorizontal: 4,
-    },
+    minWidth: 100,  // 👈 thêm để đảm bảo đủ khoảng trống
+    fontSize: 13,
+    paddingHorizontal: 4,
+},
     buyRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: 24,
-    },
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 24,
+},
     promoBox: {
-        backgroundColor: '#fff',
-        padding: 12,
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: '#eee',
-        gap: 4,
-        marginTop: 12,
-    },
+    backgroundColor: '#fff',
+    padding: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#eee',
+    gap: 4,
+    marginTop: 12,
+},
 
     buyBtn: {
-        backgroundColor: '#f50057',
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderRadius: 8,
-    },
+    backgroundColor: '#f50057',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+},
 });

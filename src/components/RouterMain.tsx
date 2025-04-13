@@ -4,10 +4,12 @@ import Order from '../screens/Order';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import CompareScreen from '../screens/CompareScreen';
 import CompareResultScreen from '../screens/CompareResultScreen';
-import SearchScreen from '../components/HeaderHome'
+import SearchScreen from '../screens/SearchScreen'
 import HeaderHome from './HeaderHome';
 import Icon from '@react-native-vector-icons/ant-design';
 import { RootStackParamList } from '../types/route';
+import SearchResultScreen from '../screens/SearchResultScreen'
+import { Text } from 'react-native';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -32,34 +34,82 @@ const RouterMain = () => {
             <Stack.Screen
                 name="productDetail"
                 component={ProductDetailScreen}
-                options={{
-                    headerLeft: () => null, // ❌ Ẩn nút back
-                    headerTitle: '',        // ❌ Ẩn title "productDetail"
-                    headerRight: () => (
+                options={({ navigation }) => ({
+                    headerTitle: '',
+                    headerLeft: () => (
                         <Icon
-                            name='shopping-cart'
-                            size={24}
-                            color="black"
-                            style={{ marginRight: 16 }}
-                            onPress={() => {
-                                // 👉 Navigate đến giỏ hàng nếu cần:
-                                // navigation.navigate('cart');
-                            }}
+                            name="arrow-left"
+                            size={26}
+                            color="#f50057"
+                            style={{ marginLeft: 16 }}
+                            onPress={() => navigation.goBack()}
                         />
                     ),
-                }}
+                    headerRight: () => (
+                        <Icon
+                            name="shopping-cart"
+                            size={28} // 👉 tăng kích thước
+                            color="#f50057"
+                            style={{ marginRight: 0 }}
+                            onPress={() => navigation.navigate('cart')}
+                        />
+                    ),
+                })}
             />
             <Stack.Screen
                 name="compare"
                 component={CompareScreen}
-                options={{ title: 'So sánh' }}
+                options={({ navigation }) => ({
+                    headerLeft: () => (
+                        <Icon
+                            name="arrow-left"
+                            size={24}
+                            color="#f50057"
+                            style={{ marginLeft: 16 }}
+                            onPress={() => navigation.goBack()}
+                        />
+                    ),
+                    headerTitle: () => (
+                        <Text style={{ color: '#f50057', fontSize: 18, fontWeight: 'bold', marginLeft: 8 }}>
+                            So sánh
+                        </Text>
+                    ),
+                })}
             />
+
             <Stack.Screen
                 name="compareResult"
                 component={CompareResultScreen}
-                options={{ title: 'Kết quả so sánh' }}
+                options={({ navigation }) => ({
+                    headerLeft: () => (
+                        <Icon
+                            name="arrow-left"
+                            size={24}
+                            color="#f50057"
+                            style={{ marginLeft: 16 }}
+                            onPress={() => navigation.goBack()}
+                        />
+                    ),
+                    headerTitle: () => (
+                        <Text style={{ color: '#f50057', fontSize: 18, fontWeight: 'bold', marginLeft: 8 }}>
+                            Kết quả so sánh
+                        </Text>
+                    ),
+                })}
             />
-            <Stack.Screen name="search" component={SearchScreen} />
+
+
+            <Stack.Screen
+                name="search"
+                component={SearchScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="searchResult"
+                component={SearchResultScreen}
+                options={{ headerShown: false }}
+            />
+
 
 
 
