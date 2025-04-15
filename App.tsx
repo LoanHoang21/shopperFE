@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+
 // import AppNavigation from './src/components/navigation/AppNavigation';
 import Loading from './src/screens/Loading';
 import RouterMain from './src/components/RouterMain';
@@ -31,7 +32,6 @@ const App = () => {
         <NavigationContainer>
           {isLoading ? <Loading /> : <RouterMain/>}
         </NavigationContainer>
-        {/* {isLoading ? <Loading /> : <Notification/>} */}
       </SafeAreaView>
     </CartProvider>
   );

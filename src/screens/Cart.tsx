@@ -21,11 +21,10 @@ const CartScreen: React.FC = () => {
   const [showToast, setShowToast] = React.useState(false);
   const [showOutOfStock, setShowOutOfStock] = React.useState(false);
 
-
   // const hasChecked = items.some((item) => item.checked);
 
   const selectedItems = items.filter(item => item.checked);
-const totalAmount = selectedItems.reduce(
+  const totalAmount = selectedItems.reduce(
   (sum, item) => sum + item.price * item.quantity,
   0
 );
