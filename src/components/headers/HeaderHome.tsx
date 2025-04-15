@@ -3,6 +3,7 @@ import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-nati
 import LinearGradient from 'react-native-linear-gradient';
 import ScanAndTrackBar from '../navigation/ScanAndTrackBar';
 import { useNavigation } from '@react-navigation/native';
+import Icon from '@react-native-vector-icons/ant-design';
 
 const HeaderHome: React.FC = () => {
 
@@ -34,8 +35,11 @@ const HeaderHome: React.FC = () => {
           <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
             <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.outIcon}>
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notification')}>
             <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('')}>
+            <Icon name='user' size={24} color={'white'}/>
           </TouchableOpacity>
         </View>
       </View>

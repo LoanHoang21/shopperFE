@@ -75,7 +75,7 @@ const BeforeLogin = () => {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.registerButton} onPress={() => { navigation.navigate('register'); }}>
-            <Icon name="user-add" size={25} color="#F1215A"/>
+            <Icon name="user" size={25} color="#F1215A"/>
             <Text style={styles.registerText}>Đăng Ký</Text>
           </TouchableOpacity>
         </View>

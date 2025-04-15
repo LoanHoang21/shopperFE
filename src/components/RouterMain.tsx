@@ -7,6 +7,13 @@ import Register from '../screens/Register';
 import HeaderHome from './headers/HeaderHome';
 import Home from '../screens/Home';
 import CartScreen from '../screens/Cart';
+import Notification from '../screens/Notification';
+import { StyleSheet } from 'react-native';
+import HeaderNotification from './headers/HeaderNotification';
+import PromotionNotification from '../screens/PromotionNotification';
+import UpdateOrder from '../screens/UpdateOrder';
+import HeaderUpdateOrder from './headers/HeaderUpdateOrder';
+// import HeaderUpdateOrder from './headers/HeaderUpdateOrder';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -43,6 +50,21 @@ const RouterMain = () => {
                 name="cart"
                 component={CartScreen}
                 options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="notification"
+                component={Notification}
+                options={{ header: () => <HeaderNotification/> }}
+            />
+            <Stack.Screen
+                name="promotionNotification"
+                component={PromotionNotification}
+                // options={{ header: () => <HeaderNotification/> }}
+            />
+            <Stack.Screen
+                name="updateOrder"
+                component={UpdateOrder}
+                options={{header: () => <HeaderUpdateOrder/>}}
             />
         </Stack.Navigator>
     );

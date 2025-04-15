@@ -4,6 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 // import AppNavigation from './src/components/navigation/AppNavigation';
 import Loading from './src/screens/Loading';
 import RouterMain from './src/components/RouterMain';
+// import UpdateOrder from './src/screens/Notification';
+// import Notification from './src/screens/Notification';
+import { CartProvider } from './src/context/CartContext';
 
 const App = () => {
 
@@ -18,16 +21,19 @@ const App = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
-      <StatusBar
-        backgroundColor="#ffffff"
-        // barStyle="dark-content"
-        animated={true}
-      />
-      <NavigationContainer>
-        {isLoading ? <Loading /> : <RouterMain/>}
-      </NavigationContainer>
-    </SafeAreaView>
+    <CartProvider>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
+        <StatusBar
+          backgroundColor="#ffffff"
+          barStyle="dark-content"
+          animated={true}
+        />
+        <NavigationContainer>
+          {isLoading ? <Loading /> : <RouterMain/>}
+        </NavigationContainer>
+        {/* {isLoading ? <Loading /> : <Notification/>} */}
+      </SafeAreaView>
+    </CartProvider>
   );
 };
 

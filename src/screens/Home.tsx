@@ -2,6 +2,7 @@ import React from 'react';
 import { View, FlatList, ScrollView, StyleSheet } from 'react-native';
 import ProductCard, { Product } from '../components/navigation/ProductCard';
 import QuickMenuItem from '../components/navigation/QuickMenuItem';
+import HomeBottom from '../components/bottomTab/HomeBottom';
 
 const menuData = [
   {
@@ -42,7 +43,8 @@ const data: Product[] = Array(20).fill({
 
 const HomeScreen: React.FC = () => {
   return (
-    <ScrollView style={styles.container}>
+    <>
+      <ScrollView style={styles.container}>
       {/* Menu */}
       <View style={styles.quickMenuRow}>
         {menuData.map((item, index) => (
@@ -66,6 +68,8 @@ const HomeScreen: React.FC = () => {
         keyExtractor={(_, i) => i.toString()}
       />
     </ScrollView>
+    {/* <HomeBottom/> */}
+    </>
   );
 };
 
