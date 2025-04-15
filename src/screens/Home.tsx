@@ -25,35 +25,35 @@
 
 // export default Home;
 import React from 'react';
-import { View, Text, FlatList, ScrollView, StyleSheet } from 'react-native';
-import MenuItem from '../components/MenuItem';
-import ProductCard, { Product } from '../components/ProductCard';
-import QuickMenuItem from '../components/QuickMenuItem';
+import { View, FlatList, ScrollView, StyleSheet } from 'react-native';
+import ProductCard, { Product } from '../components/navigation/ProductCard';
+import QuickMenuItem from '../components/navigation/QuickMenuItem';
+import HomeBottom from '../components/bottomTab/HomeBottom';
 
 const menuData = [
   {
     label: 'Thanh toán',
-    icon: require('../assets/pay.png'),
+    icon: require('../assets/images/pay.png'),
     borderColor: '#f44336',
   },
   {
     label: 'Food',
-    icon: require('../assets/food.png'),
+    icon: require('../assets/images/food.png'),
     borderColor: '#0d47a1',
   },
   {
     label: 'Mã giảm giá',
-    icon: require('../assets/voucher.png'),
+    icon: require('../assets/images/voucher.png'),
     borderColor: '#00bfa5',
   },
   {
     label: 'Top mua hàng',
-    icon: require('../assets/crown.png'),
+    icon: require('../assets/images/crown.png'),
     borderColor: '#fbc02d',
   },
   {
     label: 'Đơn hàng',
-    icon: require('../assets/order.png'),
+    icon: require('../assets/images/order.png'),
     borderColor: '#f06292',
   },
 ];
@@ -69,7 +69,8 @@ const data: Product[] = Array(20).fill({
 
 const HomeScreen: React.FC = () => {
   return (
-    <ScrollView style={styles.container}>
+    <>
+      <ScrollView style={styles.container}>
       {/* Menu */}
       <View style={styles.quickMenuRow}>
         {menuData.map((item, index) => (
@@ -93,6 +94,8 @@ const HomeScreen: React.FC = () => {
         keyExtractor={(_, i) => i.toString()}
       />
     </ScrollView>
+    {/* <HomeBottom/> */}
+    </>
   );
 };
 
