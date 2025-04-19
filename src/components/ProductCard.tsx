@@ -3,13 +3,16 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export interface Product {
-  title: string;
-  price: string;
-  oldPrice: string;
-  tag: string;
-  rating: string;
+  _id: string;
+  name: string;
   image: string;
+  price: number;
+  discount?: number;
+  rating_avg?: number;
+  short_description?: string;
+  description: string;
 }
+
 
 interface Props {
   item: Product;
@@ -29,14 +32,27 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
 
   return (
     <TouchableOpacity style={styles.card} onPress={handlePress}>
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.price}>đ{item.price}</Text>
-      <Text style={styles.oldPrice}>đ{item.oldPrice}</Text>
-      <View style={styles.meta}>
-        <Text style={styles.tag}>{item.tag}</Text>
-        <Text style={styles.rating}>⭐ {item.rating}/5</Text>
+      <Image
+        source={{ uri: item.image || 'https://via.placeholder.com/150' }}
+        style={styles.image}
+      />
+      <Text numberOfLines={2} style={styles.title}>{item.name}</Text>
+      <View style={styles.priceRow}>
+        <Text style={styles.price}>{item.price.toLocaleString()}₫</Text>
+        {item.discount ? (
+          <Text style={styles.oldPrice}>
+            {(item.price / (1 - item.discount / 100)).toLocaleString()}₫
+          </Text>
+        ) : null}
       </View>
+
+      {/* Tên shop giả định (hoặc bạn có thể truyền từ BE nếu muốn động) */}
+      <View style={styles.metaRow}>
+        <Text style={styles.shopName}>Chăn ga Pre</Text>
+        <Text style={styles.rating}>⭐ {item.rating_avg?.toFixed(1) || '0.0'}/5</Text>
+      </View>
+
+
     </TouchableOpacity>
   );
 };
@@ -45,6 +61,13 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
 export default ProductCard;
 
 const styles = StyleSheet.create({
+  metaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 4,
+  },
+
   card: {
     width: '48%',
     backgroundColor: '#fff',
@@ -63,16 +86,35 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 8,
   },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   price: {
     color: '#d50000',
-    marginTop: 4,
     fontWeight: 'bold',
+    marginRight: 6,
   },
   oldPrice: {
     textDecorationLine: 'line-through',
-    color: '#aaa',
+    color: '#888',
     fontSize: 12,
   },
+  shopName: {
+    fontSize: 12,
+    color: '#777',
+    marginTop: 4,
+  },
+  ratingRow: {
+    marginTop: 4,
+  },
+  rating: {
+    fontSize: 12,
+    color: '#ff9800',
+  },
+
+
   meta: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -81,8 +123,6 @@ const styles = StyleSheet.create({
   tag: {
     fontSize: 12,
   },
-  rating: {
-    fontSize: 12,
-    color: '#ff9800',
-  },
+
+
 });

@@ -8,6 +8,11 @@ type RootStackParamList = {
     compare: { products: Product[] };
     compareResult: { products: Product[] };
     search: undefined;
+    searchResult: {
+        query: string;
+        products: Product[];
+      };
+      
 
     // Feed: { sort: 'latest' | 'top' } | undefined;
 };

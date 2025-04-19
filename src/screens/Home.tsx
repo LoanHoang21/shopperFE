@@ -4,7 +4,8 @@ import { View, Text, FlatList, ScrollView, StyleSheet } from 'react-native';
 import MenuItem from '../components/MenuItem';
 import ProductCard, { Product } from '../components/ProductCard';
 import QuickMenuItem from '../components/QuickMenuItem';
-
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 const menuData = [
   {
     label: 'Thanh toán',
@@ -33,19 +34,28 @@ const menuData = [
   },
 ];
 
-const data: Product[] = Array(20).fill({
-  title: 'Bộ ga gối và vỏ chăn',
-  price: '169.000',
-  oldPrice: '205.000',
-  tag: 'Chăn ga Pre',
-  rating: '4.5',
-  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-});
+
 
 
 const HomeScreen: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://10.0.2.2:3001/api/product/getAll');
+
+
+        setProducts(response.data.data); // vì dữ liệu nằm trong `data.data`
+      } catch (error) {
+        console.error("Failed to fetch products", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {/* Menu */}
       <View style={styles.quickMenuRow}>
         {menuData.map((item, index) => (
@@ -57,19 +67,19 @@ const HomeScreen: React.FC = () => {
           />
         ))}
       </View>
-
+  
       {/* Product List */}
       <FlatList
-        data={data}
+        data={products}
         numColumns={2}
-        scrollEnabled={false}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
         contentContainerStyle={{ paddingTop: 16 }}
-        renderItem={({ item }) => <ProductCard item={item}  />}
-        keyExtractor={(_, i) => i.toString()}
+        renderItem={({ item }) => <ProductCard item={item} />}
+        keyExtractor={(item) => item._id}
       />
-    </ScrollView>
+    </View>
   );
+  
 };
 
 export default HomeScreen;
