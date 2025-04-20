@@ -1,8 +1,16 @@
-import React from 'react';
-import { View, FlatList, ScrollView, StyleSheet } from 'react-native';
-import ProductCard, { Product } from '../components/navigation/ProductCard';
+import React, {useEffect} from 'react';
+import {
+  View,
+  FlatList,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
+import ProductCard, {Product} from '../components/navigation/ProductCard';
 import QuickMenuItem from '../components/navigation/QuickMenuItem';
 import HomeBottom from '../components/bottomTab/HomeBottom';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {HandleNotification} from '../utils/handleNotification';
 
 const menuData = [
   {
@@ -38,37 +46,67 @@ const data: Product[] = Array(20).fill({
   oldPrice: '205.000',
   tag: 'Chăn ga Pre',
   rating: '4.5',
-  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
+  image:
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
 });
 
 const HomeScreen: React.FC = () => {
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
   return (
     <>
       <ScrollView style={styles.container}>
-      {/* Menu */}
-      <View style={styles.quickMenuRow}>
-        {menuData.map((item, index) => (
-          <QuickMenuItem
-            key={index}
-            icon={item.icon}
-            label={item.label}
-            borderColor={item.borderColor}
-          />
-        ))}
-      </View>
+        {/* Menu */}
+        <View style={styles.quickMenuRow}>
+          {menuData.map((item, index) => {
+            if (item.label === 'Đơn hàng') {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => navigation.navigate('order')}>
+                  <QuickMenuItem
+                    icon={item.icon}
+                    label={item.label}
+                    borderColor={item.borderColor}
+                  />
+                </TouchableOpacity>
+              );
+            } else if (item.label === 'Mã giảm giá') {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => navigation.navigate('voucher')}>
+                  <QuickMenuItem
+                    icon={item.icon}
+                    label={item.label}
+                    borderColor={item.borderColor}
+                  />
+                </TouchableOpacity>
+              );
+            } else {
+              return (
+                <QuickMenuItem
+                  key={index}
+                  icon={item.icon}
+                  label={item.label}
+                  borderColor={item.borderColor}
+                />
+              );
+            }
+          })}
+        </View>
 
-      {/* Product List */}
-      <FlatList
-        data={data}
-        numColumns={2}
-        scrollEnabled={false}
-        columnWrapperStyle={{ justifyContent: 'space-between' }}
-        contentContainerStyle={{ paddingTop: 16 }}
-        renderItem={({ item }) => <ProductCard item={item} />}
-        keyExtractor={(_, i) => i.toString()}
-      />
-    </ScrollView>
-    {/* <HomeBottom/> */}
+        {/* Product List */}
+        <FlatList
+          data={data}
+          numColumns={2}
+          scrollEnabled={false}
+          columnWrapperStyle={{justifyContent: 'space-between'}}
+          contentContainerStyle={{paddingTop: 16}}
+          renderItem={({item}) => <ProductCard item={item} />}
+          keyExtractor={(_, i) => i.toString()}
+        />
+      </ScrollView>
+      {/* <HomeBottom/> */}
     </>
   );
 };

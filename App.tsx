@@ -1,12 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StatusBar } from 'react-native';
+import { SafeAreaView, StatusBar} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 // import AppNavigation from './src/components/navigation/AppNavigation';
 import Loading from './src/screens/Loading';
-import RouterMain from './src/components/RouterMain';
+import RouterMain from './src/routers/RouterMain';
 // import UpdateOrder from './src/screens/Notification';
 // import Notification from './src/screens/Notification';
 import { CartProvider } from './src/context/CartContext';
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
+import messaging from '@react-native-firebase/messaging';
+import { useNotification } from './src/utils/handleNotification';
+import { setupNotificationListeners } from './src/utils/noti';
+
+const toastConfig = {
+  success: (props : any) => (
+    <BaseToast
+      {...props}
+      style={{ borderLeftColor: 'green' }}
+      contentContainerStyle={{ paddingHorizontal: 15, paddingVertical: 15, }}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: 'bold',
+      }}
+      text2NumberOfLines={0}
+      text2Style={{
+        fontSize: 14,
+        fontWeight: 'normal',
+        flexWrap: 'wrap',
+      }}
+    />
+  ),
+  error: (props: any) => (
+    <ErrorToast
+      style={{ borderLeftColor: 'red' }}
+      contentContainerStyle={{ paddingHorizontal: 15}}
+      {...props}
+      text1Style={{
+        fontSize: 16,
+        fontWeight: 'bold',
+      }}
+      text2NumberOfLines={0}
+      text2Style={{
+        fontSize: 14,
+        fontWeight: 'normal',
+        flexWrap: 'wrap',
+      }}
+    />
+  ),
+};
+
 
 const App = () => {
 
@@ -19,7 +61,8 @@ const App = () => {
 
     return () => clearTimeout(timer); // Clear timer nếu component unmount
   }, []);
-
+  setupNotificationListeners();
+  useNotification();
   return (
     <CartProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
@@ -30,8 +73,9 @@ const App = () => {
         />
         <NavigationContainer>
           {isLoading ? <Loading /> : <RouterMain/>}
+          <Toast config={toastConfig} />
+          {/* <Toast /> */}
         </NavigationContainer>
-        {/* {isLoading ? <Loading /> : <Notification/>} */}
       </SafeAreaView>
     </CartProvider>
   );

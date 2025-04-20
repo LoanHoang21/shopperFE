@@ -3,12 +3,16 @@ type RootStackParamList = {
     login: undefined;
     register: undefined;
     home: undefined;
-    order: { id: number };
+    order: { id: number } | undefined;
     cart: undefined;
     notification: undefined;
     promotionNotification: {id: number, type: string, desc: string, quantity: number} | undefined;
     // Feed: { sort: 'latest' | 'top' } | undefined;
     updateOrder: undefined;
+    profile: undefined;
+    voucher: undefined;
+    homeAdmin: undefined;
+    notiTypeAdmin: undefined;
 };
 
 declare global {

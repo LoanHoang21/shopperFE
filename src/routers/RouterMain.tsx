@@ -2,22 +2,25 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Order from '../screens/Order';
 import BeforeLogin from '../screens/BeforeLogin';
 import Login from '../screens/Login';
-import HeaderLogin from './headers/HeaderLogin';
+import HeaderLogin from '../components/headers/HeaderLogin';
 import Register from '../screens/Register';
-import HeaderHome from './headers/HeaderHome';
+import HeaderHome from '../components/headers/HeaderHome';
 import Home from '../screens/Home';
 import CartScreen from '../screens/Cart';
 import Notification from '../screens/Notification';
 import { StyleSheet } from 'react-native';
-import HeaderNotification from './headers/HeaderNotification';
+import HeaderNotification from '../components/headers/HeaderNotification';
 import PromotionNotification from '../screens/PromotionNotification';
 import UpdateOrder from '../screens/UpdateOrder';
-import HeaderUpdateOrder from './headers/HeaderUpdateOrder';
+import HeaderUpdateOrder from '../components/headers/HeaderUpdateOrder';
+import Profile from '../screens/Profile';
+import HomeAdmin from '../admin/screens/HomeAdmin';
+import NotiTypeAdmin from '../admin/screens/NotiTypeAdmin';
+import VoucherScreen from '../screens/Voucher';
 // import HeaderUpdateOrder from './headers/HeaderUpdateOrder';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
-
     return (
         // <Stack.Navigator screenOptions={{ headerShown: true }}>
         <Stack.Navigator>
@@ -37,9 +40,19 @@ const RouterMain = () => {
                 options={{header: () => <HeaderLogin/>}}
             />
             <Stack.Screen
+                name="homeAdmin"
+                component={HomeAdmin}
+                // options={{ header: () =>  <HeaderHome /> }}
+            />
+            <Stack.Screen
                 name="home"
                 component={Home}
                 options={{ header: () =>  <HeaderHome /> }}
+            />
+            <Stack.Screen
+                name="notiTypeAdmin"
+                component={NotiTypeAdmin}
+                // options={{ header: () =>  <HeaderHome /> }}
             />
             <Stack.Screen
                 name="order"
@@ -65,6 +78,16 @@ const RouterMain = () => {
                 name="updateOrder"
                 component={UpdateOrder}
                 options={{header: () => <HeaderUpdateOrder/>}}
+            />
+            <Stack.Screen
+                name="profile"
+                component={Profile}
+                // options={{header: () => <HeaderLogin/>}}
+            />
+            <Stack.Screen
+                name="voucher"
+                component={VoucherScreen}
+                options={{ title: "Mã giảm giá" }}
             />
         </Stack.Navigator>
     );

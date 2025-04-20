@@ -38,7 +38,7 @@ const HeaderHome: React.FC = () => {
           <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notification')}>
             <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('')}>
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('profile')}>
             <Icon name='user' size={24} color={'white'}/>
           </TouchableOpacity>
         </View>
