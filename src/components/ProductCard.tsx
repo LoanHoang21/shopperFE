@@ -41,8 +41,9 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
         <Text style={styles.price}>{item.price.toLocaleString()}₫</Text>
         {item.discount ? (
           <Text style={styles.oldPrice}>
-            {(item.price / (1 - item.discount / 100)).toLocaleString()}₫
+            {Math.ceil(item.price / (1 - item.discount / 100)).toLocaleString()}₫
           </Text>
+
         ) : null}
       </View>
 
@@ -85,6 +86,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 13,
     marginTop: 8,
+    height: 36,
   },
   priceRow: {
     flexDirection: 'row',
