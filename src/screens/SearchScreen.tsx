@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import Icon from '@react-native-vector-icons/ant-design';
 import { useNavigation } from '@react-navigation/native';
+import { Product } from '../components/ProductCard';
 
 const searchIcon = require('../assets/search.png');
 
@@ -37,22 +38,25 @@ const SearchScreen = () => {
     const [showMore, setShowMore] = useState(false);
 
     const handleSearch = (keyword: string) => {
-        const matchedProducts = searchSuggestions.map(item => ({
-            title: item.label,
+        const matchedProducts: Product[] = searchSuggestions.map((item, index) => ({
+            _id: index.toString(), // tạo id giả
+            name: item.label,
             image: item.image,
-            price: '169.000',
-            oldPrice: '250.000',
-            tag: 'Happy Bedding',
-            rating: '4.5',
+            price: 169000,
+            discount: 32,
+            rating_avg: 4.5,
+            short_description: 'Sản phẩm gợi ý',
+            description: 'Thông tin mô tả ngắn gọn của sản phẩm.',
         })).filter(p =>
-            p.title.toLowerCase().includes(keyword.toLowerCase())
+            p.name.toLowerCase().includes(keyword.toLowerCase())
         );
-
+    
         navigation.navigate('searchResult', {
             query: keyword,
             products: matchedProducts,
         });
     };
+    
 
     const visibleSuggestions = showMore ? keywordSuggestions : keywordSuggestions.slice(0, 4);
 

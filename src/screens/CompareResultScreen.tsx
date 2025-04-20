@@ -9,7 +9,7 @@ import {
     Dimensions,
 } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../types/route';
+import { RootStackParamList } from '../types/data';
 import ProductCardCompare from '../components/ProductCardCompare';
 import { Product } from '../components/ProductCard';
 
@@ -23,11 +23,8 @@ const CompareResultScreen = () => {
     const route = useRoute<ResultRouteProp>();
     const { products } = route.params;
 
-    const sorted = [...products].sort(
-        (a, b) =>
-            parseInt(a.price.replace(/\D/g, '')) -
-            parseInt(b.price.replace(/\D/g, ''))
-    );
+    const sorted = [...products].sort((a, b) => a.price - b.price);
+
     const CARD_WIDTH = sorted.length <= 2
         ? (screenWidth - CARD_MARGIN * (sorted.length + 1)) / sorted.length
         : (screenWidth - CARD_MARGIN * 2) / 2;
@@ -36,8 +33,9 @@ const CompareResultScreen = () => {
     const tableWidth = 100 + sorted.length * columnWidth;
 
     const [selectedShop, setSelectedShop] = React.useState<string>(
-        sorted[0]?.tag
-    );
+        sorted[0]?.short_description || ''
+      );
+      
 
     return (
         <ScrollView style={styles.container}>
@@ -56,7 +54,8 @@ const CompareResultScreen = () => {
                     <View style={{ width: CARD_WIDTH, marginRight: CARD_MARGIN }}>
                         <ProductCardCompare
                             item={item}
-                            isCheapest={item.title === cheapestProduct.title}
+                            isCheapest={item._id === cheapestProduct._id
+                            }
                         />
                     </View>
                 )}
@@ -73,7 +72,7 @@ const CompareResultScreen = () => {
                         {sorted.map((item, idx) => (
                             <TouchableOpacity
                                 key={idx}
-                                onPress={() => setSelectedShop(item.tag)}
+                                onPress={() => setSelectedShop(item.short_description)}
                                 style={[
                                     styles.shopTag,
                                     selectedShop === item.tag && {

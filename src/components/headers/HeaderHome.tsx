@@ -24,6 +24,7 @@ const HeaderHome: React.FC = () => {
             placeholder="Happy Bedding"
             placeholderTextColor="#999"
             style={styles.input}
+            onFocus={() => navigation.navigate('search')}
           />
           <TouchableOpacity>
             <Image source={require('../../assets/images/camera.png')} style={styles.iconRight} />

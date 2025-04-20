@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 export interface Product {
   _id: string;
   name: string;
-  image: string;
+  images?: string[];        // ✅ hỗ trợ nhiều ảnh (dữ liệu chính)
+  image?: string;
   price: number;
   discount?: number;
   rating_avg?: number;
   short_description?: string;
   description: string;
+  shop_name?: string;
 }
 
 
@@ -22,20 +25,31 @@ interface Props {
 const ProductCard: React.FC<Props> = ({ item, onPress }) => {
   const navigation = useNavigation();
 
-  const handlePress = () => {
+  const handlePress = async () => {
+    try {
+      // ✅ Gửi request tăng view trước
+      await axios.post(`http://10.0.2.2:3001/api/product/view/${item._id}`);
+     } catch (err) {
+      console.error((err as Error).message);
+    }
+    
+
+    // ✅ Sau đó mới điều hướng đến chi tiết sản phẩm
     if (onPress) {
-      onPress(); // ưu tiên dùng prop nếu có
+      onPress();
     } else {
       navigation.navigate('productDetail', { product: item });
     }
   };
 
+
   return (
     <TouchableOpacity style={styles.card} onPress={handlePress}>
       <Image
-        source={{ uri: item.image || 'https://via.placeholder.com/150' }}
+        source={{ uri: (item.images?.[0] || item.image) ?? 'https://via.placeholder.com/150' }}
         style={styles.image}
       />
+
       <Text numberOfLines={2} style={styles.title}>{item.name}</Text>
       <View style={styles.priceRow}>
         <Text style={styles.price}>{item.price.toLocaleString()}₫</Text>
@@ -49,7 +63,8 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
 
       {/* Tên shop giả định (hoặc bạn có thể truyền từ BE nếu muốn động) */}
       <View style={styles.metaRow}>
-        <Text style={styles.shopName}>Chăn ga Pre</Text>
+        <Text style={styles.shopName}>{item.shop_name}</Text>
+
         <Text style={styles.rating}>⭐ {item.rating_avg?.toFixed(1) || '0.0'}/5</Text>
       </View>
 

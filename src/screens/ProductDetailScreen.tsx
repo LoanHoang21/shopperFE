@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import Icon from '@react-native-vector-icons/ant-design';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../types/route';
+import { RootStackParamList } from '../types/data';
 import ProductCard from '../components/ProductCard';
+import { Dimensions } from 'react-native';
+
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
 
 const ProductDetailScreen = () => {
@@ -42,7 +44,19 @@ const ProductDetailScreen = () => {
     return (
         <View style={{ flex: 1 }}>
             <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
-                <Image source={{ uri: product.image || 'https://via.placeholder.com/300' }} style={styles.image} />
+                <FlatList
+                    data={Array.isArray(product.images) && product.images.length > 0 ? product.images : [product.image]}
+                    horizontal
+                    pagingEnabled
+                    keyExtractor={(item, index) => index.toString()}
+                    renderItem={({ item }) => (
+                        <Image
+                            source={{ uri: item || 'https://via.placeholder.com/300' }}
+                            style={styles.image}
+                        />
+                    )}
+                    showsHorizontalScrollIndicator={false}
+                />
 
                 <View style={styles.infoContainer}>
                     <View style={styles.priceRow}>
@@ -59,7 +73,7 @@ const ProductDetailScreen = () => {
 
                     <View style={styles.iconRow}>
                         <Icon name="shop" size={20} color="#f50057" />
-                        <Text style={styles.shop}> Chăn ga Pre</Text>
+                        <Text style={styles.shop}> {product.shop_name}</Text>
                     </View>
 
                     <View style={styles.separator} />
@@ -152,7 +166,12 @@ const ProductDetailScreen = () => {
 
 const styles = StyleSheet.create({
     container: { backgroundColor: 'white' },
-    image: { width: '100%', height: 250, resizeMode: 'cover' },
+    image: {
+        width: Dimensions.get('window').width,
+        height: 250,
+        resizeMode: 'cover',
+    },
+
     infoContainer: { padding: 16 },
     priceRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
     salePrice: { fontSize: 24, fontWeight: 'bold', color: '#f50057', marginRight: 8 },

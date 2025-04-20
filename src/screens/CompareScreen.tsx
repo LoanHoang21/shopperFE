@@ -9,8 +9,9 @@ import {
     Dimensions,
 } from 'react-native';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { RootStackParamList } from '../types/route';
+import { RootStackParamList } from '../types/data';
 import Icon from '@react-native-vector-icons/ant-design';
+import { Product } from '../components/ProductCard';
 
 const screenWidth = Dimensions.get('window').width;
 const itemWidth = (screenWidth - 48) / 2;
@@ -25,49 +26,20 @@ const CompareScreen = () => {
     const mainProduct = route.params.products[0];
 
     // Sản phẩm giả định
-    const fakeProducts = [
+    const fakeProducts: Product[] = [
         {
-            title: 'Chăn ga HD',
-            price: '169.000',
-            oldPrice: '300.000',
-            tag: 'Cửa hàng chăn ga',
-            rating: '4.5',
-            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
+          _id: '1',
+          name: 'Chăn ga HD',
+          image: 'https://...',
+          price: 169000,
+          discount: 30,
+          rating_avg: 4.5,
+          short_description: 'Chăn ga đẹp',
+          description: 'Mô tả chi tiết sản phẩm',
         },
-        {
-            title: 'Chăn ga Pre',
-            price: '169.000',
-            oldPrice: '300.000',
-            tag: 'Chăn ga Pre',
-            rating: '4.5',
-            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-        },
-        {
-            title: 'Bad Bedding',
-            price: '169.000',
-            oldPrice: '300.000',
-            tag: 'Bad Bedding',
-            rating: '4.5',
-            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-        },
-        {
-            title: 'Cửa hàng chăn ga',
-            price: '169.000',
-            oldPrice: '300.000',
-            tag: 'Chăn ga đẹp',
-            rating: '4.5',
-            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-        },
-        {
-            title: 'Happy Bedding',
-            price: '169.000',
-            oldPrice: '300.000',
-            tag: 'Happy Bedding',
-            rating: '4.5',
-            image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-        },
-    ];
-
+        
+      ];
+      
     const allProducts = [mainProduct, ...fakeProducts];
 
     const [selected, setSelected] = React.useState<string[]>([mainProduct.title]);

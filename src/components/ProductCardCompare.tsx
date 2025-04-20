@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Product } from './ProductCard';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types/route'; // đường dẫn đúng với dự án bạn
+import { RootStackParamList } from '../types/data'; // đường dẫn đúng với dự án bạn
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'compareResult'>;
 
@@ -35,14 +35,16 @@ const ProductCardCompare: React.FC<Props> = ({ item, isCheapest = false, onPress
                 )}
             </View>
 
-            <Text style={styles.title} numberOfLines={1}>{item.title}</Text>
-            <Text style={styles.price}>đ{item.price}</Text>
-            <Text style={styles.oldPrice}>đ{item.oldPrice}</Text>
+            <Text style={styles.title} numberOfLines={1}>{item.name}</Text>
+            <Text style={styles.price}>{item.price.toLocaleString()}₫</Text>
+            {item.discount && (
+                <Text style={styles.oldPrice}>
+                    {(Math.ceil(item.price / (1 - item.discount / 100))).toLocaleString()}₫
+                </Text>
+            )}
+            <Text style={styles.shop}>{item.short_description || 'Chăn ga Pre'}</Text>
+            <Text style={styles.rating}>⭐ {item.rating_avg?.toFixed(1) || '0.0'}/5</Text>
 
-            <View style={styles.meta}>
-                <Text style={styles.shop}>{item.tag}</Text>
-                <Text style={styles.rating}>⭐ {item.rating}/5</Text>
-            </View>
         </TouchableOpacity>
     );
 };

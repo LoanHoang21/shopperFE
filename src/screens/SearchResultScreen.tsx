@@ -14,7 +14,7 @@ import {
 import { StatusBar } from 'react-native';
 
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { RootStackParamList } from '../types/route';
+import { RootStackParamList } from '../types/data';
 import ProductCard, { Product } from '../components/ProductCard';
 import Icon from '@react-native-vector-icons/ant-design';
 
