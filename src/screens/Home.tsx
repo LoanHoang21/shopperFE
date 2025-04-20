@@ -1,35 +1,44 @@
 
+// import React from 'react';
+// import {View, Text, Button, StyleSheet} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+// import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+
 import React from 'react';
-import { View, Text, FlatList, ScrollView, StyleSheet } from 'react-native';
-import MenuItem from '../components/MenuItem';
-import ProductCard, { Product } from '../components/ProductCard';
-import QuickMenuItem from '../components/QuickMenuItem';
+
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+
+import { View, FlatList, ScrollView, StyleSheet, Text } from 'react-native';
+import ProductCard, { Product } from '../components/ProductCard';
+import QuickMenuItem from '../components/navigation/QuickMenuItem';
+import HomeBottom from '../components/bottomTab/HomeBottom';
+
+
 const menuData = [
   {
     label: 'Thanh toán',
-    icon: require('../assets/pay.png'),
+    icon: require('../assets/images/pay.png'),
     borderColor: '#f44336',
   },
   {
     label: 'Food',
-    icon: require('../assets/food.png'),
+    icon: require('../assets/images/food.png'),
     borderColor: '#0d47a1',
   },
   {
     label: 'Mã giảm giá',
-    icon: require('../assets/voucher.png'),
+    icon: require('../assets/images/voucher.png'),
     borderColor: '#00bfa5',
   },
   {
     label: 'Top mua hàng',
-    icon: require('../assets/crown.png'),
+    icon: require('../assets/images/crown.png'),
     borderColor: '#fbc02d',
   },
   {
     label: 'Đơn hàng',
-    icon: require('../assets/order.png'),
+    icon: require('../assets/images/order.png'),
     borderColor: '#f06292',
   },
 ];
@@ -38,8 +47,9 @@ const menuData = [
 
 
 const HomeScreen: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
 
+  const [products, setProducts] = useState<Product[]>([]);
+  const navigation = useNavigation();
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -67,7 +77,9 @@ const HomeScreen: React.FC = () => {
           />
         ))}
       </View>
-  
+
+
+      <Text onPress={() => navigation.navigate('payment')}>Sang Payment</Text>
       {/* Product List */}
       <FlatList
         data={products}
@@ -78,8 +90,9 @@ const HomeScreen: React.FC = () => {
         keyExtractor={(item) => item._id}
       />
     </View>
+
   );
-  
+
 };
 
 export default HomeScreen;
@@ -106,5 +119,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 16,
+    overflow: 'scroll',
   },
 });
