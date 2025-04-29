@@ -9,11 +9,11 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useCart, CartItemI } from '../context/CartContext';
-import CartItem from '../components/CartItem';
-import DeleteConfirmModal from '../components/DeleteConfirmModal';
-import ToastSuccess from '../components/ToastSuccess';
-import CartHeader from '../components/header/HeaderCart';
-import OutOfStockModal from '../components/OutOfStockModal';
+import CartItem from '../components/navigation/CartItem';
+import DeleteConfirmModal from '../components/navigation/DeleteConfirmModal';
+import ToastSuccess from '../components/navigation/ToastSuccess';
+import OutOfStockModal from '../components/navigation/OutOfStockModal';
+import CartHeader from '../components/headers/HeaderCart';
 
 const CartScreen: React.FC = () => {
   const { items, removeSelected } = useCart();
@@ -21,11 +21,10 @@ const CartScreen: React.FC = () => {
   const [showToast, setShowToast] = React.useState(false);
   const [showOutOfStock, setShowOutOfStock] = React.useState(false);
 
-
-  const hasChecked = items.some((item) => item.checked);
+  // const hasChecked = items.some((item) => item.checked);
 
   const selectedItems = items.filter(item => item.checked);
-const totalAmount = selectedItems.reduce(
+  const totalAmount = selectedItems.reduce(
   (sum, item) => sum + item.price * item.quantity,
   0
 );
@@ -50,7 +49,7 @@ const totalAmount = selectedItems.reduce(
             <CartHeader />
             <View style={styles.containerEmpty}>
                 <Image
-                source={require('../assets/cart_large.png')}
+                source={require('../assets/images/cart_large.png')}
                 style={styles.cartImage}
                 resizeMode="contain"
                 />
@@ -67,7 +66,6 @@ const totalAmount = selectedItems.reduce(
                 </LinearGradient>
             </View>
         </View>
-       
     );
   }
 
@@ -92,7 +90,7 @@ const totalAmount = selectedItems.reduce(
           <View key={brand} style={styles.group}>
             <View style={styles.brandRow}>
               <Image
-                source={require('../assets/store.png')}
+                source={require('../assets/images/store.png')}
                 style={styles.brandIcon}
               />
               <Text style={styles.brand}>{group.brand}</Text>

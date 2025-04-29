@@ -1,55 +1,53 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import ScanAndTrackBar from '../ScanAndTrackBar';
+import ScanAndTrackBar from '../navigation/ScanAndTrackBar';
 import { useNavigation } from '@react-navigation/native';
+import Icon from '@react-native-vector-icons/ant-design';
 
 const HeaderHome: React.FC = () => {
 
-    const navigation = useNavigation();
+  const navigation : any = useNavigation();
 
   return (
-    <LinearGradient
-  colors={[
-    'rgba(244, 35, 132, 1)',
-    'rgba(241, 33, 90, 1)',
-    'rgba(245, 85, 57, 1)',
-  ]}
-  start={{ x: 0, y: 0 }}
-  end={{ x: 1, y: 0 }}
-  style={styles.header}
->
-  <View style={styles.contentRow}>
-    {/* Search Input - chiếm toàn bộ còn lại */}
-    <View style={styles.searchWrapper}>
-      <Image source={require('../../assets/search.png')} style={styles.iconLeft} />
-      <TextInput
-        placeholder="Happy Bedding"
-        placeholderTextColor="#999"
-        style={styles.input}
-      />
-      <TouchableOpacity>
-        <Image source={require('../../assets/camera.png')} style={styles.iconRight} />
-      </TouchableOpacity>
-    </View>
+    <LinearGradient 
+      start={{x: 0, y: 0}}
+      end={{x: 0, y: 1}}
+      colors={['#F55539', '#F1215A', '#F42384']}
+      style={styles.header}
+    >
+      <View style={styles.contentRow}>
+        {/* Search Input - chiếm toàn bộ còn lại */}
+        <View style={styles.searchWrapper}>
+          <Image source={require('../../assets/images/search.png')} style={styles.iconLeft} />
+          <TextInput
+            placeholder="Happy Bedding"
+            placeholderTextColor="#999"
+            style={styles.input}
+          />
+          <TouchableOpacity>
+            <Image source={require('../../assets/images/camera.png')} style={styles.iconRight} />
+          </TouchableOpacity>
+        </View>
 
-    {/* 2 icon bên ngoài */}
-    <View style={styles.rightIcons}>
-      <TouchableOpacity onPress={() => navigation.navigate('cart')} >
-        <Image source={require('../../assets/cart.png')} style={styles.outIconImg} />
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.outIcon}>
-        <Image source={require('../../assets/icon_bell_on.png')} style={styles.outIconImg} />
-      </TouchableOpacity>
-    </View>
-  </View>
+        {/* 2 icon bên ngoài */}
+        <View style={styles.rightIcons}>
+          <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
+            <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notification')}>
+            <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('')}>
+            <Icon name='user' size={24} color={'white'}/>
+          </TouchableOpacity>
+        </View>
+      </View>
 
-  <View style={styles.scanOverlay}>
-    <ScanAndTrackBar />
-  </View>
-</LinearGradient>
-
-
+      <View style={styles.scanOverlay}>
+        <ScanAndTrackBar />
+      </View>
+    </LinearGradient>
   );
 };
 
