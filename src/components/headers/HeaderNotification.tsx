@@ -6,19 +6,21 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import AllReadModal from '../navigation/AllReadModal';
 import SettingModal from '../navigation/SettingNotiModal';
 
-type NotiRouteProp = RouteProp<RootStackParamList, 'promotionNotification'>;
+type NotiRouteProp = RouteProp<RootStackParamList, 'notiTypeDetails'>;
 type NavigationType = NativeStackNavigationProp<RootStackParamList>;
 
 interface HeaderNotificationProps {
   onOpenMarkAllModal?: () => void;
+  itemCount: number;
 }
 
-const HeaderNotification: React.FC<HeaderNotificationProps> = ({ onOpenMarkAllModal }) => {
+const HeaderNotification: React.FC<HeaderNotificationProps> = ({ onOpenMarkAllModal, itemCount }) => {
   const navigation = useNavigation<NavigationType>();
   const route = useRoute<NotiRouteProp>();
-  const id = route.params?.id;
-  const type = route.params?.type;
-  const quantity = route.params?.quantity;
+  // const {_id, name, quantity} = route.params;
+  const _id = route.params?._id;
+  const name = route.params?.name;
+  const sum = route.params?.sum;
   const [isActiveNoti, setIsActiveNoti] = useState(true);
   const [modalSettingNoti, setModalSettingNoti] = useState(false);
 
@@ -41,16 +43,16 @@ const HeaderNotification: React.FC<HeaderNotificationProps> = ({ onOpenMarkAllMo
         size={24}
         color="#ff3366"
         onPress={() => {
-          id === undefined
+          _id === undefined
             ? navigation.navigate('home')
-            : navigation.navigate('notification');
+            : navigation.navigate('notiType');
         }}
       />
       <Text style={styles.headerTitle}>
-        {id === undefined ? 'Thông báo (30)' : `${type} (${quantity})`}
+        {_id === undefined ? `Thông báo (${sum})` : `${name} (${itemCount})`}
       </Text>
       {/* <Icon name="bell" size={24} color="#ff3366" /> */}
-      {id === undefined ? (
+      {_id === undefined ? (
         <>
           <TouchableWithoutFeedback onPress={() => setModalSettingNoti(true)}>
             <Image

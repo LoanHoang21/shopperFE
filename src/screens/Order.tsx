@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {getAllOrderById, updateStatusOrder} from '../apis/Order';
-import { createNotification } from '../apis/Noti';
+import { createNotiOrder } from '../apis/Noti';
 
 // const API_BASE = 'http://localhost:3001/api/order'; // Đổi thành địa chỉ backend thật nếu cần
 
@@ -63,33 +63,6 @@ const Order = () => {
   const getNextStatusCode = (currentStatus: string) => {
     return statusFlow[currentStatus] || currentStatus;
   };
-
-  // const updateOrderStatus = async (orderId: string, currentStatus: string) => {
-  //   const nextStatus = getNextStatusCode(currentStatus);
-
-  //   if (nextStatus === currentStatus) {
-  //     Alert.alert(
-  //       'Thông báo',
-  //       'Đơn hàng đã hoàn tất không thể cập nhật tiếp.',
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     const res = await updateStatusOrder(orderId, nextStatus);
-  //     if (res.data && +res.data.EC === 0) {
-  //       Alert.alert('Thành công', 'Cập nhật trạng thái đơn hàng thành công.');
-  //       fetchOrders(); // Refresh list
-  //     } else {
-  //       Alert.alert(
-  //         'Lỗi',
-  //         res.data.EM || 'Không thể cập nhật trạng thái.',
-  //       );
-  //     }
-  //   } catch (error: any) {
-  //     Alert.alert('Lỗi', error.message || 'Có lỗi xảy ra khi cập nhật.');
-  //   }
-  // };
   const updateOrderStatus = async (orderId: string, currentStatus: string) => {
     const nextStatus = getNextStatusCode(currentStatus);
   
@@ -180,7 +153,7 @@ const Order = () => {
         // Gửi từng thông báo lên server
         for (const noti of notifications) {
           console.log(user._id, user._id, orderId, noti.name, noti.image, noti.description, fcmToken);
-          await createNotification(user._id, user._id, orderId, noti.name, noti.image, noti.description, fcmToken || '');
+          await createNotiOrder(user._id, user._id, orderId, noti.name, noti.image, noti.description, fcmToken || '');
         }
   
         Alert.alert('Thành công', 'Cập nhật trạng thái đơn hàng và gửi thông báo thành công.');

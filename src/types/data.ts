@@ -5,8 +5,8 @@ type RootStackParamList = {
     home: undefined;
     order: { id: number } | undefined;
     cart: undefined;
-    notification: undefined;
-    promotionNotification: {id: number, type: string, desc: string, quantity: number} | undefined;
+    notiType: undefined;
+    notiTypeDetails: {_id: string, name: string, sum: number} | undefined;
     // Feed: { sort: 'latest' | 'top' } | undefined;
     updateOrder: undefined;
     profile: undefined;

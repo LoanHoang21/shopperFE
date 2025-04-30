@@ -35,7 +35,7 @@ const HeaderHome: React.FC = () => {
           <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
             <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notification')}>
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notiType')}>
             <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('profile')}>

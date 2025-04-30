@@ -7,10 +7,9 @@ import Register from '../screens/Register';
 import HeaderHome from '../components/headers/HeaderHome';
 import Home from '../screens/Home';
 import CartScreen from '../screens/Cart';
-import Notification from '../screens/Notification';
-import { StyleSheet } from 'react-native';
+import NotiType from '../screens/NotiType';
 import HeaderNotification from '../components/headers/HeaderNotification';
-import PromotionNotification from '../screens/PromotionNotification';
+import NotiTypeDetails from '../screens/NotiTypeDetails';
 import UpdateOrder from '../screens/UpdateOrder';
 import HeaderUpdateOrder from '../components/headers/HeaderUpdateOrder';
 import Profile from '../screens/Profile';
@@ -65,13 +64,13 @@ const RouterMain = () => {
                 options={{ headerShown: false }}
             />
             <Stack.Screen
-                name="notification"
-                component={Notification}
+                name="notiType"
+                component={NotiType}
                 options={{ header: () => <HeaderNotification/> }}
             />
             <Stack.Screen
-                name="promotionNotification"
-                component={PromotionNotification}
+                name="notiTypeDetails"
+                component={NotiTypeDetails}
                 // options={{ header: () => <HeaderNotification/> }}
             />
             <Stack.Screen

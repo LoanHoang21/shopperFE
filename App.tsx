@@ -11,6 +11,7 @@ import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 import messaging from '@react-native-firebase/messaging';
 import { useNotification } from './src/utils/handleNotification';
 import { setupNotificationListeners } from './src/utils/noti';
+import { checkAndNotifyExpiringVouchers } from './src/utils/notiVoucher';
 
 const toastConfig = {
   success: (props : any) => (
@@ -61,8 +62,22 @@ const App = () => {
 
     return () => clearTimeout(timer); // Clear timer nếu component unmount
   }, []);
-  setupNotificationListeners();
+
+  // setupNotificationListeners();
   useNotification();
+
+  // useEffect(() => {
+  //   // Gọi 1 lần khi app mở
+  //   checkAndNotifyExpiringVouchers();
+  
+  //   // Gọi lại sau mỗi 10 phút nếu bạn muốn
+  //   const interval = setInterval(() => {
+  //     checkAndNotifyExpiringVouchers();
+  //   }, 2 * 60 * 1000); // 2 phút
+  
+  //   return () => clearInterval(interval); // Clear khi component unmount
+  // }, []);
+  
   return (
     <CartProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>

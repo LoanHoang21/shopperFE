@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   View,
   Text,
@@ -7,26 +7,91 @@ import {
   Image,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  RefreshControl,
 } from 'react-native';
 import Icon from '@react-native-vector-icons/ant-design';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
-// import PromotionNotification from './PromotionNotification';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {getAllNotiType, getQuantityNoti} from '../apis/NotiType'; // Giả định bạn có API gọi MongoDB ở đây
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-interface ITypeNoti {
-  id: number,
-  type: string,
-  desc: string,
-  quantity: number,
+interface INotiType {
+  _id: string;
+  image: string;
+  name: string;
+  description: string;
+  status: number;
+  createdAt: string;
+  updatedAt: string;
+  quantity: number;
 }
 
-const Notification = () => {
+const NotiType = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
-  const [typeNotis, setTypeNotis] = useState<ITypeNoti[]>([
-    {id: 1, type: 'Khuyến mãi', desc: 'Nạp đầy mã giảm giá tháng giờ vàng...', quantity: 20 },
-    {id: 2, type: 'Cập nhật', desc: 'Cập nhật ngay các chương trình siêu HOT...', quantity: 3},
-    {id: 3, type: 'Nhắc nhở', desc: 'Ưu đãi mua sắm sắp hết hạn. Xem ngay...', quantity: 1},
-  ]);
+  const [typeNotis, setTypeNotis] = useState<INotiType[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [expandedOrderIds, setExpandedOrderIds] = useState<number[]>([]);
+  const [userId, setUserId] = useState(null);
+  const [sumQuantity, setSumQuantity] = useState<number>(0);
+
+  const fetchUserId = async () => {
+    const userData = await AsyncStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      setUserId(user._id);
+      return user._id;
+    }
+    return null;
+  };
+  const fetchNotiTypesWithQuantity = async () => {
+    try {
+      const [userIdLocal, response] = await Promise.all([
+        fetchUserId(),
+        getAllNotiType(),
+      ]);
+
+      if (!userIdLocal) return;
+
+      const notiTypes = response.data.DT;
+
+      // Lấy số lượng thông báo cho từng loại
+      const notiWithQuantities = await Promise.all(
+        notiTypes.map(async (item: INotiType) => {
+          try {
+            const quantityRes = await getQuantityNoti(userIdLocal, item._id);
+            setSumQuantity(sumQuantity + quantityRes.data.DT);
+            console.log("Số lượng thông báo ứng với từng id type", quantityRes.data.DT);
+            return { ...item, quantity: quantityRes.data.DT || 0};
+          } catch (error) {
+            console.error('Lỗi khi lấy số lượng thông báo:', error);
+            return { ...item, quantity: 0};
+          }
+        })
+      );
+
+      setTypeNotis(notiWithQuantities);
+    } catch (error) {
+      console.error('Lỗi khi fetch dữ liệu:', error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchNotiTypesWithQuantity();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchNotiTypesWithQuantity().finally(() => setRefreshing(false));
+  }, []);
+
+  // const handleNotiTypeClick = (item: any) => {
+  //   navigation.navigate('notiTypeDetails', item);
+  // };
+
+  const toggleTimeline = (id: number) => {
+    setExpandedOrderIds(prev =>
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id],
+    );
+  };
 
   const orderUpdates = [
     {
@@ -72,67 +137,61 @@ const Notification = () => {
       ],
     },
   ];
-  
-  const [expandedOrderIds, setExpandedOrderIds] = useState<number[]>([]);
-  
-  const toggleTimeline = (id: number) => {
-    setExpandedOrderIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
 
   return (
     <View style={styles.container}>
-      
-    <ScrollView >
-      
-
-      <View style={{paddingHorizontal: 10,}}>
-        
-            <View style={styles.quickList}>
-                {typeNotis.map(item => (
-                <TouchableOpacity key={item.id} onPress={() => {navigation.navigate("promotionNotification", item)}}>
-                <View style={styles.quickItem}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        <View style={{paddingHorizontal: 10}}>
+          <View style={styles.quickList}>
+            {typeNotis.map(item => (
+              <TouchableOpacity
+                key={item._id}
+                onPress={() => navigation.navigate('notiTypeDetails', {
+                  _id: item._id,
+                  name: item.name,
+                  sum: sumQuantity,
+                })}
+                >
+                {item.name !== 'Cập nhật đơn hàng' && (
+                  <View style={styles.quickItem}>
                     <View style={styles.quickLeft}>
-                    <Image
-                        source={
-                        item.type == 'Khuyến mãi'
-                            ? require('../assets/images/promotion.png')
-                            : item.type == 'Cập nhật'
-                            ? require('../assets/images/update.png')
-                            : require('../assets/images/remind.png')
-                        }
-                        // size={24} color="#ff3366"
-                        style={{marginRight: 10,}}
-                    />
-                    <View style={styles.quickContent}>
-                        <Text style={styles.quickType}>{item.type}</Text>
-                        <Text style={styles.quickDesc}>{item.desc}</Text>
-                    </View>
+                      <Image
+                        source={{uri: item.image}}
+                        style={{marginRight: 15, height: 40, width: 40}}
+                      />
+                      <View style={styles.quickContent}>
+                        <Text style={styles.quickType}>{item.name}</Text>
+                        <Text style={styles.quickDesc}>{item.description}</Text>
+                      </View>
                     </View>
                     <View style={styles.quickRight}>
                       <View style={styles.quantity}>
-                          <Text style={styles.quantityText}>{item.quantity}</Text>
+                        <Text style={styles.quantityText}>{item.quantity}</Text>
                       </View>
-                    {/* <TouchableOpacity> */}
-                        <Icon name="arrow-right" size={18} color="#777" />
-                    {/* </TouchableOpacity> */}
+                      <Icon name="arrow-right" size={18} color="#777" />
                     </View>
-                    
-                </View>
-                </TouchableOpacity>
-                ))}
-            </View>
-        
+                  </View>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
 
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Cập nhật đơn hàng</Text>
-        <Text style={styles.seeAll} onPress={() => navigation.navigate('updateOrder')}>Xem tất cả</Text>
-      </View>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Cập nhật đơn hàng</Text>
+            <Text
+              style={styles.seeAll}
+              onPress={() => navigation.navigate('updateOrder')}>
+              Xem tất cả
+            </Text>
+          </View>
 
-      {orderUpdates.map(order => (
+          {orderUpdates.map(order => (
             <View key={order.id} style={styles.orderBox}>
-              <TouchableWithoutFeedback onPress={() => toggleTimeline(order.id)}>
+              <TouchableWithoutFeedback
+                onPress={() => toggleTimeline(order.id)}>
                 <View style={styles.orderHeader}>
                   <Image source={order.image} style={styles.orderImage} />
                   <View style={{flex: 1}}>
@@ -167,8 +226,8 @@ const Notification = () => {
               )}
             </View>
           ))}
-      </View>
-    </ScrollView>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -186,17 +245,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   quickLeft: {
-    flexDirection: 'row', 
+    flexDirection: 'row',
     alignItems: 'flex-start',
-    // borderWidth: 1,
-    // borderColor: 'green',
     width: '80%',
   },
   quickContent: {
     flexShrink: 1,
     flexWrap: 'wrap',
-    // borderWidth: 1,
-    // borderColor: 'green',
   },
   quickType: {
     fontSize: 16,
@@ -215,8 +270,6 @@ const styles = StyleSheet.create({
   quickRight: {
     flexDirection: 'row',
     gap: 6,
-    // borderWidth: 1,
-    // borderColor: 'green',
   },
   quantity: {
     backgroundColor: '#ff3366',
@@ -245,10 +298,7 @@ const styles = StyleSheet.create({
   orderImage: {width: 60, height: 60, borderRadius: 10, marginRight: 10},
   orderTitle: {fontSize: 16, fontWeight: 'bold'},
   orderDesc: {fontSize: 13, color: '#444'},
-  orderTime: {
-    fontSize: 12, 
-    color: '#888',
-  },
+  orderTime: {fontSize: 12, color: '#888'},
 
   timelineHeader: {
     flexDirection: 'row',
@@ -283,4 +333,4 @@ const styles = StyleSheet.create({
   timelineTime: {fontSize: 12, color: '#777'},
 });
 
-export default Notification;
+export default NotiType;
