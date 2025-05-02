@@ -12,7 +12,7 @@ import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/data';
 import Icon from '@react-native-vector-icons/ant-design';
 import { Product } from '../components/ProductCard';
-
+import axios from 'axios';
 const screenWidth = Dimensions.get('window').width;
 const itemWidth = (screenWidth - 48) / 2;
 
@@ -25,24 +25,35 @@ const CompareScreen = () => {
     // Sản phẩm từ productDetail
     const mainProduct = route.params.products[0];
 
-    // Sản phẩm giả định
-    const fakeProducts: Product[] = [
-        {
-          _id: '1',
-          name: 'Chăn ga HD',
-          image: 'https://...',
-          price: 169000,
-          discount: 30,
-          rating_avg: 4.5,
-          short_description: 'Chăn ga đẹp',
-          description: 'Mô tả chi tiết sản phẩm',
-        },
-        
-      ];
-      
-    const allProducts = [mainProduct, ...fakeProducts];
+    const [relatedProducts, setRelatedProducts] = React.useState<Product[]>([]);
 
-    const [selected, setSelected] = React.useState<string[]>([mainProduct.title]);
+    React.useEffect(() => {
+        const fetchRelated = async () => {
+            try {
+              const res = await axios.get(`http://10.0.2.2:3001/api/product/${mainProduct._id}/related`);
+          
+              const related = (res.data.data || []).map((p: any) => ({
+                ...p,
+                shop_name: p.category_id?.shop_id?.name ?? 'Không rõ',
+                shop_id: p.category_id?.shop_id?._id
+              }));
+          
+              setRelatedProducts(related);
+            } catch (err) {
+              console.error('Failed to fetch related products:', err);
+            }
+          };
+          
+
+        if (mainProduct?._id) {
+            fetchRelated();
+        }
+    }, [mainProduct]);
+
+
+    const allProducts = [mainProduct, ...relatedProducts];
+
+    const [selected, setSelected] = React.useState<string[]>([mainProduct.name]);
 
     const toggleSelect = (title: string) => {
         setSelected((prev) =>
@@ -61,15 +72,15 @@ const CompareScreen = () => {
                 columnWrapperStyle={{ justifyContent: 'space-between' }}
                 renderItem={({ item }) => (
                     <View style={styles.card}>
-                        <Image source={{ uri: item.image }} style={styles.image} />
-                        <Text style={styles.name} numberOfLines={1}>{item.title}</Text>
+                        <Image source={{ uri: (item.images?.[0] || item.image) ?? 'https://via.placeholder.com/150' }} style={styles.image} />
+                        <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
                         <Text style={styles.price}>đ{item.price}</Text>
-                        <Text style={styles.shop}>{item.tag}</Text>
+                        <Text style={styles.shop}>{item.shop_name}</Text>
                         <TouchableOpacity
-                            style={[styles.checkbox, selected.includes(item.title) && styles.checked]}
-                            onPress={() => toggleSelect(item.title)}
+                            style={[styles.checkbox, selected.includes(item.name) && styles.checked]}
+                            onPress={() => toggleSelect(item.name)}
                         >
-                            {selected.includes(item.title) && (
+                            {selected.includes(item.name) && (
                                 <Icon name="check" size={14} color="white" />
                             )}
                         </TouchableOpacity>
@@ -82,9 +93,13 @@ const CompareScreen = () => {
                     style={styles.compareBtn}
                     onPress={() => {
                         const selectedProducts = allProducts.filter(product =>
-                            selected.includes(product.title)
+                            selected.includes(product.name)
                         );
-                        navigation.navigate('compareResult', { products: selectedProducts });
+                        navigation.navigate('compareResult', { 
+                            products: selectedProducts,
+                            related: relatedProducts, 
+
+                         });
                     }}
                 >
                     <Text style={{ color: 'white' }}>So sánh ({selected.length})</Text>

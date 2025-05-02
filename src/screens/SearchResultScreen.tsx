@@ -48,12 +48,13 @@ const SearchResultScreen = () => {
             {/* Danh sách sản phẩm */}
             <FlatList
                 data={products}
-                keyExtractor={(item, index) => index.toString()}
+                keyExtractor={(item) => item._id} // ✅ Dùng _id thật từ DB
                 numColumns={2}
                 columnWrapperStyle={{ justifyContent: 'space-between' }}
                 contentContainerStyle={{ paddingTop: 8 }}
                 renderItem={({ item }) => <ProductCard item={item} />}
             />
+
         </View>
     );
 };

@@ -9,7 +9,7 @@ export type RootStackParamList = {
     cart: undefined;
     productDetail: { product: Product };    
     compare: { products: Product[] };
-    compareResult: { products: Product[] };
+    compareResult: { products: Product[]; related: Product[] };
     search: undefined;
     searchResult: {
         query: string;

@@ -13,14 +13,38 @@ import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/data';
 import ProductCard from '../components/ProductCard';
 import { Dimensions } from 'react-native';
+import { Product } from '../components/ProductCard';
+import axios from 'axios';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
 
+
 const ProductDetailScreen = () => {
+
     const scrollRef = React.useRef<ScrollView>(null);
     const route = useRoute<ProductDetailRouteProp>();
     const { product } = route.params;
+    const [relatedProducts, setRelatedProducts] = React.useState<Product[]>([]);
 
+    React.useEffect(() => {
+        const fetchRelatedProducts = async () => {
+            try {
+                const res = await axios.get(`http://10.0.2.2:3001/api/product/${product._id}/related`);
+                const related = (res.data.data || []).map((p: any) => ({
+                    ...p,
+                    shop_name: p.category_id?.shop_id?.name ?? 'Không rõ',
+                    shop_id: p.category_id?.shop_id?._id,
+                }));
+                setRelatedProducts(related.slice(0, 4)); // 👈 lấy tối đa 4 sản phẩm
+            } catch (err) {
+                console.error('Failed to fetch related products:', err);
+            }
+        };
+
+        if (product?._id) {
+            fetchRelatedProducts();
+        }
+    }, [product]);
     React.useEffect(() => {
         scrollRef.current?.scrollTo({ y: 0, animated: true });
     }, [product]);
@@ -106,7 +130,7 @@ const ProductDetailScreen = () => {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Sản phẩm tương tự</Text>
                     <FlatList
-                        data={[product, product, product]} // bạn có thể truyền danh sách thật từ props hoặc fetch thêm từ API
+                        data={relatedProducts}
                         numColumns={2}
                         keyExtractor={(item, index) => item._id + index}
                         renderItem={({ item }) => (
@@ -115,28 +139,13 @@ const ProductDetailScreen = () => {
                                 onPress={() => navigation.navigate('productDetail', { product: item })}
                             />
                         )}
-
                         columnWrapperStyle={{ justifyContent: 'space-between' }}
                         scrollEnabled={false}
                     />
                 </View>
 
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Sản phẩm nổi bật</Text>
-                    <FlatList
-                        data={[product, product]} // tương tự, truyền danh sách nổi bật
-                        numColumns={2}
-                        keyExtractor={(item, index) => item._id + '_hot' + index}
-                        renderItem={({ item }) => (
-                            <ProductCard
-                                item={item}
-                                onPress={() => navigation.navigate('productDetail', { product: item })}
-                            />
-                        )}
-                        columnWrapperStyle={{ justifyContent: 'space-between' }}
-                        scrollEnabled={false}
-                    />
-                </View>
+
+
 
             </ScrollView>
 

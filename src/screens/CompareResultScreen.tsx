@@ -7,8 +7,9 @@ import {
     TouchableOpacity,
     ScrollView,
     Dimensions,
+    Image
 } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/data';
 import ProductCardCompare from '../components/ProductCardCompare';
 import { Product } from '../components/ProductCard';
@@ -16,12 +17,12 @@ import { Product } from '../components/ProductCard';
 const screenWidth = Dimensions.get('window').width;
 const CARD_MARGIN = 8;
 
-
 type ResultRouteProp = RouteProp<RootStackParamList, 'compareResult'>;
 
 const CompareResultScreen = () => {
     const route = useRoute<ResultRouteProp>();
-    const { products } = route.params;
+    const navigation = useNavigation();
+    const { products, related } = route.params;
 
     const sorted = [...products].sort((a, b) => a.price - b.price);
 
@@ -29,17 +30,63 @@ const CompareResultScreen = () => {
         ? (screenWidth - CARD_MARGIN * (sorted.length + 1)) / sorted.length
         : (screenWidth - CARD_MARGIN * 2) / 2;
     const cheapestProduct = sorted[0];
-    const columnWidth = 120; // hoặc tuỳ bạn muốn rộng bao nhiêu mỗi cột
+    const columnWidth = 120;
     const tableWidth = 100 + sorted.length * columnWidth;
 
     const [selectedShop, setSelectedShop] = React.useState<string>(
-        sorted[0]?.short_description || ''
-      );
-      
+        sorted[0]?.shop_name ?? ''
+    );
+
+    const [shopVouchers, setShopVouchers] = React.useState<Record<string, any[]>>({});
+    const [suggestedProducts, setSuggestedProducts] = React.useState<Product[]>(related || []);
+
+    const renderVoucherDescription = (voucher: any) => {
+        const { discount_type, discount_value, min_order_value, discount_target } = voucher;
+        const target = discount_target === 'Shipping' ? 'phí vận chuyển' : 'đơn';
+        const icon = discount_target === 'Shipping' ? '🚚' : '🎁';
+
+        if (!discount_type || !discount_value) return `${icon} Ưu đãi đặc biệt từ shop`;
+
+        if (discount_type === 'Tiền') {
+            return `${icon} Giảm ${discount_value}k ${target} cho đơn từ ${min_order_value}k`;
+        }
+
+        if (discount_type === 'Phần trăm') {
+            return `${icon} Giảm ${discount_value}% ${target} cho đơn từ ${min_order_value}k`;
+        }
+
+        return `${icon} Ưu đãi đặc biệt từ shop`;
+    };
+
+    React.useEffect(() => {
+        const fetchVouchers = async () => {
+            const map: Record<string, any[]> = {};
+            for (const p of products) {
+                const shopId = p.category_id?.shop_id?._id;
+                if (shopId && !map[shopId]) {
+                    try {
+                        const res = await fetch(`http://10.0.2.2:3001/api/vouchers/shop/${shopId}`);
+                        const data = await res.json();
+                        map[shopId] = data.data || [];
+                    } catch (err) {
+                        console.error('Failed to fetch voucher for shop:', shopId, err);
+                        map[shopId] = [];
+                    }
+                }
+            }
+            setShopVouchers(map);
+        };
+
+        fetchVouchers();
+    }, [products]);
+
+    const selectedProduct = products.find(p => p.shop_name === selectedShop);
+    const selectedShopId = selectedProduct?.category_id?.shop_id?._id;
+    const vouchers = selectedShopId ? shopVouchers[selectedShopId] || [] : [];
+    const uniqueShops = Array.from(new Set(sorted.map(p => p.shop_name)));
 
     return (
         <ScrollView style={styles.container}>
-
             <FlatList
                 data={sorted}
                 horizontal
@@ -54,8 +101,7 @@ const CompareResultScreen = () => {
                     <View style={{ width: CARD_WIDTH, marginRight: CARD_MARGIN }}>
                         <ProductCardCompare
                             item={item}
-                            isCheapest={item._id === cheapestProduct._id
-                            }
+                            isCheapest={item._id === cheapestProduct._id}
                         />
                     </View>
                 )}
@@ -63,32 +109,22 @@ const CompareResultScreen = () => {
 
             <View style={styles.separator} />
 
-            {/* Khuyến mãi giả lập */}
             <View style={styles.promotionSection}>
                 <Text style={styles.subTitle}>Khuyến mãi từ Shop</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
 
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
                     <View style={styles.shopTabs}>
-                        {sorted.map((item, idx) => (
+                        {uniqueShops.map((name, idx) => (
                             <TouchableOpacity
                                 key={idx}
-                                onPress={() => setSelectedShop(item.short_description)}
-                                style={[
-                                    styles.shopTag,
-                                    selectedShop === item.tag && {
-                                        backgroundColor: '#f50057',
-                                        borderColor: '#f50057',
-                                    },
-                                ]}
-
+                                onPress={() => setSelectedShop(name ?? '')}
+                                style={[styles.shopTag, selectedShop === name && {
+                                    backgroundColor: '#f50057', borderColor: '#f50057',
+                                }]}
                             >
-                                <Text style={{
-                                    color: selectedShop === item.tag ? 'white' : '#f50057',
-                                    fontWeight: '500'
-                                }}>
-                                    {item.tag}
+                                <Text style={{ color: selectedShop === name ? 'white' : '#f50057', fontWeight: '500' }}>
+                                    🛍 {name ?? 'Không rõ'}
                                 </Text>
-
                             </TouchableOpacity>
                         ))}
                     </View>
@@ -96,52 +132,47 @@ const CompareResultScreen = () => {
 
                 <View style={styles.promoBox}>
                     <Text style={{ marginBottom: 4 }}>
-                        🔹 Ưu đãi của <Text style={{ fontWeight: 'bold' }}>{selectedShop}</Text>:
+                        Ưu đãi của <Text style={{ fontWeight: 'bold' }}>{selectedShop}</Text>:
                     </Text>
-                    <Text>🔹 Giảm 30k cho đơn hàng từ 500k</Text>
-                    <Text>🔹 Giảm 100k cho đơn hàng từ 1 triệu</Text>
-                    <Text>🔹 Giảm 150k cho đơn hàng từ 2 triệu</Text>
+                    <ScrollView style={{ maxHeight: 120 }} nestedScrollEnabled>
+                        {vouchers.length > 0 ? (
+                            vouchers.map((v, i) => (
+                                <Text key={i} style={{ marginBottom: 4 }}>{renderVoucherDescription(v)}</Text>
+                            ))
+                        ) : (
+                            <Text>Không có voucher nào.</Text>
+                        )}
+                    </ScrollView>
                 </View>
 
             </View>
 
-            {/* Bảng so sánh thông tin */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 16 }}>
-                <View style={[styles.compareTable, { width: tableWidth }]}>
-                    <View style={styles.tableRow}>
-                        <Text style={styles.cellHeader}>Cửa hàng</Text>
-                        {sorted.map((item, idx) => (
-                            <Text key={idx} style={styles.cell}>
-                                {item.tag}
-                            </Text>
-                        ))}
-                    </View>
-                    <View style={styles.tableRow}>
-                        <Text style={styles.cellHeader}>Chất liệu</Text>
-                        {sorted.map((_, idx) => (
-                            <Text key={idx} style={styles.cell}>
-                                Cotton 100%
-                            </Text>
-                        ))}
-                    </View>
-                    <View style={styles.tableRow}>
-                        <Text style={styles.cellHeader}>Kích thước</Text>
-                        {sorted.map((_, idx) => (
-                            <Text key={idx} style={styles.cell}>
-                                160 x 200 cm
-                            </Text>
-                        ))}
-                    </View>
-                    <View style={styles.tableRow}>
-                        <Text style={styles.cellHeader}>Màu sắc</Text>
-                        {sorted.map((_, idx) => (
-                            <Text key={idx} style={styles.cell}>
-                                Xanh, trắng, kem
-                            </Text>
-                        ))}
-                    </View>
-                </View>
-            </ScrollView>
+            <View style={{ marginTop: 24 }}>
+                <Text style={styles.subTitle}>📦 Gợi ý sản phẩm liên quan</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {suggestedProducts.map((item, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={styles.suggestCard}
+                            onPress={() => navigation.navigate('productDetail', { product: item })}
+                        >
+                            <Image
+                                source={{ uri: item.images?.[0] || item.image || 'https://via.placeholder.com/150' }}
+                                style={styles.image}
+                            />
+                            <Text style={styles.suggestName} numberOfLines={1}>{item.name}</Text>
+                            <Text style={styles.suggestPrice}>đ{item.price.toLocaleString('vi-VN')}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+
+                <TouchableOpacity
+                    style={styles.homeBtn}
+                    onPress={() => navigation.navigate('home')}
+                >
+                    <Text style={{ color: 'white', fontWeight: 'bold' }}>🔙 Về trang chủ</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 };
@@ -163,8 +194,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 1 },
         shadowRadius: 4,
         elevation: 2,
-    }
-    ,
+    },
     subTitle: { fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
     shopTabs: { flexDirection: 'row', gap: 8, marginBottom: 8 },
     shopTag: {
@@ -176,13 +206,23 @@ const styles = StyleSheet.create({
         borderColor: '#f50057',
         marginRight: 8,
     },
-
     separator: {
         height: 1,
         backgroundColor: '#ddd',
         marginVertical: 16,
     },
-    promoList: { gap: 4 },
+    promoBox: {
+        backgroundColor: '#fff',
+        padding: 12,
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: '#eee',
+        gap: 4,
+        marginTop: 12,
+        minHeight: 100,     // 👈 chiều cao tối thiểu
+        justifyContent: 'center',
+    },
+
     compareTable: {
         borderWidth: 1,
         borderColor: '#ddd',
@@ -191,32 +231,22 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         padding: 12,
     },
-    tableRow: { flexDirection: 'row', padding: 8, backgroundColor: '#fff' },
-    cellHeader: { width: 100, fontWeight: 'bold' },
-    cell: {
-    minWidth: 100,  // 👈 thêm để đảm bảo đủ khoảng trống
-    fontSize: 13,
-    paddingHorizontal: 4,
-},
-    buyRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 24,
-},
-    promoBox: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#eee',
-    gap: 4,
-    marginTop: 12,
-},
-
-    buyBtn: {
-    backgroundColor: '#f50057',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-},
+    suggestCard: {
+        width: 140,
+        backgroundColor: '#fff',
+        borderRadius: 8,
+        padding: 8,
+        marginRight: 12,
+        elevation: 2,
+    },
+    image: { width: '100%', height: 100, borderRadius: 6 },
+    suggestName: { fontWeight: '600', marginTop: 6, fontSize: 13 },
+    suggestPrice: { color: '#d50000', fontWeight: 'bold', marginTop: 2 },
+    homeBtn: {
+        backgroundColor: '#f50057',
+        paddingVertical: 12,
+        borderRadius: 6,
+        alignItems: 'center',
+        marginTop: 16,
+    },
 });

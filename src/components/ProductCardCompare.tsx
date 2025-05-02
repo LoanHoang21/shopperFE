@@ -27,7 +27,10 @@ const ProductCardCompare: React.FC<Props> = ({ item, isCheapest = false, onPress
     return (
         <TouchableOpacity style={styles.card} onPress={handlePress}>
             <View style={styles.imageWrapper}>
-                <Image source={{ uri: item.image }} style={styles.image} />
+                <Image
+                    source={{ uri: item.images?.[0] || item.image || 'https://via.placeholder.com/150' }}
+                    style={styles.image}
+                />
                 {isCheapest && (
                     <View style={styles.badge}>
                         <Text style={styles.badgeText}>Rẻ hơn</Text>

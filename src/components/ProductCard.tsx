@@ -6,14 +6,25 @@ import axios from 'axios';
 export interface Product {
   _id: string;
   name: string;
-  images?: string[];        // ✅ hỗ trợ nhiều ảnh (dữ liệu chính)
+  images?: string[];        
   image?: string;
   price: number;
   discount?: number;
+  shop_id?: string;    
   rating_avg?: number;
   short_description?: string;
   description: string;
   shop_name?: string;
+  category_id?: {
+    _id: string;
+    name: string;
+    shop_id?: {
+      _id: string;
+      name: string;
+    };
+  };
+  sale_quantity?: number;
+  review_count_7d?: number;
 }
 
 

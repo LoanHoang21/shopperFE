@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -14,55 +14,51 @@ import Icon from '@react-native-vector-icons/ant-design';
 import { useNavigation } from '@react-navigation/native';
 import { Product } from '../components/ProductCard';
 
-const searchIcon = require('../assets/search.png');
-
 const keywordSuggestions = [
-    'Chăn ga gối đệm', 'Chăn ga', 'Chăn', 'Chăn ấm',
+    'Chăn ga gối đệm', 'Chăn ga', 'Chăn', 'Quạt',
     'Ga trải giường', 'Vỏ gối', 'Chăn lông', 'Bộ chăn ga Cotton'
 ];
 
-const searchSuggestions = [
-    { label: 'Chăn ga', image: 'https://i.imgur.com/kGkSg1v.png' },
-    { label: 'Sáp thơm', image: 'https://i.imgur.com/OoE2t9g.png' },
-    { label: 'Quà tặng', image: 'https://i.imgur.com/b8dKxHZ.png' },
-    { label: 'Valentine', image: 'https://i.imgur.com/tRg5lIN.png' },
-    { label: 'Bộ nến thơm', image: 'https://i.imgur.com/YZJybKR.png' },
-    { label: 'Gối ôm cute', image: 'https://i.imgur.com/b8dKxHZ.png' },
-    { label: 'Valentine', image: 'https://i.imgur.com/tRg5lIN.png' },
-    { label: 'Bộ nến thơm', image: 'https://i.imgur.com/YZJybKR.png' },
-];
+
 
 const SearchScreen = () => {
     const navigation = useNavigation();
     const [query, setQuery] = useState('');
     const [showMore, setShowMore] = useState(false);
+    const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
 
-    const handleSearch = (keyword: string) => {
-        const matchedProducts: Product[] = searchSuggestions.map((item, index) => ({
-            _id: index.toString(), // tạo id giả
-            name: item.label,
-            image: item.image,
-            price: 169000,
-            discount: 32,
-            rating_avg: 4.5,
-            short_description: 'Sản phẩm gợi ý',
-            description: 'Thông tin mô tả ngắn gọn của sản phẩm.',
-        })).filter(p =>
-            p.name.toLowerCase().includes(keyword.toLowerCase())
-        );
-    
-        navigation.navigate('searchResult', {
-            query: keyword,
-            products: matchedProducts,
-        });
+    useEffect(() => {
+        fetch('http://10.0.2.2:3001/api/product/suggested/ml-trending')
+            .then(res => res.json())
+            .then(json => {
+                if (json.status === 'OK') {
+                    setTrendingProducts(json.data);
+                }
+            })
+            .catch((err) => console.error("Lỗi lấy sản phẩm trending:", err));
+    }, []);
+
+    const handleSearch = async (keyword: string) => {
+        try {
+            const res = await fetch(`http://10.0.2.2:3001/api/product/search?query=${encodeURIComponent(keyword)}`);
+            const json = await res.json();
+
+            if (json.status === 'OK') {
+                navigation.navigate('searchResult', {
+                    query: keyword,
+                    products: json.data, // <-- truyền danh sách sản phẩm tìm được
+                });
+            }
+        } catch (err) {
+            console.error("Lỗi tìm kiếm sản phẩm:", err);
+        }
     };
-    
+
 
     const visibleSuggestions = showMore ? keywordSuggestions : keywordSuggestions.slice(0, 4);
 
     const renderHeader = () => (
         <View style={{ paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight || 20 : 20 }}>
-            {/* Search bar */}
             <View style={styles.searchRow}>
                 <TouchableOpacity
                     onPress={() => navigation.goBack()}
@@ -86,7 +82,6 @@ const SearchScreen = () => {
                 </TouchableOpacity>
             </View>
 
-            {/* Gợi ý từ khóa */}
             <View style={{ marginTop: 16 }}>
                 {visibleSuggestions.map((item, idx) => (
                     <TouchableOpacity key={idx} onPress={() => handleSearch(item)}>
@@ -104,25 +99,29 @@ const SearchScreen = () => {
 
     return (
         <FlatList
-            data={searchSuggestions}
-            keyExtractor={(item, idx) => idx.toString()}
+            data={trendingProducts}
+            keyExtractor={(item) => item._id}
             numColumns={2}
             ListHeaderComponent={renderHeader}
             contentContainerStyle={{ padding: 16 }}
             columnWrapperStyle={{ justifyContent: 'space-between' }}
+            keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => (
                 <TouchableOpacity
-                    onPress={() => handleSearch(item.label)}
+                    onPress={() => navigation.navigate('productDetail', { product: item })}
                     style={styles.suggestBox}
                 >
                     <Image
-                        source={{ uri: item.image }}
+                        source={{ uri: item.images?.[0] || item.image }}
                         style={styles.suggestImage}
                     />
-                    <Text style={styles.suggestText}>{item.label}</Text>
+                    <Text style={styles.suggestText}>{item.name}</Text>
                 </TouchableOpacity>
             )}
+
         />
+
+
     );
 };
 
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
     },
     suggestBox: {
         width: '48%',
-        backgroundColor: 'white',
+        backgroundColor: '#fff',
         borderRadius: 6,
         borderWidth: 1,
         borderColor: '#ddd',
@@ -199,4 +198,5 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         textAlign: 'center',
     },
+
 });
