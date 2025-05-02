@@ -3,6 +3,7 @@ import Icon from '@react-native-vector-icons/ant-design';
 import { useState } from "react";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../types/data";
 
 // type NotiRouteProp = RouteProp<RootStackParamList, 'promotionNotification'>;
 type NavigationType = NativeStackNavigationProp<RootStackParamList>;
@@ -22,7 +23,7 @@ const HeaderUpdateOrder = () => {
                 size={24}
                 color="#ff3366"
                 style={styles.backIcon}
-                onPress={() => navigation.navigate("notification")}
+                onPress={() => navigation.navigate("updateOrder")}
             />
             <Text style={styles.headerTitle}>Cập nhật đơn hàng</Text>
         </View>

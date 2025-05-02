@@ -2,12 +2,13 @@ import { FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, Vi
 import Icon from '@react-native-vector-icons/ant-design';
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import AllReadModal from "../components/navigation/AllReadModal";
+import AllReadModal from "../components/AllReadModal";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {Dropdown} from 'react-native-element-dropdown';
 import HeaderNotification from "../components/headers/HeaderNotification";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAllNotiByNotiType, updateStatusNoti } from "../apis/Noti";
+import { RootStackParamList } from "../types/data";
 
 export interface INoti {
     _id: string;

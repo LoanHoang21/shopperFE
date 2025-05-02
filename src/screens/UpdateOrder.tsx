@@ -5,14 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  TouchableOpacity,
   TouchableWithoutFeedback,
 } from 'react-native';
 import Icon from '@react-native-vector-icons/ant-design';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+// import { NavigationProp, useNavigation } from '@react-navigation/native';
+// import { RootStackParamList } from '../types/data';
 
 const UpdateOrder = () => {
-  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  // const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [expandedOrderIds, setExpandedOrderIds] = useState<number[]>([]);
 
   const toggleTimeline = (id: number) => {

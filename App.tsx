@@ -80,7 +80,7 @@ const App = () => {
   // }, []);
   
   return (
-    // <CartProvider>
+    <CartProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
         <StatusBar
           backgroundColor="#ffffff"
@@ -93,7 +93,7 @@ const App = () => {
           {/* <Toast /> */}
         </NavigationContainer>
       </SafeAreaView>
-    // </CartProvider>
+    </CartProvider>
   );
 };
 

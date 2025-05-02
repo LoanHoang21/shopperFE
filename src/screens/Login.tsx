@@ -7,6 +7,7 @@ import Toast from 'react-native-toast-message';
 import { userLogin } from '../apis/Auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { checkAndNotifyExpiringVouchers } from '../utils/notiVoucher';  // Giả sử bạn đã viết api này
+import { RootStackParamList } from '../types/data';
 
 const Login = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();

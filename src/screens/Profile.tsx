@@ -3,6 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 import Toast from "react-native-toast-message";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../types/data";
 
 const Profile = () => {
     const navigation: NavigationProp<RootStackParamList> = useNavigation();

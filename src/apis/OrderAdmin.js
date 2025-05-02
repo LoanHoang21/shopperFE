@@ -1,11 +1,11 @@
 import axios from "axios";
 
 const getAllOrderById = (customerId) => {
-    return axios.get(`http://192.168.0.116:3001/api/order/getAll/${customerId}`);
+    return axios.get(`http://192.168.0.116:3001/api/orderAdmin/getAll/${customerId}`);
 }
 
 const updateStatusOrder = (orderId, nextStatus) => {
-    return axios.post(`http://192.168.0.116:3001/api/order/updateStatus/${orderId}`, {
+    return axios.post(`http://192.168.0.116:3001/api/orderAdmin/updateStatus/${orderId}`, {
         status: nextStatus,
     });
 }

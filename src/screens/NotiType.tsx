@@ -13,6 +13,7 @@ import Icon from '@react-native-vector-icons/ant-design';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
 import {getAllNotiType, getQuantityNoti} from '../apis/NotiType'; // Giả định bạn có API gọi MongoDB ở đây
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RootStackParamList } from '../types/data';
 
 interface INotiType {
   _id: string;

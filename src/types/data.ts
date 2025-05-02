@@ -1,4 +1,6 @@
-type RootStackParamList = {
+import { Product } from '../components/ProductCard';
+
+export type RootStackParamList = {
     beforeLogin: undefined;
     login: undefined;
     register: undefined;
@@ -7,6 +9,14 @@ type RootStackParamList = {
     cart: undefined;
     notiType: undefined;
     notiTypeDetails: {_id: string, name: string, sum: number} | undefined;
+    productDetail: { product: Product };
+    compare: { products: Product[] };
+    compareResult: { products: Product[]; related: Product[] };
+    search: undefined;
+    searchResult: {
+        query: string;
+        products: Product[];
+      };
     payment: undefined;
     paymentMethod: undefined;
     paymentSuccess: undefined;
@@ -26,5 +36,4 @@ declare global {
 };
 
 declare module "*.png";
-
 // declare module "react-native-vector-icons/fontawesome6";

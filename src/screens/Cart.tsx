@@ -9,10 +9,10 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useCart, CartItemI } from '../context/CartContext';
-import CartItem from '../components/navigation/CartItem';
-import DeleteConfirmModal from '../components/navigation/DeleteConfirmModal';
-import ToastSuccess from '../components/navigation/ToastSuccess';
-import OutOfStockModal from '../components/navigation/OutOfStockModal';
+import CartItem from '../components/CartItem';
+import DeleteConfirmModal from '../components/DeleteConfirmModal';
+import ToastSuccess from '../components/ToastSuccess';
+import OutOfStockModal from '../components/OutOfStockModal';
 import CartHeader from '../components/headers/HeaderCart';
 
 const CartScreen: React.FC = () => {

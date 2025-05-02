@@ -1,10 +1,11 @@
-import React from 'react';
-import { View, FlatList, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import ProductCard, { Product } from '../components/navigation/ProductCard';
-import QuickMenuItem from '../components/navigation/QuickMenuItem';
-// import HomeBottom from '../components/bottomTab/HomeBottom';
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import ProductCard, { Product } from '../components/ProductCard';
+import QuickMenuItem from '../components/QuickMenuItem';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-// import {HandleNotification} from '../utils/handleNotification';
+// import HomeBottom from '../components/bottomTab/HomeBottom';
+import axios from 'axios';
+import { RootStackParamList } from '../types/data';
 
 const menuData = [
   {
@@ -34,18 +35,21 @@ const menuData = [
   },
 ];
 
-const data: Product[] = Array(20).fill({
-  title: 'Bộ ga gối và vỏ chăn',
-  price: '169.000',
-  oldPrice: '205.000',
-  tag: 'Chăn ga Pre',
-  rating: '4.5',
-  image:
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-});
-
 const HomeScreen: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('http://10.0.2.2:3001/api/product/getAll');
+        setProducts(response.data.data); // vì dữ liệu nằm trong `data.data`
+      } catch (error) {
+        console.error("Failed to fetch products", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
   return (
     <>
       <ScrollView style={styles.container}>
@@ -94,18 +98,19 @@ const HomeScreen: React.FC = () => {
     <Text onPress={() => navigation.navigate('payment')}>Sang Payment</Text>
       {/* Product List */}
       <FlatList
-        data={data}
+        data={products}
         numColumns={2}
         scrollEnabled={false}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
         contentContainerStyle={{ paddingTop: 16 }}
         renderItem={({ item }) => <ProductCard item={item} />}
-        keyExtractor={(_, i) => i.toString()}
+        keyExtractor={(item) => item._id}
       />
     </ScrollView>
     {/* <HomeBottom/> */}
     </>
   );
+
 };
 
 export default HomeScreen;

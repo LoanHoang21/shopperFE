@@ -25,7 +25,7 @@ const DeleteConfirmModal: React.FC<Props> = ({
         <View style={styles.modal}>
           <View style={styles.header}>
             <Image
-              source={require('../assets/delete.png')}
+              source={require('../assets/images/delete.png')}
               style={styles.icon}
             />
             <Text style={styles.title}>Xoá Sản Phẩm</Text>

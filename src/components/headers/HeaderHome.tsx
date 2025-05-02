@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import ScanAndTrackBar from '../navigation/ScanAndTrackBar';
+import ScanAndTrackBar from '../ScanAndTrackBar';
 import { useNavigation } from '@react-navigation/native';
 import Icon from '@react-native-vector-icons/ant-design';
 
@@ -24,6 +24,7 @@ const HeaderHome: React.FC = () => {
             placeholder="Happy Bedding"
             placeholderTextColor="#999"
             style={styles.input}
+            onFocus={() => navigation.navigate('search')}
           />
           <TouchableOpacity>
             <Image source={require('../../assets/images/camera.png')} style={styles.iconRight} />

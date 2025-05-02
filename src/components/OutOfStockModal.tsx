@@ -20,7 +20,7 @@ const OutOfStockModal: React.FC<Props> = ({ visible, onClose }) => {
         <View style={styles.modal}>
           <View style={styles.header}>
             <Image
-              source={require('../assets/warning.png')} // 🟠 icon cảnh báo bạn cần thêm trong assets
+              source={require('../assets/images/warning.png')} // 🟠 icon cảnh báo bạn cần thêm trong assets
               style={styles.icon}
             />
             <Text style={styles.title}>Cảnh Báo</Text>

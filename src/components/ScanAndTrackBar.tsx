@@ -6,13 +6,13 @@ const ScanAndTrackBar: React.FC = () => {
     <View style={styles.container}>
       {/* Nút Quét mã */}
       <TouchableOpacity style={[styles.button, styles.leftButton]}>
-        <Image source={require('../assets/scan.png')} style={styles.icon} />
+        <Image source={require('../assets/images/scan.png')} style={styles.icon} />
         <Text style={styles.text}>Quét mã</Text>
       </TouchableOpacity>
 
       {/* Nút Theo dõi đơn hàng */}
       <TouchableOpacity style={[styles.button, styles.rightButton]}>
-        <Image source={require('../assets/order_track.png')} style={styles.icon} />
+        <Image source={require('../assets/images/order_track.png')} style={styles.icon} />
         <Text style={styles.text}>Theo dõi đơn hàng</Text>
       </TouchableOpacity>
     </View>

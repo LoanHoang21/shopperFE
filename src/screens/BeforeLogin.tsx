@@ -1,45 +1,3 @@
-// import { NativeStackScreenProps } from "@react-navigation/native-stack";
-// import React from "react";
-// import { Button, StyleSheet, View, Text } from "react-native";
-// import { RootStackParamList } from "../routers/AppNavigator";
-// import LinearGradient from "react-native-linear-gradient";
-// // import { Icon } from "@react-navigation/elements";
-// // import { StyleSheet } from "react-native";
-
-// // type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
-
-// const Login = () => {
-//     return (
-//         <View style={styles.container}>
-//             <LinearGradient
-//                 start={{x: 0, y: 0}}
-//                 end={{x: 0, y: 1}}
-//                 colors={['#F55539', '#F1215A', '#F42384']}
-//                 style={{flex: 1}}
-//             >
-//             <View>
-//                 <Button
-//                     title="Đăng nhập"
-//                     onPress={() => {}}
-//                 />
-//             </View>
-//             </LinearGradient>
-//         </View>
-//     );
-// }
-
-// const styles = StyleSheet.create({
-// 	container: {
-//         borderWidth: 1,
-//         borderColor: "red",
-//     },
-//     text: {
-
-//     }
-// });
-
-// export default Login;
-
 import React from 'react';
 import {
   View,
@@ -52,6 +10,7 @@ import LinearGradient from 'react-native-linear-gradient';
 // import BackgroundImage from '../assets/images/background.png';
 import Icon from '@react-native-vector-icons/ant-design';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { RootStackParamList } from '../types/data';
 
 const BeforeLogin = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
@@ -97,11 +56,8 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flex: 1,
-    // marginTop: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    // borderWidth: 2,
-    // borderColor: "black",
   },
   loginButton: {
     width: screenWidth * 0.8,

@@ -4,7 +4,8 @@ import {useState} from 'react';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 // import AllReadModal from '../navigation/AllReadModal';
-import SettingModal from '../navigation/SettingNotiModal';
+import SettingModal from '../SettingNotiModal';
+import { RootStackParamList } from '../../types/data';
 
 type NotiRouteProp = RouteProp<RootStackParamList, 'notiTypeDetails'>;
 type NavigationType = NativeStackNavigationProp<RootStackParamList>;

@@ -10,7 +10,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getAllOrderById, updateStatusOrder} from '../apis/Order';
+import {getAllOrderById, updateStatusOrder} from '../apis/OrderAdmin';
 import { createNotiOrder } from '../apis/Noti';
 
 // const API_BASE = 'http://localhost:3001/api/order'; // Đổi thành địa chỉ backend thật nếu cần
