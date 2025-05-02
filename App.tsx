@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+
 // import AppNavigation from './src/components/navigation/AppNavigation';
 import Loading from './src/screens/Loading';
 import RouterMain from './src/routers/RouterMain';
@@ -79,7 +80,7 @@ const App = () => {
   // }, []);
   
   return (
-    <CartProvider>
+    // <CartProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
         <StatusBar
           backgroundColor="#ffffff"
@@ -92,7 +93,7 @@ const App = () => {
           {/* <Toast /> */}
         </NavigationContainer>
       </SafeAreaView>
-    </CartProvider>
+    // </CartProvider>
   );
 };
 

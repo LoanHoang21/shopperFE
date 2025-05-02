@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { CartItemI as ItemType, useCart } from '../../context/CartContext';
+import { CartItemI as ItemType, useCart } from '../context/CartContext';
 
 const CartItem: React.FC<{ item: ItemType; onOutOfStock: () => void }> = ({ item, onOutOfStock }) => {
     const { toggleItem, changeQty } = useCart();

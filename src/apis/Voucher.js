@@ -11,7 +11,7 @@ import axios from "axios";
 // }
 
 const getAllVoucher = () => {
-    return axios.get(`http://192.168.1.164:3001/api/voucher/getAll/`);
+    return axios.get(`http://192.168.0.116:3001/api/voucher/getAll/`);
 }
 
 // const userLogin = (valueLogin, password) => {

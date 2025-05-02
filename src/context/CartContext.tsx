@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export interface CartItemI {
   id: string;
@@ -35,58 +35,56 @@ const CartContext = createContext<CartContextType>({
   removeSelected: () => {},
 });
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [items, setItems] = useState<CartItemI[]>([
-        {
-          id: '1',
-          brand_id: 'b1',
-          brand: 'Happy Bedding',
-          title: 'Bộ ga gối Cotton',
-          price: 169000,
-          oldPrice: 205000,
-          thumbnail: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-          quantity: 1,
-          stock: 3,
-          checked: false,
-          attributes: [
-            { label: 'Kích thước', value: 'M8-2m' },
-            { label: 'Màu sắc', value: 'Caro Xanh nhạt' },
-          ],
-        },
-        {
-          id: '2',
-          brand_id: 'b2',
-          brand: 'ONATREE',
-          title: 'Set quà nến thơm',
-          price: 169000,
-          oldPrice: 205000,
-          thumbnail: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-          quantity: 2,
-          stock: 4,
-          checked: true,
-          attributes: [
-            { label: 'Chất liệu', value: 'Sáp đậu nành' },
-            { label: 'Dung tích', value: '200ml' },
-          ],
-        },
-        {
-            id: '3',
-            brand_id: 'b2',
-            brand: 'ONATREE',
-            title: 'Set quà valentine',
-            price: 200000,
-            oldPrice: 250000,
-            thumbnail: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-            quantity: 1,
-            stock: 5,
-            checked: false,
-            attributes: [
-              { label: 'Chất liệu', value: 'Sáp đậu nành' },
-              { label: 'Dung tích', value: '200ml' },
-            ],
-          },
-      ]);
+const convertCartItemFromApi = (apiItem: any): CartItemI => {
+  const product = apiItem.product_id;
+  const category = product?.category_id;
+  const shop = category?.shop_id;
+  const attributes = apiItem?.product_attributes?.flatMap((attr: any) => {
+    return attr.attributions.map((option: any) => ({
+      label: attr.category_attribution_name,
+      value: option.name,
+    }));
+  }) || [];
 
+  return {
+    id: apiItem._id,
+    brand_id: shop?._id || '',
+    brand: shop?.name || '',   // ✅ lấy tên shop ở đây
+    title: product?.name || '',
+    price: product?.discount  ? product?.price*(100-product?.discount)/100 : product?.price,
+    oldPrice: product?.price || 0,
+    thumbnail: product?.images[0] || '',
+    quantity: apiItem.quantity,
+    stock: product?.quantity || 0,
+    checked: apiItem.isSelected || false,
+    attributes: attributes,
+  };
+};
+
+
+
+export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+
+    const [items, setItems] = useState<CartItemI[]>([]);
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      try {
+        const res = await fetch('http://10.0.2.2:3001/api/cartitems'); // ⚡ Sửa lại URL theo server bạn
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          const converted = data.map((item) => convertCartItemFromApi(item));
+          setItems(converted);
+        }
+      } catch (error) {
+        console.error('Failed to fetch cart items:', error);
+      }
+    };
+
+    fetchCartItems();
+  }, []);
+  
   const toggleItem = (id: string) => {
     setItems((prev) =>
       prev.map((item) =>

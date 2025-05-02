@@ -1,16 +1,10 @@
-import React, {useEffect} from 'react';
-import {
-  View,
-  FlatList,
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import ProductCard, {Product} from '../components/navigation/ProductCard';
+import React from 'react';
+import { View, FlatList, ScrollView, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import ProductCard, { Product } from '../components/navigation/ProductCard';
 import QuickMenuItem from '../components/navigation/QuickMenuItem';
-import HomeBottom from '../components/bottomTab/HomeBottom';
+// import HomeBottom from '../components/bottomTab/HomeBottom';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-import {HandleNotification} from '../utils/handleNotification';
+// import {HandleNotification} from '../utils/handleNotification';
 
 const menuData = [
   {
@@ -55,14 +49,16 @@ const HomeScreen: React.FC = () => {
   return (
     <>
       <ScrollView style={styles.container}>
-        {/* Menu */}
-        <View style={styles.quickMenuRow}>
+      {/* Menu */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <View style={styles.quickMenuRow}>
           {menuData.map((item, index) => {
             if (item.label === 'Đơn hàng') {
               return (
                 <TouchableOpacity
                   key={index}
-                  onPress={() => navigation.navigate('order')}>
+                  // onPress={() => navigation.navigate('order')}>
+                    onPress={() => navigation.navigate('orderAdmin')}>
                   <QuickMenuItem
                     icon={item.icon}
                     label={item.label}
@@ -94,19 +90,20 @@ const HomeScreen: React.FC = () => {
             }
           })}
         </View>
-
-        {/* Product List */}
-        <FlatList
-          data={data}
-          numColumns={2}
-          scrollEnabled={false}
-          columnWrapperStyle={{justifyContent: 'space-between'}}
-          contentContainerStyle={{paddingTop: 16}}
-          renderItem={({item}) => <ProductCard item={item} />}
-          keyExtractor={(_, i) => i.toString()}
-        />
-      </ScrollView>
-      {/* <HomeBottom/> */}
+    </ScrollView>
+    <Text onPress={() => navigation.navigate('payment')}>Sang Payment</Text>
+      {/* Product List */}
+      <FlatList
+        data={data}
+        numColumns={2}
+        scrollEnabled={false}
+        columnWrapperStyle={{ justifyContent: 'space-between' }}
+        contentContainerStyle={{ paddingTop: 16 }}
+        renderItem={({ item }) => <ProductCard item={item} />}
+        keyExtractor={(_, i) => i.toString()}
+      />
+    </ScrollView>
+    {/* <HomeBottom/> */}
     </>
   );
 };
@@ -135,5 +132,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 16,
+    overflow: 'scroll',
   },
 });

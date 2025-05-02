@@ -3,7 +3,7 @@ import Icon from '@react-native-vector-icons/ant-design';
 import {useState} from 'react';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import AllReadModal from '../navigation/AllReadModal';
+// import AllReadModal from '../navigation/AllReadModal';
 import SettingModal from '../navigation/SettingNotiModal';
 
 type NotiRouteProp = RouteProp<RootStackParamList, 'notiTypeDetails'>;
@@ -11,7 +11,7 @@ type NavigationType = NativeStackNavigationProp<RootStackParamList>;
 
 interface HeaderNotificationProps {
   onOpenMarkAllModal?: () => void;
-  itemCount: number;
+  itemCount?: number;
 }
 
 const HeaderNotification: React.FC<HeaderNotificationProps> = ({ onOpenMarkAllModal, itemCount }) => {

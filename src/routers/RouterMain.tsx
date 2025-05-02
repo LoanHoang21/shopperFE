@@ -1,11 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Home from '../screens/Home';
 import Order from '../screens/Order';
 import BeforeLogin from '../screens/BeforeLogin';
 import Login from '../screens/Login';
 import HeaderLogin from '../components/headers/HeaderLogin';
 import Register from '../screens/Register';
 import HeaderHome from '../components/headers/HeaderHome';
-import Home from '../screens/Home';
 import CartScreen from '../screens/Cart';
 import NotiType from '../screens/NotiType';
 import HeaderNotification from '../components/headers/HeaderNotification';
@@ -17,9 +17,14 @@ import HomeAdmin from '../admin/screens/HomeAdmin';
 import NotiTypeAdmin from '../admin/screens/NotiTypeAdmin';
 import VoucherScreen from '../screens/Voucher';
 // import HeaderUpdateOrder from './headers/HeaderUpdateOrder';
+import Payment from '../screens/payment/Payment';
+import PaymentMethod from '../screens/payment/PaymentMethod';
+import PaymentSuccess from '../screens/payment/PaymentSuccess';
+import OrderAdmin from '../screens/OrderAdmin';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
+
     return (
         // <Stack.Navigator screenOptions={{ headerShown: true }}>
         <Stack.Navigator>
@@ -49,19 +54,34 @@ const RouterMain = () => {
                 options={{ header: () =>  <HeaderHome /> }}
             />
             <Stack.Screen
-                name="notiTypeAdmin"
-                component={NotiTypeAdmin}
-                // options={{ header: () =>  <HeaderHome /> }}
-            />
-            <Stack.Screen
                 name="order"
                 component={Order}
-            // options={{ title: 'Chi tiết Review' }}
+                // options={{ title: 'Chi tiết Review' }}
             />
             <Stack.Screen
                 name="cart"
                 component={CartScreen}
-                options={{ headerShown: false }}
+                options={{headerShown: false}}
+            />
+            <Stack.Screen
+                name="payment"
+                component={Payment}
+                options={{headerShown: true}}
+            />
+            <Stack.Screen
+                name="paymentMethod"
+                component={PaymentMethod}
+                options={{headerShown: true}}
+            />
+            <Stack.Screen
+                name="paymentSuccess"
+                component={PaymentSuccess}
+                options={{headerShown: false}}
+            />
+            <Stack.Screen
+                name="notiTypeAdmin"
+                component={NotiTypeAdmin}
+                // options={{ header: () =>  <HeaderHome /> }}
             />
             <Stack.Screen
                 name="notiType"
@@ -87,6 +107,11 @@ const RouterMain = () => {
                 name="voucher"
                 component={VoucherScreen}
                 options={{ title: "Mã giảm giá" }}
+            />
+            <Stack.Screen
+                name="orderAdmin"
+                component={OrderAdmin}
+                // options={{ title: 'Chi tiết Review' }}
             />
         </Stack.Navigator>
     );

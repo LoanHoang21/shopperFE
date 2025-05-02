@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const registerNewUser = (username, email, phone, password) => {
-    return axios.post('http://192.168.1.164:3001/api/auth/register', {
+    return axios.post('http://192.168.0.116:3001/api/auth/register', {
         username, email, phone, password
       })
 }
 
 const userLogin = (valueLogin, password) => {
-    return axios.post('http://192.168.1.164:3001/api/auth/login', {
+    // return axios.post('http://192.168.1.164:3001/api/auth/login', {
+    return axios.post('http://192.168.0.116:3001/api/auth/login', {
         valueLogin, password,
       })
 }
