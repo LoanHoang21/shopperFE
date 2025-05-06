@@ -15,6 +15,7 @@ import ProductCard from '../components/ProductCard';
 import { Dimensions } from 'react-native';
 import { Product } from '../components/ProductCard';
 import axios from 'axios';
+import AddToCartModal from '../components/AddToCartModal';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
 
@@ -25,6 +26,22 @@ const ProductDetailScreen = () => {
     const route = useRoute<ProductDetailRouteProp>();
     const { product } = route.params;
     const [relatedProducts, setRelatedProducts] = React.useState<Product[]>([]);
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const [productOptions, setProductOptions] = React.useState<string[]>([]);
+    const [productAttributes, setProductAttributes] = React.useState<
+    { category: string; values: string[] }[]
+    >([]);
+
+
+    const fetchProductAttributions = async () => {
+        try {
+          const res = await axios.get(`http://10.0.2.2:3001/api/product/${product._id}/attributions`);
+          setProductAttributes(res.data.data || []);
+        } catch (error) {
+          console.error('Lỗi khi lấy thuộc tính sản phẩm:', error);
+        }
+    };
+      
 
     React.useEffect(() => {
         const fetchRelatedProducts = async () => {
@@ -52,9 +69,9 @@ const ProductDetailScreen = () => {
     const navigation = useNavigation();
     const [showAlert, setShowAlert] = React.useState(false);
 
-    const handleAddToCart = () => {
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 2000);
+    const handleAddToCart = async () => {
+        await fetchProductAttributions();
+        setModalVisible(true);
     };
 
     const handleCompare = () => {
@@ -169,6 +186,27 @@ const ProductDetailScreen = () => {
                     </View>
                 </View>
             )}
+            <AddToCartModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                product={{
+                    id: product._id,
+                    image: Array.isArray(product.images) && product.images.length > 0
+                ? product.images[0] ?? 'https://via.placeholder.com/300'
+                : product.image ?? 'https://via.placeholder.com/300',
+                    name: product.name,
+                    discountPrice: product.price,
+                    price: originalPrice,
+                    stock: (product.quantity && product.sale_quantity)? (product.quantity - product.sale_quantity) : 0,
+                    options:productAttributes
+                }}
+                onAddToCart={(item) => {
+                    console.log('Đã thêm giỏ:', item);
+                    setShowAlert(true);
+                    setTimeout(() => setShowAlert(false), 2000);
+                }}
+            />
+
         </View>
     );
 };

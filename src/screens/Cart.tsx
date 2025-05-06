@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,14 +14,19 @@ import DeleteConfirmModal from '../components/DeleteConfirmModal';
 import ToastSuccess from '../components/ToastSuccess';
 import OutOfStockModal from '../components/OutOfStockModal';
 import CartHeader from '../components/headers/HeaderCart';
+import { useNavigation } from '@react-navigation/native';
 
 const CartScreen: React.FC = () => {
-  const { items, removeSelected } = useCart();
+  const { items, removeSelected, deleteSelectedItems } = useCart();
   const [modalVisible, setModalVisible] = React.useState(false);
   const [showToast, setShowToast] = React.useState(false);
   const [showOutOfStock, setShowOutOfStock] = React.useState(false);
+  const { reloadCart } = useCart(); 
+  const navigation = useNavigation();
 
-  // const hasChecked = items.some((item) => item.checked);
+  useEffect(() => {
+    reloadCart();
+  }, []);
 
   const selectedItems = items.filter(item => item.checked);
   const totalAmount = selectedItems.reduce(
@@ -36,8 +41,11 @@ const CartScreen: React.FC = () => {
     return acc;
   }, {} as Record<string, { brand: string; items: CartItemI[] }>);
 
+  console.log('grouped',grouped)
+
   const handleConfirmDelete = () => {
     removeSelected();
+    deleteSelectedItems()
     setModalVisible(false);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
@@ -60,7 +68,7 @@ const CartScreen: React.FC = () => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 >
-                <TouchableOpacity style={styles.button}>
+                <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate('home')}}>
                     <Text style={styles.buttonText}>MUA NGAY</Text>
                 </TouchableOpacity>
                 </LinearGradient>
@@ -68,6 +76,7 @@ const CartScreen: React.FC = () => {
         </View>
     );
   }
+  
 
   return (
     <View style={{ flex: 1 }}>
@@ -96,8 +105,7 @@ const CartScreen: React.FC = () => {
               <Text style={styles.brand}>{group.brand}</Text>
             </View>
             {group.items.map((item) => (
-              <CartItem key={item.id} item={item} onOutOfStock={() => setShowOutOfStock(true)} />
-
+              <CartItem key={item.id} item={item} onOutOfStock={(stock) => setShowOutOfStock(true)} />
             ))}
           </View>
         ))}
@@ -113,7 +121,10 @@ const CartScreen: React.FC = () => {
   </View>
 )}
 
-      <OutOfStockModal visible={showOutOfStock} onClose={() => setShowOutOfStock(false)} />
+      <OutOfStockModal 
+      visible={showOutOfStock} 
+      onClose={() => setShowOutOfStock(false)} 
+      />
     </View>
   );
 };

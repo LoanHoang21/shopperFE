@@ -25,6 +25,7 @@ export interface Product {
   };
   sale_quantity?: number;
   review_count_7d?: number;
+  quantity?: number;
 }
 
 
@@ -72,7 +73,7 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
         ) : null}
       </View>
 
-      {/* Tên shop giả định (hoặc bạn có thể truyền từ BE nếu muốn động) */}
+     
       <View style={styles.metaRow}>
         <Text style={styles.shopName}>{item.shop_name}</Text>
 

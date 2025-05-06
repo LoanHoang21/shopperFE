@@ -1,4 +1,7 @@
+import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { deleteCartItems, updateCartItemQuantity } from '../apis/Cart';
 
 export interface CartItemI {
   id: string;
@@ -18,7 +21,9 @@ interface CartContextType {
     items: CartItemI[];
     toggleItem: (id: string) => void;
     changeQty: (id: string, delta: number) => void;
-    removeSelected: () => void; // 👈 thêm dòng này
+    removeSelected: () => void;
+    reloadCart: () => void;
+    deleteSelectedItems: () => void;
   }
   
 
@@ -26,6 +31,8 @@ interface CartContextType {
   items: CartItemI[];
   toggleItem: (id: string) => void;
   changeQty: (id: string, delta: number) => void;
+  reloadCart: () => void;
+  deleteSelectedItems: () => void;
 }
 
 const CartContext = createContext<CartContextType>({
@@ -33,29 +40,32 @@ const CartContext = createContext<CartContextType>({
   toggleItem: () => {},
   changeQty: () => {},
   removeSelected: () => {},
+  reloadCart: () => {},
+  deleteSelectedItems: () => {},
 });
 
 const convertCartItemFromApi = (apiItem: any): CartItemI => {
   const product = apiItem.product_id;
   const category = product?.category_id;
   const shop = category?.shop_id;
-  const attributes = apiItem?.product_attributes?.flatMap((attr: any) => {
-    return attr.attributions.map((option: any) => ({
-      label: attr.category_attribution_name,
-      value: option.name,
-    }));
-  }) || [];
+
+  const attributes = apiItem?.attributions?.map((attr: any) => ({
+    label: attr.category,
+    value: attr.value,
+  })) || [];
+
+  console.log('⚠️ shop:', shop, '-> brand_id:', shop?._id);
 
   return {
     id: apiItem._id,
     brand_id: shop?._id || '',
-    brand: shop?.name || '',   // ✅ lấy tên shop ở đây
+    brand: shop?.name || '',
     title: product?.name || '',
-    price: product?.discount  ? product?.price*(100-product?.discount)/100 : product?.price,
+    price: product?.discount ? product?.price * (100 - product?.discount) / 100 : product?.price,
     oldPrice: product?.price || 0,
-    thumbnail: product?.images[0] || '',
+    thumbnail: product?.images?.[0] || '',
     quantity: apiItem.quantity,
-    stock: product?.quantity || 0,
+    stock: product?.quantity -  product?.sale_quantity|| 0,
     checked: apiItem.isSelected || false,
     attributes: attributes,
   };
@@ -63,27 +73,34 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
 
 
 
+
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     const [items, setItems] = useState<CartItemI[]>([]);
 
-  useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const res = await fetch('http://10.0.2.2:3001/api/cartitems'); // ⚡ Sửa lại URL theo server bạn
-        const data = await res.json();
-
+        const userStr = await AsyncStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        if (!user || !user._id) return;
+  
+        const res = await axios.get(`http://192.168.79.11:3001/api/cart/user/${user._id}`);
+        const data = res.data?.data;
+        console.log('🛒 Fetched cart data:', data);
+  
         if (Array.isArray(data)) {
           const converted = data.map((item) => convertCartItemFromApi(item));
           setItems(converted);
         }
       } catch (error) {
-        console.error('Failed to fetch cart items:', error);
+        console.error('❌ Failed to fetch cart items:', error);
       }
     };
-
-    fetchCartItems();
-  }, []);
+  
+    useEffect(() => {
+      fetchCartItems();
+    }, []);
+    
   
   const toggleItem = (id: string) => {
     setItems((prev) =>
@@ -93,7 +110,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
-  const changeQty = (id: string, delta: number) => {
+  const changeQty = async (id: string, delta: number) => {
     setItems((prev) => {
       return prev
         .map((item) =>
@@ -101,16 +118,46 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         )
         .filter((item) => item.quantity > 0); // ✅ xoá sản phẩm nếu số lượng ≤ 0
     });
+
+    try {
+      const item = items.find((i) => i.id === id);
+      if (!item) return;
+      const newQuantity = item.quantity + delta;
+  
+      if (newQuantity <= 0) {
+        await deleteCartItems([id]);
+      } else {
+        console.log(id, newQuantity)
+        await updateCartItemQuantity(id, newQuantity);
+      }
+  
+      // reloadCart(); // nên gọi lại để fetch mới sau khi thay đổi
+    } catch (err) {
+      console.error('❌ Failed to update/delete quantity:', err);
+    }
   };
 
   const removeSelected = () => {
     setItems((prev) => prev.filter((item) => !item.checked));
   };
-  
-  
 
+  const getSelectedItemIds = () => {
+    return items.filter(item => item.checked).map(item => item.id);
+  };
+  
+  const deleteSelectedItems = async () => {
+    try {
+      const itemIds = getSelectedItemIds();
+      if (itemIds.length === 0) return;
+  
+      await deleteCartItems(itemIds);
+    } catch (err) {
+      console.error('❌ Failed to delete selected items:', err);
+    }
+  };
+  
   return (
-    <CartContext.Provider value={{ items, toggleItem, changeQty, removeSelected }}>
+    <CartContext.Provider value={{ items, toggleItem, changeQty, removeSelected, reloadCart: fetchCartItems, deleteSelectedItems  }}>
       {children}
     </CartContext.Provider>
   );
