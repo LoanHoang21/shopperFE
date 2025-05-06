@@ -11,13 +11,15 @@ export const addToCart = (
   userId: string,
   product_id: string,
   quantity: number,
-  attributions: Attribute[]
+  attributions: Attribute[],
+  variant_id: any
 ) => {
   return axios.post(`${BASE_URL}/add`, {
     userId,
     product_id,
     quantity,
     attributions,
+    variant_id
   });
 };
 

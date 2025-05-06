@@ -15,6 +15,7 @@ export interface CartItemI {
   stock: number;
   checked: boolean;
   attributes?: { label: string; value: string }[];
+  variantId?: string;
 }
 
 interface CartContextType {
@@ -48,6 +49,7 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
   const product = apiItem.product_id;
   const category = product?.category_id;
   const shop = category?.shop_id;
+  const variant = apiItem?.variant_id; 
 
   const attributes = apiItem?.attributions?.map((attr: any) => ({
     label: attr.category,
@@ -61,13 +63,15 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
     brand_id: shop?._id || '',
     brand: shop?.name || '',
     title: product?.name || '',
-    price: product?.discount ? product?.price * (100 - product?.discount) / 100 : product?.price,
+    // price: product?.discount ? product?.price * (100 - product?.discount) / 100 : product?.price,
+    price: variant?.price ?? product?.price,
     oldPrice: product?.price || 0,
-    thumbnail: product?.images?.[0] || '',
+    thumbnail: variant.image ?? product?.images?.[0] ?? '',
     quantity: apiItem.quantity,
-    stock: product?.quantity -  product?.sale_quantity|| 0,
+    stock: ( variant?.quantity - variant?.sale_quantity || 0),
     checked: apiItem.isSelected || false,
     attributes: attributes,
+    variantId: variant?._id,
   };
 };
 

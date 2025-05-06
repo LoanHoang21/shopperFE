@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -18,6 +18,18 @@ import axios from 'axios';
 import AddToCartModal from '../components/AddToCartModal';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
+type ProductVariant = {
+    _id: string;
+    attributes: {
+      category: string;
+      value: string;
+    }[];
+    price: number;
+    discount: number;
+    quantity: number;
+    sale_quantity: number;
+    image: string;
+  };
 
 
 const ProductDetailScreen = () => {
@@ -31,7 +43,9 @@ const ProductDetailScreen = () => {
     const [productAttributes, setProductAttributes] = React.useState<
     { category: string; values: string[] }[]
     >([]);
+    const [variants, setVariants] = useState<ProductVariant[]>([]);
 
+    console.log('product',product)
 
     const fetchProductAttributions = async () => {
         try {
@@ -41,6 +55,16 @@ const ProductDetailScreen = () => {
           console.error('Lỗi khi lấy thuộc tính sản phẩm:', error);
         }
     };
+
+    const fetchProductVariants = async () => {
+        try {
+          const res = await axios.get(`http://10.0.2.2:3001/api/product/${product._id}/variants`);
+          const data = res.data?.data?.variants || [];
+          setVariants(data);
+        } catch (error) {
+          console.error('Lỗi khi lấy biến thể sản phẩm:', error);
+        }
+      };
       
 
     React.useEffect(() => {
@@ -63,6 +87,9 @@ const ProductDetailScreen = () => {
         }
     }, [product]);
     React.useEffect(() => {
+        if (product?._id) {
+            fetchProductVariants();
+          }
         scrollRef.current?.scrollTo({ y: 0, animated: true });
     }, [product]);
 
@@ -198,7 +225,8 @@ const ProductDetailScreen = () => {
                     discountPrice: product.price,
                     price: originalPrice,
                     stock: (product.quantity && product.sale_quantity)? (product.quantity - product.sale_quantity) : 0,
-                    options:productAttributes
+                    options:productAttributes,
+                    variants: variants 
                 }}
                 onAddToCart={(item) => {
                     console.log('Đã thêm giỏ:', item);
@@ -241,7 +269,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 10,
+        paddingHorizontal: 10,
+        paddingBottom:30,
+        paddingTop:20,
         backgroundColor: 'white',
         borderTopWidth: 1,
         borderColor: '#ddd',

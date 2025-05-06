@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Modal,
   View,
@@ -23,6 +23,15 @@ type Product = {
   discountPrice?: number;
   stock: number;
   options: { category: string; values: string[] }[];
+  variants: {
+    attributes: { category: string; value: string }[];
+    price: number;
+    quantity: number;
+    discount: number;
+    sale_quantity: number;
+    image: string;
+    _id: string;
+  }[];
 };
 
 type Props = {
@@ -40,6 +49,7 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedOptions, setSelectedOptions] = useState<{ [category: string]: string }>({});
   const [showStockModal, setShowStockModal] = useState(false);
+  const [outOfStock, setoutOfStock] = useState(false);
   const { reloadCart } = useCart(); 
 
   const isReadyToAdd = product.options.every(
@@ -63,19 +73,40 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
             product_id: product.id,
             quantity,
             selectedAttributes,
+            variantId: selectedVariant?._id,
           });
 
-      const response = await addToCart( user._id, product.id, quantity, selectedAttributes);
+      const response = await addToCart( user._id, product.id, quantity, selectedAttributes,selectedVariant?._id);
       ToastAndroid.show('Đã thêm vào giỏ hàng!', ToastAndroid.SHORT);
       onClose();
       setSelectedOptions({});
       setQuantity(1);
-    //   reloadCart();
+      setoutOfStock(false)
     } catch (err: any) {
       console.error('Thêm giỏ hàng thất bại:', err);
       Alert.alert('Lỗi', err?.response?.data?.message || 'Không thể thêm vào giỏ hàng');
     }
   };
+
+  const selectedVariant = React.useMemo(() => {
+    return product.variants?.find((v) =>
+      v.attributes.every((attr) => selectedOptions[attr.category] === attr.value)
+    );
+  }, [selectedOptions, product.variants]);
+
+  useEffect(() => {
+    if(selectedVariant){
+        console.log('selectedVariant',selectedVariant)
+        setQuantity(1);
+        if(selectedVariant?.quantity === 0 || selectedVariant?.quantity === selectedVariant?.sale_quantity){
+            setoutOfStock(true)
+        }
+        else{
+            setoutOfStock(false)
+        }
+    }
+  }, [selectedVariant]);
+  
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -83,21 +114,31 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <Image source={{ uri: product.image }} style={styles.image} />
-            <View style={styles.info}>
-              <Text style={styles.price}>
-                ₫{(product.discountPrice ?? product.price).toLocaleString()}
-              </Text>
-              {product.discountPrice && (
-                <Text style={styles.oldPrice}>₫{product.price.toLocaleString()}</Text>
-              )}
-              <Text style={styles.stock}>Kho: {product.stock}</Text>
+            <Image source={{ uri: selectedVariant?.image || product.image }} style={styles.image} />
+            {selectedVariant ? (
+                <View style={styles.info}>
+                <Text style={styles.price}>
+                    ₫{((selectedVariant?.discount? selectedVariant?.price * (100-selectedVariant?.discount) /100:selectedVariant?.price) ?? product.price).toLocaleString()}
+                    </Text>
+                    {selectedVariant?.discount || product.discountPrice ? (
+                    <Text style={styles.oldPrice}>₫{( selectedVariant?.price ?? product.price).toLocaleString()}</Text>
+                    ) : null}
+                <Text style={styles.stock}>Kho: {selectedVariant?.sale_quantity ? selectedVariant?.quantity - selectedVariant?.sale_quantity :  selectedVariant?.quantity}</Text>
             </View>
+            )
+            :
+            (
+                <View style={styles.info}>
+                    </View>
+            )
+        }
+    
             <TouchableOpacity
               onPress={() => {
                 onClose();
                 setSelectedOptions({});
                 setQuantity(1);
+                setoutOfStock(false)
               }}
             >
               <Text style={styles.close}>✕</Text>
@@ -141,11 +182,11 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
               <Text style={styles.qty}>{quantity}</Text>
               <TouchableOpacity
                 onPress={() => {
-                  if (quantity < product.stock) {
-                    setQuantity(quantity + 1);
-                  } else {
-                    setShowStockModal(true);
-                  }
+                    if (quantity < (selectedVariant?.sale_quantity ? selectedVariant?.quantity - selectedVariant?.sale_quantity : selectedVariant?.quantity ?? product.stock)) {
+                        setQuantity(quantity + 1);
+                      } else {
+                        setShowStockModal(true);
+                      }
                 }}
               >
                 <Text style={styles.qtyBtn}>+</Text>
@@ -153,13 +194,19 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
             </View>
           </View>
 
+          {outOfStock && (
+            <Text style={{ color: 'red', marginTop: 8 }}>
+                Sản phẩm với lựa chọn này hiện đã hết hàng.
+            </Text>
+            )}
+
           {/* Add button */}
           <TouchableOpacity
             onPress={handleAddToCart}
-            disabled={!isReadyToAdd}
+            disabled={!isReadyToAdd || outOfStock}
             style={[
               styles.addButton,
-              !isReadyToAdd && { backgroundColor: '#ccc' },
+              (!isReadyToAdd || outOfStock) && { backgroundColor: '#ccc' },
             ]}
           >
             <Text style={styles.addButtonText}>Thêm vào Giỏ hàng</Text>
@@ -171,7 +218,7 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
       <OutOfStockModal
         visible={showStockModal}
         onClose={() => setShowStockModal(false)}
-        stock={product.stock}
+        stock={selectedVariant?.sale_quantity ? selectedVariant?.quantity - selectedVariant?.sale_quantity : selectedVariant?.quantity}
       />
     </Modal>
   );

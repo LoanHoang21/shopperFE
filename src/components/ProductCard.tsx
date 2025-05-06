@@ -26,6 +26,7 @@ export interface Product {
   sale_quantity?: number;
   review_count_7d?: number;
   quantity?: number;
+  variants?: any ;
 }
 
 
