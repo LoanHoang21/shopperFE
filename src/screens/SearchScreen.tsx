@@ -28,7 +28,7 @@ const SearchScreen = () => {
     const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
 
     useEffect(() => {
-        fetch('http://10.0.2.2:3001/api/product/suggested/ml-trending')
+        fetch('http://192.168.1.145:3001/api/product/suggested/ml-trending')
             .then(res => res.json())
             .then(json => {
                 if (json.status === 'OK') {
@@ -40,7 +40,7 @@ const SearchScreen = () => {
 
     const handleSearch = async (keyword: string) => {
         try {
-            const res = await fetch(`http://10.0.2.2:3001/api/product/search?query=${encodeURIComponent(keyword)}`);
+            const res = await fetch(`http://192.168.1.145:3001/api/product/search?query=${encodeURIComponent(keyword)}`);
             const json = await res.json();
 
             if (json.status === 'OK') {

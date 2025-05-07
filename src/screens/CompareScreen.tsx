@@ -30,7 +30,7 @@ const CompareScreen = () => {
     React.useEffect(() => {
         const fetchRelated = async () => {
             try {
-              const res = await axios.get(`http://10.0.2.2:3001/api/product/${mainProduct._id}/related`);
+              const res = await axios.get(`http://192.168.1.145:3001/api/product/${mainProduct._id}/related`);
           
               const related = (res.data.data || []).map((p: any) => ({
                 ...p,

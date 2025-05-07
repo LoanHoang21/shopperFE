@@ -70,13 +70,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const res = await fetch('http://10.0.2.2:3001/api/cartitems'); // ⚡ Sửa lại URL theo server bạn
-        const data = await res.json();
+        // const res = await fetch('http://192.168.1.145:3001/api/cartitems'); // ⚡ Sửa lại URL theo server bạn
+        // const data = await res.json();
 
-        if (Array.isArray(data)) {
-          const converted = data.map((item) => convertCartItemFromApi(item));
-          setItems(converted);
-        }
+        // if (Array.isArray(data)) {
+        //   const converted = data.map((item) => convertCartItemFromApi(item));
+        //   setItems(converted);
+        // }
       } catch (error) {
         console.error('Failed to fetch cart items:', error);
       }

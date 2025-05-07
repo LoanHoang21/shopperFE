@@ -65,7 +65,7 @@ const CompareResultScreen = () => {
                 const shopId = p.category_id?.shop_id?._id;
                 if (shopId && !map[shopId]) {
                     try {
-                        const res = await fetch(`http://10.0.2.2:3001/api/vouchers/shop/${shopId}`);
+                        const res = await fetch(`http://192.168.1.145:3001/api/vouchers/shop/${shopId}`);
                         const data = await res.json();
                         map[shopId] = data.data || [];
                     } catch (err) {

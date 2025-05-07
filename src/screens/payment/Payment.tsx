@@ -1,8 +1,25 @@
-import { ScrollView, Text, View, TouchableOpacity } from 'react-native';
+import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import OrderPayment from '../../components/OrderPayment';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/data';
 import RadioList from '../../components/RadioList';
-import { useState } from 'react';
+import { AddressData } from '../../components/AddressModal';
+import AddressModal from '../../components/AddressModal';
+import { getAddressByCustomerId, createOrUpdateAddress, updateAddress } from '../../apis/Address';
+import { useState, useEffect, useRef } from 'react';
+
+import Toast from 'react-native-toast-message';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+type PaymentRouteProp = RouteProp<RootStackParamList, 'payment'>;
+
+type PaymentMethodType = {
+    _id: string;
+    name: string;
+    type: string;
+};
 
 const orderInfor = {
     shopName: 'Happy Bedding',
@@ -31,21 +48,125 @@ const orderInfor = {
 
 const Payment = () => {
     const navigation = useNavigation();
-    //   const [checked, setChecked] = useState(false);
+    const route = useRoute<PaymentRouteProp>();
+    const { paymentMethodId } = route.params || "681a1bde3427154ae2166ebd";
+    console.log('PaymentMethodId:', paymentMethodId);
+    const [showModal, setShowModal] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>({});
+    const customerIdRef = useRef<string | null>(null);
+    const [selectedAddress, setSelectedAddress] = useState<AddressData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    const getUserInfo = async () => {
+        try {
+            const jsonValue = await AsyncStorage.getItem('user');
+            if (jsonValue !== null) {
+                const user = JSON.parse(jsonValue);
+                // console.log('User info:', user);
+                return user;
+            } else {
+                console.log('No user found');
+                return null;
+            }
+        } catch (e) {
+            console.error('Error reading user from AsyncStorage', e);
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const fetchPaymentMethod = async () => {
+            if (!paymentMethodId) return;
+
+            try {
+                const res = await axios.get(`http://192.168.1.145:3001/api/payment-method/${paymentMethodId}`);
+                setPaymentMethod(res.data?.data);
+            } catch (err) {
+                console.error('Lỗi khi lấy phương thức thanh toán:', err);
+            }
+        };
+
+        fetchPaymentMethod();
+    }, [paymentMethodId]);
+
+    // 🧠 Lấy địa chỉ khi mở màn
+    useEffect(() => {
+        const fetchUserAndAddress = async () => {
+            try {
+                const user = await getUserInfo();
+                if (user) {
+                    customerIdRef.current = user._id;
+
+                    const res = await getAddressByCustomerId(user._id);
+                    if (res.data?.data) {
+                        setSelectedAddress(res.data.data);
+                    } else {
+                        console.log('Chưa có địa chỉ');
+                    }
+                }
+            } catch (err) {
+                console.error('Lỗi khi lấy thông tin:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchUserAndAddress();
+    }, []);
+
+    // 💾 Lưu hoặc cập nhật địa chỉ
+    const handleSaveAddress = async (data: AddressData) => {
+        try {
+            await createOrUpdateAddress({
+                ...data,
+                customer_id: customerIdRef.current
+            }); setSelectedAddress(data);
+            setShowModal(false);
+
+            Toast.show({
+                type: 'success',
+                text1: 'Địa chỉ đã được cập nhật',
+                position: 'top',
+                visibilityTime: 1500,
+            });
+        } catch (err) {
+            console.error('Lỗi lưu địa chỉ:', err);
+        }
+    };
 
     return (
         <ScrollView style={{ flex: 1, paddingHorizontal: 12 }}>
-            <View style={{ marginTop: 10, backgroundColor: '#fff', padding: 12, borderRadius: 5 }}>
-                <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', paddingBottom: 10 }}>
-                    <Text style={{ fontWeight: '700', fontSize: 16 }}>Nguyễn Bá Phong</Text>
-                    <Text>(+84) 328 737 474</Text>
-                </View>
+            {loading ? (
+                <ActivityIndicator style={{ marginTop: 20 }} />
+            ) : (
+                <TouchableOpacity
+                    onPress={() => setShowModal(true)}
+                    style={{ marginTop: 10, backgroundColor: '#fff', padding: 12, borderRadius: 5 }}
+                >
+                    {selectedAddress ? (
+                        <>
+                            <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center', paddingBottom: 10 }}>
+                                <Text style={{ fontWeight: '700', fontSize: 16 }}>{selectedAddress.receiver}</Text>
+                                <Text>(+84) {selectedAddress.phone}</Text>
+                            </View>
+                            <View>
+                                <Text style={{ marginBottom: 3 }}>{selectedAddress.street}</Text>
+                                <Text>{selectedAddress.primary}, {selectedAddress.city}, {selectedAddress.country}</Text>
+                            </View>
+                        </>
+                    ) : (
+                        <Text>Chọn hoặc thêm địa chỉ</Text>
+                    )}
+                </TouchableOpacity>
+            )}
 
-                <View>
-                    <Text style={{ marginBottom: 3 }}>Số nhà 12, ngõ 12, Phố Chính Kinh</Text>
-                    <Text>Phường Thượng Đình, Quận Thanh Xuân, Hà Nội</Text>
-                </View>
-            </View>
+            <AddressModal
+                visible={showModal}
+                onClose={() => setShowModal(false)}
+                onSave={handleSaveAddress}
+                defaultValue={selectedAddress}
+            />
+
 
             <View style={{ marginTop: 10, backgroundColor: '#fff', padding: 12, borderRadius: 5 }}>
                 <OrderPayment {...orderInfor} />
@@ -58,7 +179,7 @@ const Payment = () => {
                 </View>
 
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Text>Thanh toán khi nhận hàng</Text>
+                    <Text>{paymentMethod?.name}</Text>
                     <View style={{
                         width: 20,
                         height: 20,

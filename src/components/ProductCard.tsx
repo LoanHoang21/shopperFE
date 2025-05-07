@@ -39,7 +39,7 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
   const handlePress = async () => {
     try {
       // ✅ Gửi request tăng view trước
-      await axios.post(`http://10.0.2.2:3001/api/product/view/${item._id}`);
+      await axios.post(`http://192.168.1.145:3001/api/product/view/${item._id}`);
      } catch (err) {
       console.error((err as Error).message);
     }

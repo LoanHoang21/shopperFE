@@ -33,7 +33,16 @@ const Login = () => {
 
   // Handle login action
   const handleLogin = async () => {
+    navigation.navigate('home');
     let res = await userLogin(valueLogin, password);
+    Toast.show({
+      type: 'success',
+      text1: 'Thông báo',
+      text2: `ok`,
+      position: 'bottom',
+      visibilityTime: 1500,
+    });
+    console.log('res', res);
     if (res && res.data && +res.data.EC === 0) {
       Toast.show({
         type: 'success',

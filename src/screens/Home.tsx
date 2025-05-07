@@ -41,7 +41,7 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://10.0.2.2:3001/api/product/getAll');
+        const response = await axios.get('http://192.168.1.145:3001/api/product/getAll');
         setProducts(response.data.data); // vì dữ liệu nằm trong `data.data`
       } catch (error) {
         console.error("Failed to fetch products", error);
@@ -62,7 +62,7 @@ const HomeScreen: React.FC = () => {
                 <TouchableOpacity
                   key={index}
                   // onPress={() => navigation.navigate('order')}>
-                    onPress={() => navigation.navigate('orderAdmin')}>
+                    onPress={() => navigation.navigate('order')}>
                   <QuickMenuItem
                     icon={item.icon}
                     label={item.label}

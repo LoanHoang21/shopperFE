@@ -11,11 +11,11 @@ import axios from "axios";
 // }
 
 const getAllVoucher = () => {
-    return axios.get(`http://192.168.0.116:3001/api/voucher/getAll/`);
+    return axios.get(`http://192.168.1.145:3001/api/voucher/getAll/`);
 }
 
 // const userLogin = (valueLogin, password) => {
-//     return axios.post('http://10.0.2.2:3001/api/auth/login', {
+//     return axios.post('http://192.168.1.145:3001/api/auth/login', {
 //         valueLogin, password
 //       })
 // }

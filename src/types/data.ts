@@ -8,7 +8,7 @@ export type RootStackParamList = {
     order: { id: number } | undefined;
     cart: undefined;
     notiType: undefined;
-    notiTypeDetails: {_id: string, name: string, sum: number} | undefined;
+    notiTypeDetails: { _id: string, name: string, sum: number } | undefined;
     productDetail: { product: Product };
     compare: { products: Product[] };
     compareResult: { products: Product[]; related: Product[] };
@@ -16,8 +16,11 @@ export type RootStackParamList = {
     searchResult: {
         query: string;
         products: Product[];
-      };
-    payment: undefined;
+    };
+    payment: {
+        product?: { product: Product, quantity: number }[];
+        paymentMethodId?: string;
+    };
     paymentMethod: undefined;
     paymentSuccess: undefined;
     // Feed: { sort: 'latest' | 'top' } | undefined;
