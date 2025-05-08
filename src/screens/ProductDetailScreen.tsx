@@ -44,12 +44,14 @@ const ProductDetailScreen = () => {
     { category: string; values: string[] }[]
     >([]);
     const [variants, setVariants] = useState<ProductVariant[]>([]);
+   
+
 
     console.log('product',product)
 
     const fetchProductAttributions = async () => {
         try {
-          const res = await axios.get(`http://10.0.2.2:3001/api/product/${product._id}/attributions`);
+          const res = await axios.get(`http://192.168.79.11:3001/api/product/${product._id}/attributions`);
           setProductAttributes(res.data.data || []);
         } catch (error) {
           console.error('Lỗi khi lấy thuộc tính sản phẩm:', error);
@@ -58,7 +60,7 @@ const ProductDetailScreen = () => {
 
     const fetchProductVariants = async () => {
         try {
-          const res = await axios.get(`http://10.0.2.2:3001/api/product/${product._id}/variants`);
+          const res = await axios.get(`http://192.168.79.11:3001/api/product/${product._id}/variants`);
           const data = res.data?.data?.variants || [];
           setVariants(data);
         } catch (error) {
@@ -70,7 +72,7 @@ const ProductDetailScreen = () => {
     React.useEffect(() => {
         const fetchRelatedProducts = async () => {
             try {
-                const res = await axios.get(`http://10.0.2.2:3001/api/product/${product._id}/related`);
+                const res = await axios.get(`http://192.168.79.11:3001/api/product/${product._id}/related`);
                 const related = (res.data.data || []).map((p: any) => ({
                     ...p,
                     shop_name: p.category_id?.shop_id?.name ?? 'Không rõ',
@@ -86,6 +88,7 @@ const ProductDetailScreen = () => {
             fetchRelatedProducts();
         }
     }, [product]);
+
     React.useEffect(() => {
         if (product?._id) {
             fetchProductVariants();

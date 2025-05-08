@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = 'http://10.0.2.2:3001/api/cart';
+const BASE_URL = 'http://192.168.79.11:3001/api/cart';
 
 interface Attribute {
   category: string;
