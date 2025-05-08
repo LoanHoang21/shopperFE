@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Linking, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 
-// import AppNavigation from './src/components/navigation/AppNavigation';
 import Loading from './src/screens/Loading';
 import RouterMain from './src/routers/RouterMain';
-// import UpdateOrder from './src/screens/Notification';
-// import Notification from './src/screens/Notification';
 import { CartProvider } from './src/context/CartContext';
 import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
+import { NotificationProvider } from './src/context/NotiContext';
 import messaging from '@react-native-firebase/messaging';
 import { useNotification } from './src/utils/handleNotification';
 import { setupNotificationListeners } from './src/utils/noti';
@@ -55,7 +53,6 @@ const toastConfig = {
   ),
 };
 
-
 const App = () => {
 
   const [isLoading, setIsLoading] = useState(true);
@@ -65,7 +62,7 @@ const App = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000); // Đợi 1 giây
+    }, 500); // Đợi 0.5 giây
 
     return () => clearTimeout(timer); // Clear timer nếu component unmount
   }, []);
@@ -113,6 +110,7 @@ const App = () => {
   
   return (
     <CartProvider>
+      <NotificationProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
         <StatusBar
           backgroundColor="#ffffff"
@@ -139,7 +137,8 @@ const App = () => {
   </View>
 )}
       </SafeAreaView>
-    </CartProvider>
+      </NotificationProvider>
+     </CartProvider>
   );
 };
 

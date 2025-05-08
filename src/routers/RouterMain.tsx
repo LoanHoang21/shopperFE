@@ -14,13 +14,12 @@ import UpdateOrder from '../screens/UpdateOrder';
 import HeaderUpdateOrder from '../components/headers/HeaderUpdateOrder';
 import Profile from '../screens/Profile';
 import HomeAdmin from '../admin/screens/HomeAdmin';
-import NotiTypeAdmin from '../admin/screens/NotiTypeAdmin';
 import VoucherScreen from '../screens/Voucher';
 // import HeaderUpdateOrder from './headers/HeaderUpdateOrder';
 import Payment from '../screens/payment/Payment';
 import PaymentMethod from '../screens/payment/PaymentMethod';
 import PaymentSuccess from '../screens/payment/PaymentSuccess';
-import OrderAdmin from '../screens/OrderAdmin';
+import OrderAdmin from '../admin/screens/OrderAdmin';
 
 import Icon from '@react-native-vector-icons/ant-design';
 import SearchResultScreen from '../screens/SearchResultScreen';
@@ -30,12 +29,16 @@ import CompareResultScreen from '../screens/CompareResultScreen';
 import CompareScreen from '../screens/CompareScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import { RootStackParamList } from '../types/data';
+import HeaderHomeAdmin from '../admin/components/headers/HeaderHomeAdmin';
+import HeaderNotificationAdmin from '../admin/components/headers/HeaderNotificationAdmin';
+import RecommendedProduct from '../screens/RecommendedProduct';
+import NotiAdmin from '../admin/screens/NotiAdmin';
+import NotiTypeAdmin from '../admin/screens/NotiTypeAdmin';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
 
     return (
-        // <Stack.Navigator screenOptions={{ headerShown: true }}>
         <Stack.Navigator>
             <Stack.Screen
                 name="beforeLogin"
@@ -52,11 +55,7 @@ const RouterMain = () => {
                 component={Register}
                 options={{header: () => <HeaderLogin/>}}
             />
-            <Stack.Screen
-                name="homeAdmin"
-                component={HomeAdmin}
-                // options={{ header: () =>  <HeaderHome /> }}
-            />
+
             <Stack.Screen
                 name="home"
                 component={Home}
@@ -88,11 +87,6 @@ const RouterMain = () => {
                 options={{headerShown: false}}
             />
             <Stack.Screen
-                name="notiTypeAdmin"
-                component={NotiTypeAdmin}
-                // options={{ header: () =>  <HeaderHome /> }}
-            />
-            <Stack.Screen
                 name="notiType"
                 component={NotiType}
                 options={{ header: () => <HeaderNotification/> }}
@@ -110,7 +104,7 @@ const RouterMain = () => {
             <Stack.Screen
                 name="profile"
                 component={Profile}
-                // options={{header: () => <HeaderLogin/>}}
+                options={{title: "Tài khoản"}}
             />
             <Stack.Screen
                 name="voucher"
@@ -120,7 +114,7 @@ const RouterMain = () => {
             <Stack.Screen
                 name="orderAdmin"
                 component={OrderAdmin}
-                // options={{ title: 'Chi tiết Review' }}
+                options={{ title: 'Quản lý đơn hàng' }}
             />
             <Stack.Screen
                 name="productDetail"
@@ -199,6 +193,28 @@ const RouterMain = () => {
                 name="searchResult"
                 component={SearchResultScreen}
                 options={{ headerShown: false }}
+            />
+
+            {/* Admin */}
+            <Stack.Screen
+                name="homeAdmin"
+                component={HomeAdmin}
+                // options={{headerShown: false}}
+                options={{ header: () =>  <HeaderHomeAdmin /> }}
+            />
+            <Stack.Screen
+                name="notiTypeAdmin"
+                component={NotiTypeAdmin}
+                options={{ header: () =>  <HeaderNotificationAdmin /> }}
+            />
+            <Stack.Screen
+                name="recommendedProduct"
+                component={RecommendedProduct}
+                options={{ headerShown: false}}
+            />
+            <Stack.Screen
+                name="notiAdmin"
+                component={NotiAdmin}
             />
         </Stack.Navigator>
     );

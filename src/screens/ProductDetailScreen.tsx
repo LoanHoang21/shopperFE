@@ -16,6 +16,8 @@ import { Dimensions } from 'react-native';
 import { Product } from '../components/ProductCard';
 import axios from 'axios';
 import AddToCartModal from '../components/AddToCartModal';
+import { API_BASE_URL } from '../utils/const';
+import AddToPaymentModal from '../components/AddToPaymentModal';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
 type ProductVariant = {
@@ -39,6 +41,7 @@ const ProductDetailScreen = () => {
     const { product } = route.params;
     const [relatedProducts, setRelatedProducts] = React.useState<Product[]>([]);
     const [modalVisible, setModalVisible] = React.useState(false);
+    const [modalPaymentVisible, setModalPaymentVisible] = React.useState(false);
     const [productOptions, setProductOptions] = React.useState<string[]>([]);
     const [productAttributes, setProductAttributes] = React.useState<
     { category: string; values: string[] }[]
@@ -51,7 +54,7 @@ const ProductDetailScreen = () => {
 
     const fetchProductAttributions = async () => {
         try {
-          const res = await axios.get(`http://192.168.79.11:3001/api/product/${product._id}/attributions`);
+          const res = await axios.get(`${API_BASE_URL}/product/${product._id}/attributions`);
           setProductAttributes(res.data.data || []);
         } catch (error) {
           console.error('Lỗi khi lấy thuộc tính sản phẩm:', error);
@@ -60,7 +63,7 @@ const ProductDetailScreen = () => {
 
     const fetchProductVariants = async () => {
         try {
-          const res = await axios.get(`http://192.168.79.11:3001/api/product/${product._id}/variants`);
+          const res = await axios.get(`${API_BASE_URL}/product/${product._id}/variants`);
           const data = res.data?.data?.variants || [];
           setVariants(data);
         } catch (error) {
@@ -72,7 +75,7 @@ const ProductDetailScreen = () => {
     React.useEffect(() => {
         const fetchRelatedProducts = async () => {
             try {
-                const res = await axios.get(`http://192.168.79.11:3001/api/product/${product._id}/related`);
+                const res = await axios.get(`${API_BASE_URL}/product/${product._id}/related`);
                 const related = (res.data.data || []).map((p: any) => ({
                     ...p,
                     shop_name: p.category_id?.shop_id?.name ?? 'Không rõ',
@@ -104,6 +107,11 @@ const ProductDetailScreen = () => {
         setModalVisible(true);
     };
 
+    const handleAddToPayment = async () => {
+      await fetchProductAttributions();
+      setModalPaymentVisible(true);
+  };
+
     const handleCompare = () => {
         navigation.navigate('compare', { products: [product] });
     };
@@ -112,7 +120,7 @@ const ProductDetailScreen = () => {
         ? Math.floor(product.price / (1 - product.discount / 100))
         : product.price;
 
-    return (
+        return (
         <View style={{ flex: 1 }}>
             <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
                 <FlatList
@@ -190,17 +198,13 @@ const ProductDetailScreen = () => {
                         scrollEnabled={false}
                     />
                 </View>
-
-
-
-
             </ScrollView>
 
             <View style={styles.fixedBottomBar}>
                 <TouchableOpacity style={styles.buyBtn} onPress={handleCompare}>
                     <Text style={{ color: 'white' }}>So sánh thêm</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buyBtn}>
+                <TouchableOpacity style={styles.buyBtn} onPress={handleAddToPayment}>
                     <Text style={{ color: 'white' }}>Mua hàng</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.cartIconBtn} onPress={handleAddToCart}>
@@ -237,7 +241,27 @@ const ProductDetailScreen = () => {
                     setTimeout(() => setShowAlert(false), 2000);
                 }}
             />
-
+            <AddToPaymentModal
+                visible={modalPaymentVisible}
+                onClose={() => setModalPaymentVisible(false)}
+                product={{
+                    id: product._id,
+                    image: Array.isArray(product.images) && product.images.length > 0
+                ? product.images[0] ?? 'https://via.placeholder.com/300'
+                : product.image ?? 'https://via.placeholder.com/300',
+                    name: product.name,
+                    discountPrice: product.price,
+                    price: originalPrice,
+                    stock: (product.quantity && product.sale_quantity)? (product.quantity - product.sale_quantity) : 0,
+                    options:productAttributes,
+                    variants: variants 
+                }}
+                onAddToCart={(item) => {
+                    console.log('Đã thêm giỏ:', item);
+                    setShowAlert(true);
+                    setTimeout(() => setShowAlert(false), 2000);
+                }}
+            />
         </View>
     );
 };

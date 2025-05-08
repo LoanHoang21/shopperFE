@@ -1,14 +1,14 @@
-import { FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, RefreshControl, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from '@react-native-vector-icons/ant-design';
-import React, { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
-import AllReadModal from "../components/AllReadModal";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import React, { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import AllReadModal from '../components/AllReadModal';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {Dropdown} from 'react-native-element-dropdown';
-import HeaderNotification from "../components/headers/HeaderNotification";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAllNotiByNotiType, updateStatusNoti } from "../apis/Noti";
-import { RootStackParamList } from "../types/data";
+import HeaderNotification from '../components/headers/HeaderNotification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAllNotiByNotiType, updateStatusNoti } from '../apis/Noti';
+import { RootStackParamList } from '../types/data';
 
 export interface INoti {
     _id: string;
@@ -23,8 +23,7 @@ export interface INoti {
     is_read: boolean;
     createdAt: string;
     updatedAt: string;
-  }
-  
+}
 
 const NotiTypeDetails = () => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -50,71 +49,58 @@ const NotiTypeDetails = () => {
       const getAllNoti = useCallback(async () => {
         try {
             const uid = await fetchUserId();
-            if (!uid) return;
-    
+            if (!uid) {return;}
+
             const res = await getAllNotiByNotiType(uid, notiTypeId);
             if (res?.data?.DT) {
                 setNotis(res.data.DT);
             }
         } catch (e) {
-            console.log("Lấy tất cả thông báo theo loại thông báo thất bại", e);
+            console.log('Lấy tất cả thông báo theo loại thông báo thất bại', e);
         }
     }, [notiTypeId]);
-    
+
     useEffect(() => {
     getAllNoti();
-}, [notiTypeId, getAllNoti]);  // Thêm getAllNoti vào danh sách phụ thuộc
+}, [notiTypeId, getAllNoti]);
 
 const handleRefresh = async () => {
     setRefreshing(true);
     await getAllNoti();
     setRefreshing(false);
 };
-    // const filterNotis = notis.filter(noti => noti._id === notiTypeId);
-
-    const handlePress = async (id: string) => {
+    const handlePress = async (id: string, description: string) => {
         try {
-            // Gọi API cập nhật trạng thái is_read = true
             await updateStatusNoti(id, true);
-    
-            // Cập nhật local state sau khi cập nhật thành công
             const updatedNotis = notis.map(noti =>
                 noti._id === id ? { ...noti, is_read: true } : noti
             );
             setNotis(updatedNotis);
-    
-            // Điều hướng nếu cần
-            navigation.navigate('voucher');
+            const desc = description.toLowerCase();
+            if (desc.includes('giảm giá') || desc.includes('mã') || desc.includes('voucher')) {
+                navigation.navigate('voucher');
+            } else if (desc.includes('đơn hàng')) {
+                navigation.navigate('order');
+            } else {
+                // navigation.navigate('home');
+            }
         } catch (error) {
             console.error('Lỗi khi cập nhật trạng thái thông báo:', error);
         }
     };
 
-    // const formatDate = (dateStr: string): string => {
-    //     const date = new Date(dateStr); // Chuyển chuỗi thành đối tượng Date
-        
-    //     const day = String(date.getDate()).padStart(2, '0'); // Đảm bảo ngày có 2 chữ số
-    //     const month = String(date.getMonth() + 1).padStart(2, '0'); // Lấy tháng (tính từ 0)
-    //     const year = date.getFullYear(); // Lấy năm
-    //     const hours = String(date.getHours()).padStart(2, '0'); // Lấy giờ
-    //     const minutes = String(date.getMinutes()).padStart(2, '0'); // Lấy phút
-        
-    //     // Định dạng theo kiểu '00:00 27-02-2025'
-    //     return `${hours}:${minutes} ${day}-${month}-${year}`;
-    // };
-    
     const filterNotisByTime = useCallback((noti: any) => {
         const today = new Date();
-        const notiDate = new Date(noti.updatedAt);  // Sử dụng định dạng ngày tháng
-    
+        const notiDate = new Date(noti.createdAt);  // Sử dụng định dạng ngày tháng
+
         switch (filter) {
             case 'today':
                 return today.toDateString() === notiDate.toDateString();
             case 'this_week':
                 const day = today.getDay();
-                const diffToSunday = today.getDate() - day;
+                const diffToMonday = (day === 0 ? 6 : day - 1); 
                 const startOfWeek = new Date(today);
-                startOfWeek.setDate(diffToSunday);
+                startOfWeek.setDate(today.getDate() - diffToMonday);
                 const endOfWeek = new Date(startOfWeek);
                 endOfWeek.setDate(startOfWeek.getDate() + 6);
                 return notiDate >= startOfWeek && notiDate <= endOfWeek;
@@ -132,7 +118,7 @@ const handleRefresh = async () => {
                 return true;
         }
     }, [filter]);
-    
+
     const filterNotisTime = notis.filter(noti => {
         const isTypeMatch = noti.notitype_id === notiTypeId;
         return isTypeMatch && filterNotisByTime(noti);
@@ -145,11 +131,11 @@ const handleRefresh = async () => {
         { label: 'Thông báo tháng này', value: 'this_month' },
         { label: 'Thông báo đã đọc', value: 'read' },
         { label: 'Thông báo chưa đọc', value: 'unread' },
-    ]; 
+    ];
 
     const renderItem = ({ item }: { item: INoti }) => {
         return (
-            <TouchableOpacity onPress={() => { handlePress(item._id); }}>
+            <TouchableOpacity onPress={() => { handlePress(item._id, item.description); }}>
                 <View style={[styles.quickItem, { backgroundColor: item.is_read ? 'white' : '#DBF3FF' }]}>
                     <View style={styles.quickLeft}>
                         <Image
@@ -165,7 +151,7 @@ const handleRefresh = async () => {
                                     <Image key={index} source={{uri: imgSrc}} style={styles.subImage} />
                                 ))}
                             </View>
-                            <Text style={styles.time}>{new Date(item.updatedAt).toLocaleString('vi-VN')}</Text>
+                            <Text style={styles.time}>{new Date(item.createdAt).toLocaleString('vi-VN')}</Text>
                         </View>
                     </View>
                     <View style={styles.quickRight}>
@@ -182,16 +168,24 @@ const handleRefresh = async () => {
             </TouchableOpacity>
         );
     };
-    
+    const handleMarkAllAsRead = async () => {
+        try {
+            await Promise.all(
+                filterNotisTime.map(noti =>
+                    updateStatusNoti(noti._id, true)
+                )
+            );
 
-    const handleMarkAllAsRead = () => {
-        const updatedNotis = notis.map(noti =>
-            filterNotisTime.some(filtered => filtered._id === noti._id)
-                ? { ...noti, is_read: true }
-                : noti
-        );
-        setNotis(updatedNotis);
-        setModalVisible(false);
+            const updatedNotis = notis.map(noti =>
+                filterNotisTime.some(filtered => filtered._id === noti._id)
+                    ? { ...noti, is_read: true }
+                    : noti
+            );
+            setNotis(updatedNotis);
+            setModalVisible(false);
+        } catch (error) {
+            console.error('Lỗi khi đánh dấu tất cả đã đọc:', error);
+        }
     };
 
     const itemCount = notis.length;
@@ -199,9 +193,9 @@ const handleRefresh = async () => {
     useLayoutEffect(() => {
         navigation.setOptions({
             header: () => <HeaderNotification 
-            onOpenMarkAllModal={() => setModalVisible(true)}
-            itemCount={itemCount}
-            />,
+                                onOpenMarkAllModal={() => setModalVisible(true)}
+                                itemCount={itemCount}
+                            />,
         });
     }, [navigation, itemCount]);
 
@@ -222,13 +216,6 @@ const handleRefresh = async () => {
                     )}
                 />
             </View>
-            {/* Nút mở modal đánh dấu đã đọc tất cả */}
-            {/* <TouchableOpacity
-                style={styles.markAllButton}
-                onPress={() => setModalVisible(true)}
-            >
-                <Text style={styles.markAllText}>Đánh dấu tất cả đã đọc</Text>
-            </TouchableOpacity> */}
             <FlatList
                 data={filterNotisTime}
                 keyExtractor={(item) => item._id}
@@ -260,8 +247,6 @@ const styles = StyleSheet.create({
     },
     quickItem: {
         flexDirection: 'row',
-        // justifyContent: 'space-between',
-        // alignItems: 'center',
         padding: 12,
         marginVertical: 6,
         borderRadius: 10,

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
 export interface Product {
   _id: string;
@@ -41,7 +42,7 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
   const handlePress = async () => {
     try {
       // ✅ Gửi request tăng view trước
-      await axios.post(`http://192.168.79.11:3001/api/product/view/${item._id}`);
+      await axios.post(`${API_BASE_URL}/product/view/${item._id}`);
      } catch (err) {
       console.error((err as Error).message);
     }

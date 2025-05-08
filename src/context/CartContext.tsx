@@ -1,7 +1,7 @@
-import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { deleteCartItems, updateCartItemQuantity } from '../apis/Cart';
+import { API_BASE_URL } from '../utils/const';
 
 export interface CartItemI {
   id: string;
@@ -51,6 +51,7 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
   const shop = category?.shop_id;
   const variant = apiItem?.variant_id; 
 
+
   const attributes = apiItem?.attributions?.map((attr: any) => ({
     label: attr.category,
     value: attr.value,
@@ -71,7 +72,7 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
     stock: ( variant?.quantity - variant?.sale_quantity || 0),
     checked: apiItem.isSelected || false,
     attributes: attributes,
-    variantId: variant?._id,
+    variantId: apiItem.variant_id,
   };
 };
 
@@ -88,8 +89,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const user = userStr ? JSON.parse(userStr) : null;
         if (!user || !user._id) return;
   
-        const res = await axios.get(`http://192.168.79.11:3001/api/cart/user/${user._id}`);
-        const data = res.data?.data;
+        const res = await fetch(`${API_BASE_URL}/cartitems`); // ⚡ Sửa lại URL theo server bạn
+        const data = await res.json();
         console.log('🛒 Fetched cart data:', data);
   
         if (Array.isArray(data)) {

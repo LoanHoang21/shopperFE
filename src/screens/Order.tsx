@@ -1,92 +1,134 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ScrollView,
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Image,
-  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import {useState} from 'react';
-// import { RouteProp, useRoute } from '@react-navigation/native';
-// import AntDesign from 'react-native-vector-icons/AntDesign';
-// import { Icon } from 'react-native-elements';
+import axios from 'axios';
 import OrderTabbar from '../components/OrderTabbar';
 import OrderItem from '../components/OrderItem';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../utils/const';
 
-// type OrderRouteProp = RouteProp<RootStackParamList, 'order'>;
+import { CartProductItem } from './payment/Payment';
 
-const orderList = [
-  {
-    shopName: 'Happy Bedding',
-    status: 'Chờ xác nhận',
-    products: [
-      {
-        name: 'Bộ ga gối Cotton',
-        variant: 'Kích thước: M8-2m, Caro xanh nhạt',
-        quantity: 2,
-        originalPrice: 205000,
-        salePrice: 169000,
-        imageUrl:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-      },
-      {
-        name: 'Chăn lông mềm',
-        variant: 'Màu: Xanh pastel',
-        quantity: 1,
-        originalPrice: 399000,
-        salePrice: 315000,
-        imageUrl:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-      },
-    ],
-  },
-  {
-    shopName: 'Gối Ôm Cute',
-    status: 'Chờ xác nhận',
-    products: [
-      {
-        name: 'Gối ôm hình gấu',
-        variant: 'Hình: Gấu trúc',
-        quantity: 3,
-        originalPrice: 150000,
-        salePrice: 120000,
-        imageUrl:
-          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-      },
-    ],
-  },
-];
+export type OrderType = {
+  _id: string;
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  products: CartProductItem[];
+  quantity: number;
+  total_price: number;
+  createdAt: string;
+  updatedAt: string;
+  customer_id: any;
+  address_id: any;
+  voucher_id?: any;
+  shipment_id?: any;
+  payment_method_id?: any;
+};
 
 const Order = () => {
-  // const route = useRoute<OrderRouteProp>();
-  // const { id } = route.params;
-  const [tabIndex, setTabIndex] = useState<string>('Chờ xác nhận');
+  const [tabIndex, setTabIndex] = useState('Chờ xác nhận');
+  const [orders, setOrders] = useState<OrderType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const getUserInfo = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem('user');
+      return jsonValue ? JSON.parse(jsonValue) : null;
+    } catch (e) {
+      console.error('Error reading user from AsyncStorage', e);
+      return null;
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const userData = await getUserInfo();
+      if (!userData) return;
+      const res = await axios.get(
+        `${API_BASE_URL}/order/by-customer/${userData._id}`
+      );
+
+      if (res.data?.status === 'OK') {
+        setOrders(res.data.data);
+      } else {
+        setOrders([]);
+      }
+    } catch (err) {
+      console.error('Lỗi khi lấy danh sách đơn hàng:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const mapTabToStatus = (tab: string) => {
+    switch (tab) {
+      case 'Chờ xác nhận':
+        return 'pending';
+      case 'Đã xác nhận':
+        return 'confirmed';
+      case 'Đang giao':
+        return 'shipped';
+      case 'Đã nhận':
+        return 'delivered';
+      case 'Hủy':
+        return 'cancelled';
+      default:
+        return 'pending';
+    }
+  };
+
+  const filteredOrders = orders.filter(
+    order => order.status === mapTabToStatus(tabIndex)
+  );
+
+  const handleUpdateSuccess = () => {
+    fetchOrders(); // gọi lại API để reload danh sách đơn hàng
+  };
+  
 
   return (
-    <ScrollView style={stylesOrder.container}>
-      <OrderTabbar
-        onClick={tab => {
-          setTabIndex(tab);
-        }}
-      />
+    <ScrollView style={styles.container}>
+      <OrderTabbar onClick={tab => setTabIndex(tab)} />
+      {loading ? (
+        <ActivityIndicator style={{ marginTop: 20 }} />
+      ) : filteredOrders.length === 0 ? (
+        <EmptyOrder />
+      ) : (
+        filteredOrders.map((order, index) => {
+          console.log('order', order);
+          return (
+            <OrderItem
+              key={index}
+              status={tabIndex}
+              totalPrice={order.total_price}
+              products={order.products}
+              orderId={order._id}
+              onUpdate={handleUpdateSuccess} 
+            />
 
-      <Text>{tabIndex}</Text>
-{/* 
-      {orderList.map((order, index) => (
-        <OrderItem key={index} {...order} />
-      ))} */}
-
-      <EmptyOrder />
+          )
+})
+      )}
     </ScrollView>
   );
 };
 
 export default Order;
 
-const stylesOrder = StyleSheet.create({
-  container: {},
-  text: {fontSize: 24},
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f6f6f6',
+  },
 });
 
 const EmptyOrder = () => {
@@ -104,7 +146,7 @@ const EmptyOrder = () => {
         style={{ width: 200, height: 200 }}
         resizeMode="contain"
       />
-      <Text style={{ fontWeight: '700'}}>Bạn chưa có đơn hàng nào</Text>
+      <Text style={{ fontWeight: '700' }}>Bạn chưa có đơn hàng nào</Text>
     </View>
   );
 };

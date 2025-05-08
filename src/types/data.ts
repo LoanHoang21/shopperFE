@@ -8,7 +8,7 @@ export type RootStackParamList = {
     order: { id: number } | undefined;
     cart: undefined;
     notiType: undefined;
-    notiTypeDetails: {_id: string, name: string, sum: number} | undefined;
+    notiTypeDetails: {_id: string, name: string} | undefined;
     productDetail: { product: Product };
     compare: { products: Product[] };
     compareResult: { products: Product[]; related: Product[] };
@@ -16,17 +16,27 @@ export type RootStackParamList = {
     searchResult: {
         query: string;
         products: Product[];
-      };
-    payment: undefined;
-    paymentMethod: undefined;
+    };
+    payment: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+        paymentMethodId?: string;
+        voucherId?: string;
+    };
+    paymentMethod: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+    };
     paymentSuccess: undefined;
-    // Feed: { sort: 'latest' | 'top' } | undefined;
     updateOrder: undefined;
     profile: undefined;
-    voucher: undefined;
+    voucher: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+        paymentMethodId?: string;
+    };
     homeAdmin: undefined;
     notiTypeAdmin: undefined;
     orderAdmin: { id: number } | undefined;
+    recommendedProduct: undefined;
+    notiAdmin: {_id: string, name: string} | undefined;
 };
 
 declare global {

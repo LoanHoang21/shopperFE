@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from '@react-native-vector-icons/ant-design';
@@ -6,32 +6,18 @@ import { NavigationProp, useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 import { userLogin } from '../apis/Auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { checkAndNotifyExpiringVouchers } from '../utils/notiVoucher';  // Giả sử bạn đã viết api này
 import { RootStackParamList } from '../types/data';
+import { initNotification } from '../utils/handleNotification';
+import { getDetailUser, updateFcmToken } from '../apis/User';
+import { setupNotificationListeners } from '../utils/noti';
 
 const Login = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
   const [showPassword, setShowPassword] = useState(false);
   const [valueLogin, setValueLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);  // Trạng thái đăng nhập
+  let isNotificationListenerSet = false;
 
-  // Gọi checkAndNotifyExpiringVouchers khi đăng nhập thành công
-  useEffect(() => {
-    if (isLoggedIn) {
-      // Gọi 1 lần khi app mở
-      checkAndNotifyExpiringVouchers();
-
-      // Gọi lại sau mỗi 2 phút
-      const interval = setInterval(() => {
-        checkAndNotifyExpiringVouchers();
-      }, 5 * 60 * 1000); // 5 phút
-
-      return () => clearInterval(interval); // Clear khi component unmount
-    }
-  }, [isLoggedIn]); // Chạy lại khi trạng thái đăng nhập thay đổi
-
-  // Handle login action
   const handleLogin = async () => {
     let res = await userLogin(valueLogin, password);
     if (res && res.data && +res.data.EC === 0) {
@@ -43,25 +29,35 @@ const Login = () => {
         visibilityTime: 1500,
       });
 
-      // Lưu thông tin người dùng vào AsyncStorage
+      await initNotification();
+      let res1 = await getDetailUser(res.data.DT._id);
+      let userInfor = res1.data.DT;
+
+      if (userInfor.setting_noti_id.status === 'Bật') {
+        const token = await AsyncStorage.getItem('fcmToken');
+        await updateFcmToken(userInfor._id, token);
+        userInfor.fcm_token = token;
+      }
+
       try {
-        await AsyncStorage.setItem('user', JSON.stringify(res.data.DT));
-        console.log('Dữ liệu đã được lưu!');
+        await AsyncStorage.setItem('user', JSON.stringify(userInfor));
+        if (!isNotificationListenerSet) {
+            setupNotificationListeners();
+            isNotificationListenerSet = true;
+        }
       } catch (e) {
         console.error('Lỗi khi lưu dữ liệu:', e);
       }
 
-      // Lấy thông tin người dùng từ AsyncStorage và điều hướng
       try {
         const userData = await AsyncStorage.getItem('user');
         if (userData) {
           const user = JSON.parse(userData);
-          if (user.role == 1) {
+          if (user.role === 1) {
             navigation.navigate('homeAdmin');
           } else {
             navigation.navigate('home');
           }
-          setIsLoggedIn(true);  // Đặt trạng thái đăng nhập thành công
         }
       } catch (e) {
         console.error('Lỗi khi lấy dữ liệu:', e);
@@ -81,10 +77,10 @@ const Login = () => {
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View style={styles.content}>
-          <Text style={{ fontSize: 30, textAlign: 'center', paddingBottom: 15 }}>Đăng Nhập</Text>
+          <Text style={{fontSize: 30, textAlign: 'center', paddingBottom: 15}}>Đăng Nhập</Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}><Text style={{ color: 'red' }}>*</Text> SĐT/Email/Tên đăng nhập</Text>
+            <Text style={styles.label}><Text style={{color: 'red'}}>*</Text> SĐT/Email/Tên đăng nhập</Text>
             <TextInput
               style={styles.input}
               placeholder="SĐT/Email/Tên đăng nhập đã đăng kí"
@@ -95,7 +91,7 @@ const Login = () => {
           </View>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}><Text style={{ color: 'red' }}>*</Text> Mật khẩu</Text>
+            <Text style={styles.label}><Text style={{color: 'red'}}>*</Text> Mật khẩu</Text>
             <View style={styles.input}>
               <TextInput
                 placeholder="Vui lòng nhập mật khẩu"
@@ -104,7 +100,9 @@ const Login = () => {
                 value={password}
                 onChangeText={setPassword}
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{ justifyContent: 'center' }}>
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={{justifyContent: 'center'}}>
                 <Icon name={showPassword ? 'eye' : 'eye-invisible'} size={17} />
               </TouchableOpacity>
             </View>
@@ -112,11 +110,10 @@ const Login = () => {
 
           <TouchableOpacity onPress={handleLogin}>
             <LinearGradient
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
+              start={{x: 0, y: 0}}
+              end={{x: 0, y: 1}}
               colors={['#F55539', '#F1215A', '#F42384']}
-              style={styles.loginButton}
-            >
+              style={styles.loginButton}>
               <Text style={styles.loginText}>Đăng Nhập</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -127,6 +124,7 @@ const Login = () => {
 };
 
 export default Login;
+
 
 const screenHeight = Dimensions.get('window').height;
 

@@ -3,7 +3,8 @@ import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-nati
 import LinearGradient from 'react-native-linear-gradient';
 import ScanAndTrackBar from '../ScanAndTrackBar';
 import { useNavigation } from '@react-navigation/native';
-import Icon from '@react-native-vector-icons/ant-design';
+import IconFontawesome from '@react-native-vector-icons/fontawesome';
+import IconAntDesign from '@react-native-vector-icons/ant-design';
 
 const HeaderHome: React.FC = () => {
 
@@ -34,13 +35,15 @@ const HeaderHome: React.FC = () => {
         {/* 2 icon bên ngoài */}
         <View style={styles.rightIcons}>
           <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
-            <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} />
+            {/* <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} /> */}
+            <IconAntDesign name="shopping-cart" size={30} color={'white'}/>
           </TouchableOpacity>
           <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notiType')}>
-            <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} />
+            {/* <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} /> */}
+            <IconFontawesome name="bell-o" size={25} color={'white'}/>
           </TouchableOpacity>
           <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('profile')}>
-            <Icon name='user' size={24} color={'white'}/>
+            <IconAntDesign name="user" size={25} color={'white'}/>
           </TouchableOpacity>
         </View>
       </View>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, ScrollView, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from '@react-native-vector-icons/ant-design';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
@@ -33,10 +33,6 @@ const Register = () => {
       phone: '',
     }));
   }, [tab]);
-
-  // useEffect(() => {
-    
-  // }, []);
 
   // Validation logic using a shared function for email/phone
   const validateInput = useCallback((field: string, value: string): string => {
@@ -101,9 +97,6 @@ const Register = () => {
             visibilityTime: 1500,
           });
       }
-      // console.log("Đăng ký thành công!");
-      // Logic đăng ký
-      // navigation.navigate('login');
     }
   };
   
@@ -145,12 +138,24 @@ const Register = () => {
             </View>
 
             {/* Input fields */}
-            {renderInputField("Tên đăng nhập", "Nhập vào tên đăng nhập", username, setUsername, errors.username, false, () => {}, false)}
+            {renderInputField('Tên đăng nhập', 'Nhập vào tên đăng nhập', 
+              username, setUsername, errors.username, false, () => {}, false)
+            }
             {tab === 'phone' 
-              ? renderInputField("Số điện thoại", "Nhập vào số điện thoại", phone, setPhone, errors.phone, false, () => {}, false)
-              : renderInputField("Email", "Nhập vào Email", email, setEmail, errors.email, false, () => {}, false)}
-            {renderInputField("Mật khẩu", "Vui lòng nhập mật khẩu", password, setPassword, errors.password, showPassword, () => setShowPassword(prev => !prev), true)}
-            {renderInputField("Xác nhận mật khẩu", "Vui lòng xác nhận mật khẩu", confirmPassword, setConfirmPassword, errors.confirmPassword, showConfirmPassword, () => setShowConfirmPassword(prev => !prev), true)}
+              ? renderInputField('Số điện thoại', 'Nhập vào số điện thoại',
+                  phone, setPhone, errors.phone, false, () => {}, false
+                )
+              : renderInputField('Email', 'Nhập vào Email', 
+                  email, setEmail, errors.email, false, () => {}, false
+                )}
+            {renderInputField('Mật khẩu', 'Vui lòng nhập mật khẩu',
+              password, setPassword, errors.password, showPassword,
+              () => setShowPassword(prev => !prev), true)
+            }
+            {renderInputField('Xác nhận mật khẩu', 'Vui lòng xác nhận mật khẩu', 
+              confirmPassword, setConfirmPassword, errors.confirmPassword, showConfirmPassword,
+              () => setShowConfirmPassword(prev => !prev), true)
+            }
 
             {/* Login and Register buttons */}
             <TouchableOpacity onPress={() => navigation.navigate('login')}>

@@ -21,7 +21,6 @@ interface INotiType {
   name: string;
   description: string;
   status: number;
-  quantity: number;
 }
 
 interface Props {
@@ -48,7 +47,6 @@ const NotiTypeModel: React.FC<Props> = ({
     name: '',
     description: '',
     status: 1,
-    quantity: 0,
   });
 
   useEffect(() => {
@@ -59,8 +57,7 @@ const NotiTypeModel: React.FC<Props> = ({
         image: '',
         name: '',
         description: '',
-        status: 1,
-        quantity: 0,
+        status: 1
       });
     }
   }, [initialData]);
@@ -136,13 +133,6 @@ const NotiTypeModel: React.FC<Props> = ({
               </TouchableOpacity>
             </View>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Số lượng"
-              keyboardType="numeric"
-              value={form.quantity.toString()}
-              onChangeText={(text) => handleChange('quantity', parseInt(text) || 0)}
-            />
             <View style={styles.statusContainer}>
               <Text style={styles.statusLabel}>Trạng thái:</Text>
               <TouchableOpacity

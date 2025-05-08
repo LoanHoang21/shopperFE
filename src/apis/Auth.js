@@ -1,38 +1,24 @@
 import axios from "axios";
+import { API_BASE_URL } from "../utils/const";
 
 const registerNewUser = (username, email, phone, password) => {
-    return axios.post('http://192.168.79.11:3001/api/auth/register', {
-        username, email, phone, password
-      })
-}
+    return axios.post(`${API_BASE_URL}/auth/register`, {
+        username, email, phone, password,
+    });
+};
 
 const userLogin = (valueLogin, password) => {
-    // return axios.post('http://192.168.1.164:3001/api/auth/login', {
-    return axios.post('http://192.168.79.11:3001/api/auth/login', {
+    return axios.post(`${API_BASE_URL}/auth/login`, {
         valueLogin, password,
-      })
-}
+    });
+};
+
+const logout = (userId) => {
+    return axios.post(`${API_BASE_URL}/auth/logout/${userId}`);
+};
 
 export {
     registerNewUser,
     userLogin,
+    logout,
 };
-
-// import axios from "axios";
-
-// const registerNewUser = (username, email, phone, password) => {
-//     return axios.post('http://192.168.1.164:3001/api/auth/register', {
-//         username, email, phone, password
-//       })
-// }
-
-// const userLogin = (valueLogin, password, fcmToken) => {
-//     return axios.post('http://192.168.1.164:3001/api/auth/login', {
-//         valueLogin, password, fcmToken,
-//       })
-// }
-
-// export {
-//     registerNewUser,
-//     userLogin,
-// };
