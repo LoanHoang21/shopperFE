@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Image,
 } from 'react-native';
+import { useCart } from '../context/CartContext';
 
 interface Props {
   visible: boolean;

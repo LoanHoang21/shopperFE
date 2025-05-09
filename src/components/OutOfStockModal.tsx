@@ -11,9 +11,10 @@ import {
 interface Props {
   visible: boolean;
   onClose: () => void;
+  stock?: number;
 }
 
-const OutOfStockModal: React.FC<Props> = ({ visible, onClose }) => {
+const OutOfStockModal: React.FC<Props> = ({ visible, onClose, stock }) => {
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
@@ -25,7 +26,10 @@ const OutOfStockModal: React.FC<Props> = ({ visible, onClose }) => {
             />
             <Text style={styles.title}>Cảnh Báo</Text>
           </View>
-          <Text style={styles.message}>Số lượng sản phẩm trong kho hàng không đủ!</Text>
+          <Text style={styles.message}>
+  Số lượng sản phẩm trong kho không đủ. Chỉ còn lại <Text style={{ fontWeight: 'bold' }}>{stock}</Text> sản phẩm!
+</Text>
+
           <View style={styles.buttonRow}>
             <TouchableOpacity onPress={onClose} style={styles.confirmBtn}>
               <Text style={styles.confirmText}>Đóng</Text>
@@ -72,7 +76,7 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 14,
     color: '#333',
-    marginBottom: 20,
+    marginBottom: 8,
   },
   buttonRow: {
     alignItems: 'flex-end',
@@ -87,4 +91,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  subNote: {
+    fontSize: 13,
+    color: '#333',
+    marginBottom: 16,
+  }
+  
 });
