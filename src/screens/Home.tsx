@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, FlatList, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import ProductCard, { Product } from '../components/ProductCard';
 import QuickMenuItem from '../components/QuickMenuItem';
 import {NavigationProp, useNavigation} from '@react-navigation/native';
-// import HomeBottom from '../components/bottomTab/HomeBottom';
 import axios from 'axios';
 import { RootStackParamList } from '../types/data';
+import { API_BASE_URL } from '../utils/const';
 
 const menuData = [
   {
@@ -24,7 +24,7 @@ const menuData = [
     borderColor: '#00bfa5',
   },
   {
-    label: 'Top mua hàng',
+    label: 'Top đề xuất',
     icon: require('../assets/images/crown.png'),
     borderColor: '#fbc02d',
   },
@@ -41,8 +41,8 @@ const HomeScreen: React.FC = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('http://192.168.1.145:3001/api/product/getAll');
-        setProducts(response.data.data); // vì dữ liệu nằm trong `data.data`
+        const response = await axios.get(`${API_BASE_URL}/product/getAll`);
+        setProducts(response.data.data);
       } catch (error) {
         console.error("Failed to fetch products", error);
       }
@@ -61,8 +61,9 @@ const HomeScreen: React.FC = () => {
               return (
                 <TouchableOpacity
                   key={index}
-                  // onPress={() => navigation.navigate('order')}>
-                    onPress={() => navigation.navigate('order')}>
+                  onPress={() => navigation.navigate('order')}
+                    // onPress={() => navigation.navigate('orderAdmin')}
+                >
                   <QuickMenuItem
                     icon={item.icon}
                     label={item.label}
@@ -82,7 +83,19 @@ const HomeScreen: React.FC = () => {
                   />
                 </TouchableOpacity>
               );
-            } else {
+            } else if (item.label === 'Top đề xuất') {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => navigation.navigate('recommendedProduct')}>
+                  <QuickMenuItem
+                    icon={item.icon}
+                    label={item.label}
+                    borderColor={item.borderColor}
+                  />
+                </TouchableOpacity>
+              );
+            }else {
               return (
                 <QuickMenuItem
                   key={index}

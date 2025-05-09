@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { deleteCartItems, updateCartItemQuantity } from '../apis/Cart';
@@ -90,7 +89,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const user = userStr ? JSON.parse(userStr) : null;
         if (!user || !user._id) return;
   
-        const res = await fetch(`${API_BASE_URL}/cartitems`);
+        const res = await fetch(`${API_BASE_URL}/cartitems`); // ⚡ Sửa lại URL theo server bạn
         const data = await res.json();
         console.log('🛒 Fetched cart data:', data);
   

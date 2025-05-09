@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/data';
+import { API_BASE_URL } from '../../utils/const';
 
 type PaymentMethodRouteProp = RouteProp<RootStackParamList, 'paymentMethod'>; 
 
@@ -18,7 +19,7 @@ const PaymentMethod = () => {
   useEffect(() => {
     const fetchMethods = async () => {
       try {
-        const res = await axios.get('http://192.168.1.145:3001/api/payment-method');
+        const res = await axios.get(`${API_BASE_URL}/payment-method`);
         setPaymentMethods(res.data.data || []);
       } catch (err) {
         console.error('Error fetching payment methods:', err);

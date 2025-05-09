@@ -53,10 +53,10 @@ type VoucherRouteProp = RouteProp<RootStackParamList, 'payment'>;
 
 
 const VoucherScreen = () => {
+  const navigation = useNavigation();
   const [selectedTab, setSelectedTab] = useState('Tất cả');
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation();
 const route = useRoute<VoucherRouteProp>();
 const { product, paymentMethodId } = route.params;
 
@@ -82,8 +82,8 @@ const { product, paymentMethodId } = route.params;
 
   const filterVouchers = () => {
     return vouchers.filter(v => {
-      if (selectedTab === 'Tất cả') return true;
-      if (selectedTab === 'Sắp hết hạn') return isExpiringSoon(v.start_date, v.end_date);
+      if (selectedTab === 'Tất cả') {return true;}
+      if (selectedTab === 'Sắp hết hạn') {return isExpiringSoon(v.start_date, v.end_date);}
       return v.type_voucher === selectedTab;
     });
   };

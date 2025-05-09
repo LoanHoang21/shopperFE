@@ -1,11 +1,12 @@
-import axios from "axios";
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
 const getAllNotiType = () => {
-    return (axios.get("http://192.168.1.145:3001/api/notiType/getAll"));
+    return (axios.get(`${API_BASE_URL}/notiType/getAll`));
 };
 
 const getQuantityNoti = (receiveId, notitypeId) => {
-    return (axios.get(`http://192.168.1.145:3001/api/notiType/getQuantityNoti/${receiveId}?notitype_id=${notitypeId}`));
+    return (axios.get(`${API_BASE_URL}/notiType/getQuantityNoti/${receiveId}?notitype_id=${notitypeId}`));
 };
 
 export {

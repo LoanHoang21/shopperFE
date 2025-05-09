@@ -11,6 +11,7 @@ import axios from 'axios';
 import OrderTabbar from '../components/OrderTabbar';
 import OrderItem from '../components/OrderItem';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../utils/const';
 
 import { CartProductItem } from './payment/Payment';
 
@@ -49,7 +50,7 @@ const Order = () => {
       const userData = await getUserInfo();
       if (!userData) return;
       const res = await axios.get(
-        `http://192.168.1.145:3001/api/order/by-customer/${userData._id}`
+        `${API_BASE_URL}/order/by-customer/${userData._id}`
       );
 
       if (res.data?.status === 'OK') {

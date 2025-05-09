@@ -24,8 +24,7 @@ import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '@react-native-vector-icons/ant-design';
-import { Alert } from 'react-native';
-
+import { API_BASE_URL } from '../../utils/const';
 export interface Shop {
     _id: string;
     name: string;
@@ -124,7 +123,7 @@ const Payment = () => {
             console.log('🧾 Product:', product);
             try {
                 const res = await axios.post(
-                    'http://192.168.1.145:3001/api/order/get-product-variants',
+                    `${API_BASE_URL}/order/get-product-variants`,
                     {
                         products: product,
                     }
@@ -233,7 +232,7 @@ const Payment = () => {
 
             try {
                 const res = await axios.get(
-                    `http://192.168.1.145:3001/api/payment-method/${paymentMethodId || "681a1bde3427154ae2166ebd"}`,
+                    `${API_BASE_URL}/payment-method/${paymentMethodId || "681a1bde3427154ae2166ebd"}`,
                 );
                 setPaymentMethod(res.data?.data);
             } catch (err) {
@@ -332,9 +331,8 @@ const Payment = () => {
             };
 
             
-            const res = await axios.post('http://192.168.1.145:3001/api/order/addOrder', body);
+            const res = await axios.post(`${API_BASE_URL}/order/addOrder`, body);
             
-            console.log(res.data)
             if (res.data?.status === 'OK') {
                 navigation.navigate('paymentSuccess');
                 Toast.show({

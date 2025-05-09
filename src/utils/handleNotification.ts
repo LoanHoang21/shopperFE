@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import messaging from '@react-native-firebase/messaging';
 import { PermissionsAndroid, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,9 +20,9 @@ const requestUserPermission = async () => {
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
     if (enabled) {
-      console.log('✅ Notification permission granted (iOS):', authStatus);
+      console.log('Notification permission granted (iOS):', authStatus);
     } else {
-      console.log("❌ Notification permission denied (iOS)");
+      console.log("Notification permission denied (iOS)");
     }
   }
 };
@@ -34,19 +34,17 @@ const getFcmToken = async () => {
       const token = await messaging().getToken();
       if (token) {
         await AsyncStorage.setItem('fcmToken', token);
-        console.log('📲 FCM Token:', token);
+        console.log('FCM Token:', token);
       }
     } catch (error) {
-      console.error('❌ FCM token error:', error);
+      console.error('FCM token error:', error);
     }
   } else {
-    console.log("✅ FCM Token (from storage):", fcmToken);
+    console.log('FCM Token (from storage):', fcmToken);
   }
 };
 
-export const useNotification = () => {
-  useEffect(() => {
-    requestUserPermission();
-    getFcmToken();
-  }, []);
+export const initNotification = async () => {
+    await requestUserPermission();
+    await getFcmToken();
 };

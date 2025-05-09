@@ -13,6 +13,7 @@ import { RootStackParamList } from '../types/data';
 import Icon from '@react-native-vector-icons/ant-design';
 import { Product } from '../components/ProductCard';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 const screenWidth = Dimensions.get('window').width;
 const itemWidth = (screenWidth - 48) / 2;
 
@@ -30,7 +31,7 @@ const CompareScreen = () => {
     React.useEffect(() => {
         const fetchRelated = async () => {
             try {
-              const res = await axios.get(`http://192.168.1.145:3001/api/product/${mainProduct._id}/related`);
+              const res = await axios.get(`${API_BASE_URL}/product/${mainProduct._id}/related`);
           
               const related = (res.data.data || []).map((p: any) => ({
                 ...p,

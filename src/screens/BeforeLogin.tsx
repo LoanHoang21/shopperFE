@@ -17,13 +17,13 @@ const BeforeLogin = () => {
 
   return (
     <View style={styles.container}>
-      {/* <StatusBar 
+      {/* <StatusBar
         // backgroundColor="light-content"
       /> */}
       <View style={styles.content}>
         <View style={styles.buttonContainer}>
           <TouchableOpacity onPress={() => { navigation.navigate('login')}}>
-              <LinearGradient 
+              <LinearGradient
                 start={{x: 0, y: 0}}
                 end={{x: 0, y: 1}}
                 colors={['#F55539', '#F1215A', '#F42384']}

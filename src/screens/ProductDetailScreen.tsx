@@ -16,6 +16,7 @@ import { Dimensions } from 'react-native';
 import { Product } from '../components/ProductCard';
 import axios from 'axios';
 import AddToCartModal from '../components/AddToCartModal';
+import { API_BASE_URL } from '../utils/const';
 import AddToPaymentModal from '../components/AddToPaymentModal';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
@@ -51,7 +52,7 @@ const ProductDetailScreen = () => {
 
     const fetchProductAttributions = async () => {
         try {
-          const res = await axios.get(`http://192.168.1.145:3001/api/product/${product._id}/attributions`);
+          const res = await axios.get(`${API_BASE_URL}/product/${product._id}/attributions`);
           setProductAttributes(res.data.data || []);
         } catch (error) {
           console.error('Lỗi khi lấy thuộc tính sản phẩm:', error);
@@ -60,7 +61,7 @@ const ProductDetailScreen = () => {
 
     const fetchProductVariants = async () => {
         try {
-          const res = await axios.get(`http://192.168.1.145:3001/api/product/${product._id}/variants`);
+          const res = await axios.get(`${API_BASE_URL}/product/${product._id}/variants`);
           const data = res.data?.data?.variants || [];
           setVariants(data);
         } catch (error) {
@@ -72,7 +73,7 @@ const ProductDetailScreen = () => {
     React.useEffect(() => {
         const fetchRelatedProducts = async () => {
             try {
-                const res = await axios.get(`http://192.168.1.145:3001/api/product/${product._id}/related`);
+                const res = await axios.get(`${API_BASE_URL}/product/${product._id}/related`);
                 const related = (res.data.data || []).map((p: any) => ({
                     ...p,
                     shop_name: p.category_id?.shop_id?.name ?? 'Không rõ',
@@ -194,10 +195,6 @@ const ProductDetailScreen = () => {
                         scrollEnabled={false}
                     />
                 </View>
-
-
-
-
             </ScrollView>
 
             <View style={styles.fixedBottomBar}>

@@ -1,32 +1,15 @@
-import axios from "axios";
-
-// const getAllOrderById = (customerId) => {
-//     return axios.get(`http://192.168.1.164:3001/api/order/getAll/${customerId}`);
-// }
-
-// const updateStatusOrder = (orderId, nextStatus) => {
-//     return axios.post(`http://192.168.1.164:3001/api/order/updateStatus/${orderId}`, {
-//         status: nextStatus,
-//     });
-// }
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
 const getAllVoucher = () => {
-    return axios.get(`http://192.168.1.145:3001/api/voucher/getAll/`);
+    return axios.get(`${API_BASE_URL}/voucher/getAll/`);
 }
 
 const getVoucherById = async (id) => {
-    return await axios.get(`http://192.168.1.145:3001/api/voucher/detail/${id}`);
+    return await axios.get(`${API_BASE_URL}/voucher/detail/${id}`);
   };
 
-// const userLogin = (valueLogin, password) => {
-//     return axios.post('http://192.168.1.145:3001/api/auth/login', {
-//         valueLogin, password
-//       })
-// }
-
 export {
-    // getAllOrderById,
-    // updateStatusOrder,
     getAllVoucher,
     getVoucherById
 };

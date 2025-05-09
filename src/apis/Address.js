@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
-const BASE_URL = 'http://192.168.1.145:3001/api/address';
+const BASE_URL = `${API_BASE_URL}/address`;
 
 // 📌 1. Lấy địa chỉ theo customer_id
 const getAddressByCustomerId = (customer_id) => {

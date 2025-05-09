@@ -23,7 +23,7 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate }: OrderIte
 
   const handleCancelOrder = async () => {
     try {
-      const res = await axios.put(`http://192.168.1.145:3001/api/order/${orderId}/status`, {
+      const res = await axios.put(`${API_BASE_URL}/order/${orderId}/status`, {
         status: 'cancelled',
       });
   
