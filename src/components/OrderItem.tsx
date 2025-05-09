@@ -1,91 +1,230 @@
-import {View, Text, TouchableOpacity} from 'react-native';
+import React from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import OrderProduct from './OrderProduct';
-
-type OrderProduct = {
-  name: string;
-  variant: string;
-  quantity: number;
-  originalPrice: number;
-  salePrice: number;
-  imageUrl: string;
-};
+import { CartProductItem } from '../screens/payment/Payment';
+import Icon from '@react-native-vector-icons/ant-design';
+import { Alert } from 'react-native';
+import axios from 'axios';
+import { Modal, Pressable } from 'react-native';
 
 type OrderItemProps = {
-  shopName: string;
+  // shopName: string;
   status: string;
-  products: OrderProduct[];
+  products: CartProductItem[];
+  totalPrice: number;
+  orderId?: string;
+  onUpdate: () => void;
 };
 
-const OrderItem = ({shopName, status, products}: OrderItemProps) => {
-  const totalPrice = products.reduce(
-    (sum, item) => sum + item.salePrice * item.quantity,
-    0,
-  );
+const OrderItem = ({ status, products, totalPrice, orderId, onUpdate }: OrderItemProps) => {
+  const [showModal, setShowModal] = React.useState(false);
+  // console.log('products', products);
+  console.log(orderId)
+
+  const handleCancelOrder = async () => {
+    try {
+      const res = await axios.put(`http://192.168.1.145:3001/api/order/${orderId}/status`, {
+        status: 'cancelled',
+      });
+  
+      if (res.data?.status === 'OK') {
+        Alert.alert('Thành công', 'Đơn hàng đã được hủy');
+        onUpdate();
+      } else {
+        Alert.alert('Thất bại', 'Không thể hủy đơn hàng');
+      }
+    } catch (err) {
+      console.error('Hủy đơn hàng lỗi:', err);
+      Alert.alert('Lỗi', 'Đã xảy ra lỗi khi hủy đơn');
+    }
+  };
 
   return (
-    <View
-      style={{
-        backgroundColor: '#fff',
-        paddingHorizontal: 12,
-        paddingVertical: 15,
-        marginTop: 10,
-      }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-        <Text style={{color: '#e53935', fontWeight: '600'}}>{shopName}</Text>
-        <Text style={{color: 'red'}}>{status}</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.shopName}><Icon name="shop" size={20} color="#F1215A" />{products[0].product_id.product_id.category_id.shop_id.name}</Text>
+        <Text style={styles.status}>{status}</Text>
       </View>
 
       {products.map((product, index) => (
-        <OrderProduct key={index} {...product} />
+        <OrderProduct
+          key={index}
+          name={product.product_id?.product_id?.name || 'Sản phẩm'}
+          variant={product.type}
+          quantity={product.quantity}
+          originalPrice={product.product_id?.price}
+          salePrice={
+            product.product_id?.price
+              ? product.product_id.price * (1 - (product.product_id?.discount || 0) / 100)
+              : 0
+          }
+          imageUrl={product.product_id?.image || ''}
+        />
       ))}
 
-      <View style={{justifyContent: 'flex-end'}}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            marginBottom: 10,
-          }}>
+      <View style={styles.footer}>
+        <View style={styles.totalRow}>
           <Text>Tổng số tiền ({products.length} sản phẩm): </Text>
-          <Text style={{color: '#e53935', fontWeight: '700'}}>
-            {`₫${totalPrice.toLocaleString('vi-VN')}`}
-          </Text>
+          <Text style={styles.totalPrice}>₫{totalPrice.toLocaleString('vi-VN')}</Text>
         </View>
 
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'flex-end',
-            gap: 10,
-          }}>
-          <TouchableOpacity
-            style={{
-              borderWidth: 1,
-              borderColor: '#ccc',
-              padding: 10,
-              borderRadius: 5,
-            }}>
-            <Text>Liên hệ shop</Text>
-          </TouchableOpacity>
+        <View style={styles.buttonRow}>
+          {status === 'Chờ xác nhận' && (
+            <>
+              <TouchableOpacity style={styles.contactButton}>
+                <Text>Liên hệ shop</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(true)}>
+  <Text style={styles.cancelText}>Hủy đơn hàng</Text>
+</TouchableOpacity>
 
-          <TouchableOpacity
-            style={{
-              borderWidth: 1,
-              borderColor: '#e53935',
-              padding: 10,
-              borderRadius: 5,
-            }}>
-            <Text style={{color: '#e53935'}}>Hủy đơn hàng</Text>
-          </TouchableOpacity>
+            </>
+          )}
+
+<Modal
+  transparent
+  visible={showModal}
+  animationType="fade"
+  onRequestClose={() => setShowModal(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContent}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Xác nhận hủy đơn hàng</Text>
+      <Text style={{ marginBottom: 20 }}>Bạn có chắc chắn muốn hủy đơn hàng này không?</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+        <Pressable onPress={() => setShowModal(false)} style={styles.modalCancel}>
+          <Text>Đóng</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            setShowModal(false);
+            handleCancelOrder();
+          }}
+          style={styles.modalConfirm}
+        >
+          <Text style={{ color: 'white' }}>Xác nhận</Text>
+        </Pressable>
+      </View>
+    </View>
+  </View>
+</Modal>
+
+
+          {status === 'Đã xác nhận' && (
+            <TouchableOpacity style={styles.contactButton}>
+              <Text>Liên hệ shop</Text>
+            </TouchableOpacity>
+          )}
+
+          {status === 'Đang giao' && (
+            <>
+              <TouchableOpacity style={styles.contactButton}>
+                <Text>Liên hệ shop</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelButton}>
+                <Text style={styles.cancelText}>Theo dõi đơn</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {status === 'Đã nhận' && (
+            <>
+              <TouchableOpacity style={styles.contactButton}>
+                <Text>Đánh giá</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelButton}>
+                <Text style={styles.cancelText}>Mua lại</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {status === 'Hủy' && (
+            <TouchableOpacity style={styles.contactButton}>
+              <Text>Mua lại</Text>
+            </TouchableOpacity>
+          )}
         </View>
+
       </View>
     </View>
   );
 };
 
 export default OrderItem;
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 15,
+    marginTop: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  shopName: {
+    color: '#e53935',
+    fontWeight: '600',
+  },
+  status: {
+    color: 'red',
+  },
+  footer: {
+    justifyContent: 'flex-end',
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 10,
+  },
+  totalPrice: {
+    color: '#e53935',
+    fontWeight: '700',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+  },
+  contactButton: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+  },
+  cancelButton: {
+    borderWidth: 1,
+    borderColor: '#e53935',
+    padding: 10,
+    borderRadius: 5,
+  },
+  cancelText: {
+    color: '#e53935',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 8,
+    width: '80%',
+    elevation: 5,
+  },
+  modalCancel: {
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: '#eee',
+  },
+  modalConfirm: {
+    padding: 10,
+    borderRadius: 5,
+    backgroundColor: '#e53935',
+  },
+  
+});

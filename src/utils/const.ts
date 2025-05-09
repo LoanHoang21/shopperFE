@@ -7,3 +7,5 @@ export const globalStyles = StyleSheet.create({
         fontFamily: OPENSANS_REGULAR,
     }
 })
+
+export const API_BASE_URL = 'http://192.168.1.145:3001/api';

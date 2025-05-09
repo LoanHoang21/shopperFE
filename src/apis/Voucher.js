@@ -14,6 +14,10 @@ const getAllVoucher = () => {
     return axios.get(`http://192.168.1.145:3001/api/voucher/getAll/`);
 }
 
+const getVoucherById = async (id) => {
+    return await axios.get(`http://192.168.1.145:3001/api/voucher/detail/${id}`);
+  };
+
 // const userLogin = (valueLogin, password) => {
 //     return axios.post('http://192.168.1.145:3001/api/auth/login', {
 //         valueLogin, password
@@ -24,4 +28,5 @@ export {
     // getAllOrderById,
     // updateStatusOrder,
     getAllVoucher,
+    getVoucherById
 };

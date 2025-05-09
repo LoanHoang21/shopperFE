@@ -1,49 +1,44 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Scroll } from 'react-native';
 
-const tabList = ['Chờ xác nhận', 'Chờ lấy hàng', 'Chờ giao hàng', 'Đã giao'];
+const tabList = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Đã nhận', 'Hủy'];
 
 type OrderTabbarProps = {
   onClick?: (tabValue: string, tabIndex: number) => void;
 };
 
 const OrderTabbar = ({ onClick }: OrderTabbarProps) => {
-  const [activeTab, setActiveTab] = useState(2);
+  const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <View style={stylesTab.container}>
+    <View style={styles.container}>
       {tabList.map((tab, index) => (
         <TouchableOpacity
           key={index}
-          style={stylesTab.tab}
+          style={styles.tab}
           onPress={() => {
             setActiveTab(index);
-            console.log(`Clicked tab: ${tab} (${index})`);
             onClick?.(tab, index); // gọi callback nếu có
           }}
         >
-          <Text style={[stylesTab.tabText, activeTab === index && stylesTab.activeText]}>
+          <Text style={[styles.tabText, activeTab === index && styles.activeText]}>
             {tab}
           </Text>
-          {activeTab === index && <View style={stylesTab.underline} />}
+          {activeTab === index && <View style={styles.underline} />}
         </TouchableOpacity>
       ))}
     </View>
   );
 };
 
-
 export default OrderTabbar;
 
-// const screenWidth = Dimensions.get('window').width;
-
-const stylesTab = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     backgroundColor: '#f5f5f5',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     paddingVertical: 10,
-    gap: 2,
     paddingTop: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -62,7 +57,7 @@ const stylesTab = StyleSheet.create({
   },
   underline: {
     marginTop: 10,
-    height: 1,
+    height: 2,
     backgroundColor: '#F1215A',
     width: '100%',
   },

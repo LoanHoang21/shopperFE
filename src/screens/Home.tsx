@@ -95,7 +95,6 @@ const HomeScreen: React.FC = () => {
           })}
         </View>
     </ScrollView>
-    <Text onPress={() => navigation.navigate('payment')}>Sang Payment</Text>
       {/* Product List */}
       <FlatList
         data={products}

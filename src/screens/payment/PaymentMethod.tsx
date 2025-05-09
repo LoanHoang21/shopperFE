@@ -2,11 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import { useRoute, RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../../types/data';
+
+type PaymentMethodRouteProp = RouteProp<RootStackParamList, 'paymentMethod'>; 
 
 const PaymentMethod = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const route = useRoute<PaymentMethodRouteProp>();
+  const { product } = route.params;
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -35,7 +41,7 @@ const PaymentMethod = () => {
       return;
     }
 
-    navigation.navigate('payment', { paymentMethodId: selectedId });
+    navigation.navigate('payment', { paymentMethodId: selectedId, product });
   };
 
   if (loading) {

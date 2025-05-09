@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
 export interface AddressData {
+    _id: string;
     receiver: string;
     phone: string;
     country: string;

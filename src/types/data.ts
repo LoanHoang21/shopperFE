@@ -18,15 +18,21 @@ export type RootStackParamList = {
         products: Product[];
     };
     payment: {
-        product?: { product: Product, quantity: number }[];
+        product?: { product_id: string, quantity: number, type?: string }[];
         paymentMethodId?: string;
+        voucherId?: string;
     };
-    paymentMethod: undefined;
+    paymentMethod: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+    };
     paymentSuccess: undefined;
     // Feed: { sort: 'latest' | 'top' } | undefined;
     updateOrder: undefined;
     profile: undefined;
-    voucher: undefined;
+    voucher: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+        paymentMethodId?: string;
+    };
     homeAdmin: undefined;
     notiTypeAdmin: undefined;
     orderAdmin: { id: number } | undefined;
