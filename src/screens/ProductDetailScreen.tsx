@@ -47,6 +47,8 @@ const ProductDetailScreen = () => {
     { category: string; values: string[] }[]
     >([]);
     const [variants, setVariants] = useState<ProductVariant[]>([]);
+   
+
 
     console.log('product',product)
 
@@ -89,6 +91,7 @@ const ProductDetailScreen = () => {
             fetchRelatedProducts();
         }
     }, [product]);
+
     React.useEffect(() => {
         if (product?._id) {
             fetchProductVariants();
