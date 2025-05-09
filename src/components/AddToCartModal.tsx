@@ -31,6 +31,7 @@ type Product = {
     sale_quantity: number;
     image: string;
     _id: string;
+    attribution_ids: string[]
   }[];
 };
 
@@ -50,18 +51,14 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
   const [selectedOptions, setSelectedOptions] = useState<{ [category: string]: string }>({});
   const [showStockModal, setShowStockModal] = useState(false);
   const [outOfStock, setoutOfStock] = useState(false);
-  const { reloadCart } = useCart(); 
+  const [existingCartItemQty , setExistingCartItemQty ] = useState(0);
+  const { reloadCart, items } = useCart(); 
 
   const isReadyToAdd = product.options.every(
     (group) => selectedOptions[group.category]
   );
 
   const handleAddToCart = async () => {
-    const selectedAttributes = Object.entries(selectedOptions).map(([category, value]) => ({
-      category,
-      value,
-    }));
-
     try {
         const userJson = await AsyncStorage.getItem('user');
         const user = userJson ? JSON.parse(userJson) : null;
@@ -72,11 +69,10 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
             userId: user._id,
             product_id: product.id,
             quantity,
-            selectedAttributes,
             variantId: selectedVariant?._id,
           });
 
-      const response = await addToCart( user._id, product.id, quantity, selectedAttributes,selectedVariant?._id);
+      const response = await addToCart( user._id, product.id, quantity, selectedVariant?._id);
       ToastAndroid.show('Đã thêm vào giỏ hàng!', ToastAndroid.SHORT);
       onClose();
       setSelectedOptions({});
@@ -104,8 +100,18 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
         else{
             setoutOfStock(false)
         }
+
+        const existingCartQty = items?.reduce((acc, item) => {
+          if (item.variantId === selectedVariant?._id) {
+            return acc + item.quantity;
+          }
+          return acc;
+        }, 0) || 0;
+
+        setExistingCartItemQty(existingCartQty)
     }
   }, [selectedVariant]);
+
   
 
   return (
@@ -182,12 +188,16 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
               <Text style={styles.qty}>{quantity}</Text>
               <TouchableOpacity
                 onPress={() => {
-                    if (quantity < (selectedVariant?.sale_quantity ? selectedVariant?.quantity - selectedVariant?.sale_quantity : selectedVariant?.quantity ?? product.stock)) {
+                  const availableQty = selectedVariant?.sale_quantity ? selectedVariant?.quantity - selectedVariant?.sale_quantity : selectedVariant?.quantity ?? product.stock
+                  const remainingQty = availableQty - existingCartItemQty;
+
+                    if (quantity < remainingQty) {
                         setQuantity(quantity + 1);
                       } else {
                         setShowStockModal(true);
                       }
                 }}
+                disabled={!selectedVariant}
               >
                 <Text style={styles.qtyBtn}>+</Text>
               </TouchableOpacity>
@@ -219,6 +229,7 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
         visible={showStockModal}
         onClose={() => setShowStockModal(false)}
         stock={selectedVariant?.sale_quantity ? selectedVariant?.quantity - selectedVariant?.sale_quantity : selectedVariant?.quantity}
+        existingCartItemQty={existingCartItemQty}
       />
     </Modal>
   );

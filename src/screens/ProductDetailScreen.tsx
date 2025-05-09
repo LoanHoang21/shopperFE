@@ -24,6 +24,7 @@ type ProductVariant = {
       category: string;
       value: string;
     }[];
+    attribution_ids: Array<string>;
     price: number;
     discount: number;
     quantity: number;

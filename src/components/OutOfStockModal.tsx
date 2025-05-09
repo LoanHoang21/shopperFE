@@ -11,10 +11,11 @@ import {
 interface Props {
   visible: boolean;
   onClose: () => void;
-  stock?: number;
+  stock: any;
+  existingCartItemQty?: number
 }
 
-const OutOfStockModal: React.FC<Props> = ({ visible, onClose, stock }) => {
+const OutOfStockModal: React.FC<Props> = ({ visible, onClose, stock, existingCartItemQty }) => {
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
@@ -26,9 +27,20 @@ const OutOfStockModal: React.FC<Props> = ({ visible, onClose, stock }) => {
             />
             <Text style={styles.title}>Cảnh Báo</Text>
           </View>
-          <Text style={styles.message}>
-  Số lượng sản phẩm trong kho không đủ. Chỉ còn lại <Text style={{ fontWeight: 'bold' }}>{stock}</Text> sản phẩm!
-</Text>
+          {existingCartItemQty ? (
+              <Text style={styles.message}>
+              Bạn đã có <Text style={{ fontWeight: 'bold' }}>{existingCartItemQty}</Text> sản phẩm này trong giỏ. Chỉ còn 
+              <Text style={{ fontWeight: 'bold' }}> {stock-existingCartItemQty}</Text> sản phẩm có thể thêm.
+            </Text>
+          ):
+          (
+              <Text style={styles.message}>
+                  Số lượng sản phẩm trong kho không đủ. Chỉ còn lại 
+                  <Text style={{ fontWeight: 'bold' }}> {stock}</Text> sản phẩm!
+                </Text>
+          )
+          }
+          
 
           <View style={styles.buttonRow}>
             <TouchableOpacity onPress={onClose} style={styles.confirmBtn}>

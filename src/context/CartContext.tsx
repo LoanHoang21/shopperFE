@@ -50,13 +50,13 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
   const category = product?.category_id;
   const shop = category?.shop_id;
   const variant = apiItem?.variant_id; 
+  const attributions = variant?.attribution_ids
 
-  const attributes = apiItem?.attributions?.map((attr: any) => ({
-    label: attr.category,
-    value: attr.value,
-  })) || [];
+  const attributes = attributions?.map((attr: any) => ({
+    label: attr.category_attribution_id.name,
+    value: attr.name
+  }));
 
-  console.log('⚠️ shop:', shop, '-> brand_id:', shop?._id);
 
   return {
     id: apiItem._id,
@@ -66,7 +66,7 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
     // price: product?.discount ? product?.price * (100 - product?.discount) / 100 : product?.price,
     price: variant?.price ?? product?.price,
     oldPrice: product?.price || 0,
-    thumbnail: variant.image ?? product?.images?.[0] ?? '',
+    thumbnail: variant?.image ?? product?.images?.[0] ?? '',
     quantity: apiItem.quantity,
     stock: ( variant?.quantity - variant?.sale_quantity || 0),
     checked: apiItem.isSelected || false,
@@ -90,14 +90,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
         const res = await axios.get(`http://192.168.79.11:3001/api/cart/user/${user._id}`);
         const data = res.data?.data;
-        console.log('🛒 Fetched cart data:', data);
   
         if (Array.isArray(data)) {
           const converted = data.map((item) => convertCartItemFromApi(item));
           setItems(converted);
         }
       } catch (error) {
-        console.error('❌ Failed to fetch cart items:', error);
+        console.error( error);
       }
     };
   
@@ -120,7 +119,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .map((item) =>
           item.id === id ? { ...item, quantity: item.quantity + delta } : item
         )
-        .filter((item) => item.quantity > 0); // ✅ xoá sản phẩm nếu số lượng ≤ 0
+        .filter((item) => item.quantity > 0); 
     });
 
     try {
@@ -135,9 +134,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await updateCartItemQuantity(id, newQuantity);
       }
   
-      // reloadCart(); // nên gọi lại để fetch mới sau khi thay đổi
     } catch (err) {
-      console.error('❌ Failed to update/delete quantity:', err);
+      console.error( err);
     }
   };
 
@@ -156,7 +154,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
       await deleteCartItems(itemIds);
     } catch (err) {
-      console.error('❌ Failed to delete selected items:', err);
+      console.error( err);
     }
   };
   

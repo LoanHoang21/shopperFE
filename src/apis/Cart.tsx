@@ -2,23 +2,16 @@ import axios from "axios";
 
 const BASE_URL = 'http://192.168.79.11:3001/api/cart';
 
-interface Attribute {
-  category: string;
-  value: string;
-}
-
 export const addToCart = (
   userId: string,
   product_id: string,
   quantity: number,
-  attributions: Attribute[],
   variant_id: any
 ) => {
   return axios.post(`${BASE_URL}/add`, {
     userId,
     product_id,
     quantity,
-    attributions,
     variant_id
   });
 };
