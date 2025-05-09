@@ -1,34 +1,11 @@
-// import React from 'react';
-// import {View, Text, Button, StyleSheet} from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-// import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-
-// const Home = () => {
-//   type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'home'>;
-//   const navigation = useNavigation<NavigationProp>();
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.text}>🏠 Đây là trang Home</Text>
-//       <Button
-//         title="Đi tới Giỏ hàng 123"
-//         onPress={() => navigation.navigate('order', {id: 1234})}
-//       />
-//     </View>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {flex: 1, justifyContent: 'center', alignItems: 'center'},
-//   text: {fontSize: 20, marginBottom: 16},
-// });
-
-// export default Home;
-import React from 'react';
-import { View, FlatList, ScrollView, StyleSheet } from 'react-native';
-import ProductCard, { Product } from '../components/navigation/ProductCard';
-import QuickMenuItem from '../components/navigation/QuickMenuItem';
-import HomeBottom from '../components/bottomTab/HomeBottom';
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import ProductCard, { Product } from '../components/ProductCard';
+import QuickMenuItem from '../components/QuickMenuItem';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+import { RootStackParamList } from '../types/data';
+import { API_BASE_URL } from '../utils/const';
 
 const menuData = [
   {
@@ -47,7 +24,7 @@ const menuData = [
     borderColor: '#00bfa5',
   },
   {
-    label: 'Top mua hàng',
+    label: 'Top đề xuất',
     icon: require('../assets/images/crown.png'),
     borderColor: '#fbc02d',
   },
@@ -58,49 +35,94 @@ const menuData = [
   },
 ];
 
-const data: Product[] = Array(20).fill({
-  title: 'Bộ ga gối và vỏ chăn',
-  price: '169.000',
-  oldPrice: '205.000',
-  tag: 'Chăn ga Pre',
-  rating: '4.5',
-  image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTR9aM8aQyWtcV41nBhSw4JDBEI8QernSD5mw&s',
-});
-
 const HomeScreen: React.FC = () => {
-  const navigation = useNavigation();
+  const [products, setProducts] = useState<Product[]>([]);
+  const navigation: NavigationProp<RootStackParamList> = useNavigation();
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`${API_BASE_URL}/product/getAll`);
+        setProducts(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch products", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
   return (
     <>
       <ScrollView style={styles.container}>
       {/* Menu */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View style={styles.quickMenuRow}>
-          {menuData.map((item, index) => (
-            <QuickMenuItem
-              key={index}
-              icon={item.icon}
-              label={item.label}
-              borderColor={item.borderColor}
-            />
-          ))}
+      <View style={styles.quickMenuRow}>
+          {menuData.map((item, index) => {
+            if (item.label === 'Đơn hàng') {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => navigation.navigate('order')}
+                    // onPress={() => navigation.navigate('orderAdmin')}
+                >
+                  <QuickMenuItem
+                    icon={item.icon}
+                    label={item.label}
+                    borderColor={item.borderColor}
+                  />
+                </TouchableOpacity>
+              );
+            } else if (item.label === 'Mã giảm giá') {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => navigation.navigate('voucher')}>
+                  <QuickMenuItem
+                    icon={item.icon}
+                    label={item.label}
+                    borderColor={item.borderColor}
+                  />
+                </TouchableOpacity>
+              );
+            } else if (item.label === 'Top đề xuất') {
+              return (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => navigation.navigate('recommendedProduct')}>
+                  <QuickMenuItem
+                    icon={item.icon}
+                    label={item.label}
+                    borderColor={item.borderColor}
+                  />
+                </TouchableOpacity>
+              );
+            }else {
+              return (
+                <QuickMenuItem
+                  key={index}
+                  icon={item.icon}
+                  label={item.label}
+                  borderColor={item.borderColor}
+                />
+              );
+            }
+          })}
         </View>
-      </ScrollView>
-
-        <Text onPress={() => navigation.navigate('payment')}>Sang Payment</Text>
+    </ScrollView>
       {/* Product List */}
       <FlatList
-        data={data}
+        data={products}
         numColumns={2}
         scrollEnabled={false}
         columnWrapperStyle={{ justifyContent: 'space-between' }}
         contentContainerStyle={{ paddingTop: 16 }}
         renderItem={({ item }) => <ProductCard item={item} />}
-        keyExtractor={(_, i) => i.toString()}
+        keyExtractor={(item) => item._id}
       />
     </ScrollView>
     {/* <HomeBottom/> */}
     </>
   );
+
 };
 
 export default HomeScreen;

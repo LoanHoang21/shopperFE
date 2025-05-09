@@ -2,17 +2,18 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { CartItemI as ItemType, useCart } from '../context/CartContext';
 
-const CartItem: React.FC<{ item: ItemType; onOutOfStock: () => void }> = ({ item, onOutOfStock }) => {
+const CartItem: React.FC<{ item: ItemType; onOutOfStock: (stock: number) => void }> = ({ item, onOutOfStock }) => {
     const { toggleItem, changeQty } = useCart();
-  
+
     const handleIncrease = () => {
+      console.log(item.stock)
       if (item.quantity >= item.stock) {
-        onOutOfStock(); // 🔥 gọi khi vượt quá tồn kho
+        onOutOfStock(item.stock); // 🔥 gọi khi vượt quá tồn kho
       } else {
         changeQty(item.id, 1);
       }
     };
-  
+
     return (
       <View style={styles.itemCard}>
         <TouchableOpacity
@@ -30,13 +31,13 @@ const CartItem: React.FC<{ item: ItemType; onOutOfStock: () => void }> = ({ item
               {attr.label}: {attr.value}
             </Text>
           ))}
-  
+
           <View style={styles.bottomRow}>
             <View style={styles.priceGroup}>
               <Text style={styles.price}>đ{item.price.toLocaleString()}</Text>
               <Text style={styles.oldPrice}>đ{item.oldPrice.toLocaleString()}</Text>
             </View>
-  
+
             <View style={styles.qtyRow}>
               <TouchableOpacity onPress={() => changeQty(item.id, -1)} style={styles.qtyBtn}>
                 <Text style={styles.qtyText}>-</Text>
@@ -51,9 +52,9 @@ const CartItem: React.FC<{ item: ItemType; onOutOfStock: () => void }> = ({ item
       </View>
     );
   };
-  
+
   export default CartItem;
-  
+
 const styles = StyleSheet.create({
     bottomRow: {
         flexDirection: 'row',
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 6,
       },
-      
+
       priceGroup: {
         flexDirection: 'row',
         alignItems: 'center',

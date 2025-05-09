@@ -1,9 +1,10 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import ScanAndTrackBar from '../navigation/ScanAndTrackBar';
+import ScanAndTrackBar from '../ScanAndTrackBar';
 import { useNavigation } from '@react-navigation/native';
-import Icon from '@react-native-vector-icons/ant-design';
+import IconFontawesome from '@react-native-vector-icons/fontawesome';
+import IconAntDesign from '@react-native-vector-icons/ant-design';
 
 const HeaderHome: React.FC = () => {
 
@@ -24,6 +25,7 @@ const HeaderHome: React.FC = () => {
             placeholder="Happy Bedding"
             placeholderTextColor="#999"
             style={styles.input}
+            onFocus={() => navigation.navigate('search')}
           />
           <TouchableOpacity>
             <Image source={require('../../assets/images/camera.png')} style={styles.iconRight} />
@@ -33,13 +35,15 @@ const HeaderHome: React.FC = () => {
         {/* 2 icon bên ngoài */}
         <View style={styles.rightIcons}>
           <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
-            <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} />
+            {/* <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} /> */}
+            <IconAntDesign name="shopping-cart" size={30} color={'white'}/>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notification')}>
-            <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} />
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notiType')}>
+            {/* <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} /> */}
+            <IconFontawesome name="bell-o" size={25} color={'white'}/>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('')}>
-            <Icon name='user' size={24} color={'white'}/>
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('profile')}>
+            <IconAntDesign name="user" size={25} color={'white'}/>
           </TouchableOpacity>
         </View>
       </View>

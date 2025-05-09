@@ -1,85 +1,122 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Dimensions, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from '@react-native-vector-icons/ant-design';
 import { NavigationProp, useNavigation } from '@react-navigation/native';
-// import Register from './Register';
+import Toast from 'react-native-toast-message';
+import { userLogin } from '../apis/Auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RootStackParamList } from '../types/data';
+import { initNotification } from '../utils/handleNotification';
+import { getDetailUser, updateFcmToken } from '../apis/User';
+import { setupNotificationListeners } from '../utils/noti';
 
 const Login = () => {
   const navigation: NavigationProp<RootStackParamList> = useNavigation();
-  const [tab, setTab] = useState<'phone' | 'email'>('phone');
   const [showPassword, setShowPassword] = useState(false);
+  const [valueLogin, setValueLogin] = useState('');
+  const [password, setPassword] = useState('');
+  let isNotificationListenerSet = false;
+
+  const handleLogin = async () => {
+    let res = await userLogin(valueLogin, password);
+    if (res && res.data && +res.data.EC === 0) {
+      Toast.show({
+        type: 'success',
+        text1: 'Thông báo',
+        text2: `${res.data.EM}`,
+        position: 'bottom',
+        visibilityTime: 1500,
+      });
+
+      await initNotification();
+      let res1 = await getDetailUser(res.data.DT._id);
+      let userInfor = res1.data.DT;
+
+      if (userInfor.setting_noti_id.status === 'Bật') {
+        const token = await AsyncStorage.getItem('fcmToken');
+        await updateFcmToken(userInfor._id, token);
+        userInfor.fcm_token = token;
+      }
+
+      try {
+        await AsyncStorage.setItem('user', JSON.stringify(userInfor));
+        if (!isNotificationListenerSet) {
+            setupNotificationListeners();
+            isNotificationListenerSet = true;
+        }
+      } catch (e) {
+        console.error('Lỗi khi lưu dữ liệu:', e);
+      }
+
+      try {
+        const userData = await AsyncStorage.getItem('user');
+        if (userData) {
+          const user = JSON.parse(userData);
+          if (user.role === 1) {
+            navigation.navigate('homeAdmin');
+          } else {
+            navigation.navigate('home');
+          }
+        }
+      } catch (e) {
+        console.error('Lỗi khi lấy dữ liệu:', e);
+      }
+    } else {
+      Toast.show({
+        type: 'error',
+        text1: 'Thông báo',
+        text2: `${res.data.EM}`,
+        position: 'bottom',
+        visibilityTime: 1500,
+      });
+    }
+  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         <View style={styles.content}>
-          {/* Tabs */}
-          <View style={styles.tabs}>
-            <TouchableOpacity
-              style={[styles.tab, tab === 'phone' && styles.tabActive]}
-              onPress={() => setTab('phone')}
-            >
-              <Text style={tab === 'phone' ? styles.tabTextActive : styles.tabText}>Số Điện Thoại</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, tab === 'email' && styles.tabActive]}
-              onPress={() => setTab('email')}
-            >
-              <Text style={tab === 'email' ? styles.tabTextActive : styles.tabText}>Email</Text>
-            </TouchableOpacity>
-          </View>
+          <Text style={{fontSize: 30, textAlign: 'center', paddingBottom: 15}}>Đăng Nhập</Text>
 
-          {/* Input fields */}
-          
           <View style={styles.inputContainer}>
-            <Text style={styles.label}><Text style={{ color: 'red'}}>*</Text>  {tab==="phone"?"Số điện thoại":"Email"}</Text>
-            <TextInput 
+            <Text style={styles.label}><Text style={{color: 'red'}}>*</Text> SĐT/Email/Tên đăng nhập</Text>
+            <TextInput
               style={styles.input}
-              placeholder={tab === 'phone' ? 'SDT đăng ký tài khoản' : 'Email đăng ký tài khoản'}
-              placeholderTextColor = "#aaa"
-              keyboardType={tab === 'phone' ? 'numeric' : 'default'}
+              placeholder="SĐT/Email/Tên đăng nhập đã đăng kí"
+              placeholderTextColor="#aaa"
+              value={valueLogin}
+              onChangeText={setValueLogin}
             />
           </View>
+
           <View style={styles.inputContainer}>
-            <Text style={styles.label}><Text style={{ color: 'red'}}>*</Text>  Mật khẩu</Text>
+            <Text style={styles.label}><Text style={{color: 'red'}}>*</Text> Mật khẩu</Text>
             <View style={styles.input}>
               <TextInput
-                // style={[styles.input, { flex: 1, borderWidth: 0 }]}
                 placeholder="Vui lòng nhập mật khẩu"
                 placeholderTextColor="#aaa"
-                secureTextEntry = {!showPassword}
+                secureTextEntry={!showPassword}
+                value={password}
+                onChangeText={setPassword}
               />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={{justifyContent:'center'}}>
-                <Icon name={showPassword ? 'eye' : 'eye-invisible'} size={17}/>
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                style={{justifyContent: 'center'}}>
+                <Icon name={showPassword ? 'eye' : 'eye-invisible'} size={17} />
               </TouchableOpacity>
             </View>
           </View>
-          
-          <View style={styles.registerAndForgotPassword}>
-            <TouchableOpacity onPress={()=> {navigation.navigate('register')}}>
-              <Text style={styles.register}>Đăng ký</Text>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <Text style={styles.forgotPassword}>Quên mật khẩu?</Text>
-            </TouchableOpacity>
-          </View>
 
-          {/* Button Đăng Nhập */}
-          <TouchableOpacity onPress={() => {navigation.navigate('home')}}>
+          <TouchableOpacity onPress={handleLogin}>
             <LinearGradient
               start={{x: 0, y: 0}}
               end={{x: 0, y: 1}}
               colors={['#F55539', '#F1215A', '#F42384']}
-              style={styles.loginButton}
-            >
+              style={styles.loginButton}>
               <Text style={styles.loginText}>Đăng Nhập</Text>
             </LinearGradient>
           </TouchableOpacity>
-
-          {/* <TouchableOpacity style={styles.supportLink}>
-            <Text style={styles.supportText}>📞 Liên hệ hỗ trợ</Text>
-          </TouchableOpacity> */}
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -88,70 +125,31 @@ const Login = () => {
 
 export default Login;
 
-// const { height: screenHeight, width: screenWidth } = Dimensions.get('window');
+
 const screenHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: {},
   content: {
-    flex: 1,
     alignContent: 'center',
-    marginTop: screenHeight * 0.4,
+    marginTop: screenHeight * 0.38,
     paddingHorizontal: 30,
-  },
-  tabs: {
-    flexDirection: 'row',
-    backgroundColor: '#ffe6eb',
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginBottom: 20,
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  tabActive: {
-    backgroundColor: '#fff',
-  },
-  tabText: {
-    color: '#F1215A',
-  },
-  tabTextActive: {
-    color: '#F1215A',
-    fontWeight: 'bold',
   },
   inputContainer: {
     marginBottom: 15,
   },
   label: {
     color: 'black',
-    marginBottom: 5,
-    // fontWeight: 'bold',
+    marginBottom: 10,
   },
   input: {
-    flexDirection:'row',
+    flexDirection: 'row',
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: '#fbb',
     borderRadius: 8,
     paddingHorizontal: 12,
     backgroundColor: '#fff',
-  },
-
-  registerAndForgotPassword: {
-    flexDirection:'row',
-    justifyContent: 'space-between',
-    paddingBottom: 30,
-  },
-  register: {
-    color: '#F1215A',
-  },
-  forgotPassword: {
-    color: '#F1215A',
-    textAlign: 'right',
   },
   loginButton: {
     paddingVertical: 15,
@@ -163,11 +161,4 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 15,
   },
-  // supportLink: {
-  //   marginTop: 20,
-  //   alignItems: 'center',
-  // },
-  // supportText: {
-  //   color: '#f857a6',
-  // },
 });

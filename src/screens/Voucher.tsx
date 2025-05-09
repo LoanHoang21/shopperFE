@@ -1,111 +1,123 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import {getAllVoucher} from '../apis/Voucher';
+import { useNavigation } from '@react-navigation/native';
 
 interface Voucher {
-  id: number;
+  _id: string;
   code: string;
   image: string;
   description: string;
-  discountType: string;
-  discountValue: number;
-  minOrderValue: number;
-  maxDiscountValue: number;
-  startDate: string;
-  endDate: string;
-  maxUser: number;
-  userCount: number;
-  type: string;
+  discount_type: string;
+  discount_value: number;
+  min_order_value: number;
+  max_discount_value: number;
+  start_date: string;
+  end_date: string;
+  max_user: number;
+  user_count: number;
+  type_voucher: string;
 }
 
-const vouchers: Voucher[] = [
-  {
-    id: 1,
-    code: 'VOUCHER2025',
-    image: 'https://via.placeholder.com/60',
-    description: 'Áp dụng khi thanh toán bằng ví.',
-    discountType: 'percent',
-    discountValue: 8,
-    minOrderValue: 120000,
-    maxDiscountValue: 40000,
-    startDate: '2025-04-10',
-    endDate: '2025-04-30',
-    maxUser: 1000,
-    userCount: 320,
-    type: 'Shopper',
-  },
-  {
-    id: 2,
-    code: 'FREESHIP2025',
-    image: 'https://via.placeholder.com/60',
-    description: 'Miễn phí vận chuyển đơn từ 150k.',
-    discountType: 'fixed',
-    discountValue: 30000,
-    minOrderValue: 150000,
-    maxDiscountValue: 30000,
-    startDate: '2025-04-10',
-    endDate: '2025-04-20',
-    maxUser: 1000,
-    userCount: 999,
-    type: 'Shop',
-  },
-  // ... thêm các voucher khác
+const tabs = [
+  {label: 'Tất cả', value: 'Tất cả'},
+  {label: 'Shopper', value: 'Shopper'},
+  {label: 'Shop', value: 'Shop'},
+  {label: 'Sắp hết hạn', value: 'Sắp hết hạn'},
 ];
-
-const tabs = ['Tất cả', 'Shopper', 'Shop', 'Sắp hết hạn'];
 
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
   return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
 };
 
-const isExpiringSoon = (endDate: string) => {
+const isExpiringSoon = (startDate: string, endDate: string) => {
   const today = new Date();
+  const start = new Date(startDate);
   const end = new Date(endDate);
   const diff = (end.getTime() - today.getTime()) / (1000 * 3600 * 24);
-  return diff <= 3 && diff >= 0;
+  return diff <= 3 && diff >= 0 && start <= today;
 };
 
-const VoucherListWithTabs = () => {
+const VoucherScreen = () => {
+  const navigation = useNavigation();
   const [selectedTab, setSelectedTab] = useState('Tất cả');
+  const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredVouchers = vouchers.filter((voucher) => {
-    if (selectedTab === 'Tất cả') return true;
-    if (selectedTab === 'Sắp hết hạn') return isExpiringSoon(voucher.endDate);
-    return voucher.type === selectedTab;
-  });
+  const getAllVouchers = async () => {
+    try {
+      const res = await getAllVoucher();
+      if (res?.data?.EC === 0) {
+        setVouchers(res.data.DT);
+      } else {
+        Alert.alert('Lỗi', res.data.EM);
+      }
+    } catch (e) {
+      Alert.alert('Lỗi', 'Không thể lấy danh sách voucher.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const renderVoucher = ({ item }: { item: Voucher }) => {
-    const isExpired = new Date(item.endDate) < new Date();
-    const isFull = item.userCount >= item.maxUser;
-    const actionLabel = isExpired || isFull ? 'Hết mã' : 'Dùng ngay';
-    const actionColor = isExpired || isFull ? '#ccc' : '#FF3366';
+  useEffect(() => {
+    getAllVouchers();
+  }, []);
+
+  const filterVouchers = () => {
+    return vouchers.filter(v => {
+      if (selectedTab === 'Tất cả') {return true;}
+      if (selectedTab === 'Sắp hết hạn') {return isExpiringSoon(v.start_date, v.end_date);}
+      return v.type_voucher === selectedTab;
+    });
+  };
+
+  const renderVoucher = ({item}: {item: Voucher}) => {
+    const isExpired = new Date(item.end_date) < new Date();
+    const isStarted = new Date(item.start_date) > new Date();
+    const isFull = item.user_count >= item.max_user;
+    // const isSoon = isExpiringSoon(item.end_date);
+
+    let actionLabel = 'Dùng ngay';
+    let actionColor = '#FF3366';
+    if (isExpired ) {
+      actionLabel = 'Hết hạn';
+      actionColor = '#ccc';
+    } else if(isFull){
+      actionLabel = 'Hết mã';
+      actionColor = '#ccc';
+    }
+    else if (isStarted) {
+      actionLabel = 'Dùng sau';
+      actionColor = '#F55539';
+    }
 
     return (
       <View style={styles.card}>
-        <Image source={{ uri: item.image }} style={styles.image} />
+        <Image source={{uri: item.image}} style={styles.image} />
         <View style={styles.content}>
           <Text style={styles.title}>
-            {item.discountType === 'percent'
-              ? `Giảm ${item.discountValue}%`
-              : `Giảm ${item.discountValue.toLocaleString()}đ`}
-            {item.maxDiscountValue ? `, tối đa ${item.maxDiscountValue.toLocaleString()}đ` : ''}
+            {item.discount_type === 'Phần trăm'
+              ? `Giảm ${item.discount_value}%`
+              : `Giảm ${item.discount_value.toLocaleString()}K`}
+            {item.max_discount_value
+              ? ` giảm tối đa ${item.max_discount_value.toLocaleString()}K`
+              : ''}
           </Text>
-          <Text style={styles.desc}>{item.description}</Text>
-          <Text style={styles.condition}>
-            Đơn tối thiểu {item.minOrderValue.toLocaleString()}đ · HSD:{' '}
-            {formatDate(item.startDate)} - {formatDate(item.endDate)}
+          <Text style={styles.desc}>
+            Đơn Tối Thiểu {item.min_order_value.toLocaleString()}K. {item.description}
           </Text>
+          {new Date(item.start_date).getTime() < Date.now() ? (
+            <Text style={styles.subDesc}>Đã dùng: {item.user_count}/{item.max_user}. HSD: {formatDate(item.end_date)}</Text>
+          ) : (
+            <Text style={styles.subDesc}>Có hiệu lực từ: {formatDate(item.start_date)}. HSD: {formatDate(item.end_date)}</Text>
+          )}
+
         </View>
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: actionColor }]}
+          style={[styles.button, {backgroundColor: actionColor}]}
           disabled={isExpired || isFull}
+          onPress={() => navigation.navigate('home')}
         >
           <Text style={styles.buttonText}>{actionLabel}</Text>
         </TouchableOpacity>
@@ -113,11 +125,16 @@ const VoucherListWithTabs = () => {
     );
   };
 
-  const renderTab = (tab: string) => {
-    const isActive = selectedTab === tab;
+  const renderTab = (tab: {label: string; value: string}) => {
+    const isActive = selectedTab === tab.value;
     return (
-      <TouchableOpacity key={tab} onPress={() => setSelectedTab(tab)} style={styles.tabButton}>
-        <Text style={[styles.tabText, isActive && styles.tabTextActive]}>{tab}</Text>
+      <TouchableOpacity
+        key={tab.value}
+        onPress={() => setSelectedTab(tab.value)}
+        style={styles.tabButton}>
+        <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
+          {tab.label}
+        </Text>
         {isActive && <View style={styles.tabUnderline} />}
       </TouchableOpacity>
     );
@@ -125,23 +142,25 @@ const VoucherListWithTabs = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.tabContainer}>
-        {tabs.map(renderTab)}
-      </View>
-      <FlatList
-        data={filteredVouchers}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderVoucher}
-        contentContainerStyle={{ padding: 12 }}
-        ListEmptyComponent={
-          <Text style={{ textAlign: 'center', marginTop: 40 }}>Không có mã nào</Text>
-        }
-      />
+      <View style={styles.tabContainer}>{tabs.map(renderTab)}</View>
+      {loading ? (
+        <ActivityIndicator size="large" color="#FF3366" style={{marginTop: 20}} />
+      ) : (
+        <FlatList
+          data={filterVouchers()}
+          keyExtractor={item => item._id}
+          renderItem={renderVoucher}
+          contentContainerStyle={{padding: 12}}
+          ListEmptyComponent={
+            <Text style={{textAlign: 'center', marginTop: 40}}>Không có mã nào</Text>
+          }
+        />
+      )}
     </View>
   );
 };
 
-export default VoucherListWithTabs;
+export default VoucherScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -160,7 +179,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
-    color: '#666',
+    // color: '#666',
   },
   tabTextActive: {
     fontWeight: 'bold',
@@ -170,54 +189,60 @@ const styles = StyleSheet.create({
     marginTop: 4,
     height: 2,
     backgroundColor: '#FF3366',
-    width: 30,
+    width: 60,
     borderRadius: 1,
   },
   card: {
     flexDirection: 'row',
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 12,
     marginBottom: 12,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 2,
   },
   image: {
-    width: 60,
-    height: 60,
+    width: 90,
+    height: '100%',
     marginRight: 12,
     borderRadius: 10,
   },
   content: {
     flex: 1,
+    paddingVertical: 12,
   },
   title: {
     fontWeight: 'bold',
     color: '#333',
-    fontSize: 15,
+    fontSize: 16,
     marginBottom: 4,
   },
   desc: {
-    color: '#555',
     fontSize: 13,
-    marginBottom: 4,
+    fontStyle:'italic',
+    fontWeight:'bold',
+    color: '#534B4B',
   },
-  condition: {
-    fontSize: 12,
-    color: '#888',
+  subDesc : {
+    fontSize: 11,
+    fontStyle:'italic',
+    color: '#534B4B',
   },
   button: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 35,
     borderRadius: 8,
     marginLeft: 8,
+    height: '100%',
+    width: 50,
   },
   buttonText: {
+    flex: 1,
     color: '#fff',
     fontSize: 12,
     fontWeight: '600',
+    textAlign: 'center',
+    flexWrap: 'wrap',
   },
 });

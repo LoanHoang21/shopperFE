@@ -5,7 +5,7 @@ const ToastSuccess: React.FC<{ message: string }> = ({ message }) => {
   return (
     <View style={styles.toast}>
       <Image
-        source={require('../assets/checkSuccess.png')} // icon tick xanh
+        source={require('../assets/images/checkSuccess.png')} // icon tick xanh
         style={styles.icon}
       />
       <Text style={styles.text}>{message}</Text>

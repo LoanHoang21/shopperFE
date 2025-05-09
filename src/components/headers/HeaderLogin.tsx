@@ -1,11 +1,11 @@
-import { Dimensions, Image, StyleSheet, View } from "react-native";
+import { Dimensions, Image, StyleSheet, View } from 'react-native';
 import Icon from '@react-native-vector-icons/ant-design';
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import LinearGradient from "react-native-linear-gradient";
-import logoNameApp from '../../assets/images/logoNameApp.png';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
+import * as data from '../../types/data';
 
 const HeaderLogin = () => {
-    const navigation: NavigationProp<RootStackParamList> = useNavigation();
+    const navigation: NavigationProp<data.RootStackParamList> = useNavigation();
     return (
         <View style = {styles.container}>
             <LinearGradient start={{x: 0, y: 0}}
@@ -13,8 +13,8 @@ const HeaderLogin = () => {
                 colors={['#F55539', '#F1215A', '#F42384']} 
                 style={styles.header}
             >
-                <Image source={logoNameApp}/>
-            </LinearGradient>  
+                <Image source={require('../../assets/images/logoNameApp.png')}/>
+            </LinearGradient>
             <Icon name="left" style={styles.iconLeft} onPress={() =>{navigation.goBack()}}/>
         </View>
     );
@@ -33,8 +33,6 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: screenWidth * 0.45,
         alignItems: 'center',
         justifyContent: 'center',
-        // borderWidth: 5,
-        // borderColor: 'black',
     },
     iconLeft: {
         color: 'white',
