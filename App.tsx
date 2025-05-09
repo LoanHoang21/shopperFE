@@ -2,17 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StatusBar} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
-// import AppNavigation from './src/components/navigation/AppNavigation';
 import Loading from './src/screens/Loading';
 import RouterMain from './src/routers/RouterMain';
-// import UpdateOrder from './src/screens/Notification';
-// import Notification from './src/screens/Notification';
 import { CartProvider } from './src/context/CartContext';
 import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
-import messaging from '@react-native-firebase/messaging';
-import { useNotification } from './src/utils/handleNotification';
-import { setupNotificationListeners } from './src/utils/noti';
-import { checkAndNotifyExpiringVouchers } from './src/utils/notiVoucher';
+import { NotificationProvider } from './src/context/NotiContext';
 
 const toastConfig = {
   success: (props : any) => (
@@ -51,7 +45,6 @@ const toastConfig = {
   ),
 };
 
-
 const App = () => {
 
   const [isLoading, setIsLoading] = useState(true);
@@ -59,28 +52,14 @@ const App = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000); // Đợi 1 giây
+    }, 500); // Đợi 0.5 giây
 
     return () => clearTimeout(timer); // Clear timer nếu component unmount
   }, []);
-
-  // setupNotificationListeners();
-  useNotification();
-
-  // useEffect(() => {
-  //   // Gọi 1 lần khi app mở
-  //   checkAndNotifyExpiringVouchers();
-  
-  //   // Gọi lại sau mỗi 10 phút nếu bạn muốn
-  //   const interval = setInterval(() => {
-  //     checkAndNotifyExpiringVouchers();
-  //   }, 2 * 60 * 1000); // 2 phút
-  
-  //   return () => clearInterval(interval); // Clear khi component unmount
-  // }, []);
   
   return (
     <CartProvider>
+      <NotificationProvider>
       <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
         <StatusBar
           backgroundColor="#ffffff"
@@ -93,7 +72,8 @@ const App = () => {
           {/* <Toast /> */}
         </NavigationContainer>
       </SafeAreaView>
-    </CartProvider>
+      </NotificationProvider>
+     </CartProvider>
   );
 };
 

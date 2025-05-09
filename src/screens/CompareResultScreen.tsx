@@ -13,6 +13,7 @@ import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/data';
 import ProductCardCompare from '../components/ProductCardCompare';
 import { Product } from '../components/ProductCard';
+import { API_BASE_URL } from '../utils/const';
 
 const screenWidth = Dimensions.get('window').width;
 const CARD_MARGIN = 8;
@@ -65,7 +66,7 @@ const CompareResultScreen = () => {
                 const shopId = p.category_id?.shop_id?._id;
                 if (shopId && !map[shopId]) {
                     try {
-                        const res = await fetch(`http://10.0.2.2:3001/api/vouchers/shop/${shopId}`);
+                        const res = await fetch(`${API_BASE_URL}/vouchers/shop/${shopId}`);
                         const data = await res.json();
                         map[shopId] = data.data || [];
                     } catch (err) {

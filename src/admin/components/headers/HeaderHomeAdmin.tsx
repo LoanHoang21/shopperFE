@@ -1,12 +1,11 @@
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import ScanAndTrackBar from '../ScanAndTrackBar';
 import { useNavigation } from '@react-navigation/native';
 import IconFontawesome from '@react-native-vector-icons/fontawesome';
 import IconAntDesign from '@react-native-vector-icons/ant-design';
 
-const HeaderHome: React.FC = () => {
+const HeaderHomeAdmin: React.FC = () => {
 
   const navigation : any = useNavigation();
 
@@ -20,7 +19,7 @@ const HeaderHome: React.FC = () => {
       <View style={styles.contentRow}>
         {/* Search Input - chiếm toàn bộ còn lại */}
         <View style={styles.searchWrapper}>
-          <Image source={require('../../assets/images/search.png')} style={styles.iconLeft} />
+          <Image source={require('../../../assets/images/search.png')} style={styles.iconLeft} />
           <TextInput
             placeholder="Happy Bedding"
             placeholderTextColor="#999"
@@ -28,18 +27,16 @@ const HeaderHome: React.FC = () => {
             onFocus={() => navigation.navigate('search')}
           />
           <TouchableOpacity>
-            <Image source={require('../../assets/images/camera.png')} style={styles.iconRight} />
+            <Image source={require('../../../assets/images/camera.png')} style={styles.iconRight} />
           </TouchableOpacity>
         </View>
 
         {/* 2 icon bên ngoài */}
         <View style={styles.rightIcons}>
           <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
-            {/* <Image source={require('../../assets/images/cart.png')} style={styles.outIconImg} /> */}
             <IconAntDesign name="shopping-cart" size={30} color={'white'}/>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notiType')}>
-            {/* <Image source={require('../../assets/images/icon_bell_on.png')} style={styles.outIconImg} /> */}
+          <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notiTypeAdmin')}>
             <IconFontawesome name="bell-o" size={25} color={'white'}/>
           </TouchableOpacity>
           <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('profile')}>
@@ -48,35 +45,35 @@ const HeaderHome: React.FC = () => {
         </View>
       </View>
 
-      <View style={styles.scanOverlay}>
+      {/* <View style={styles.scanOverlay}>
         <ScanAndTrackBar />
-      </View>
+      </View> */}
     </LinearGradient>
   );
 };
 
-export default HeaderHome;
+export default HeaderHomeAdmin;
 
 const styles = StyleSheet.create({
     header: {
-        height:150,
+        height:110,
         flexDirection: 'row',
         padding: 12,
-        alignItems: 'center',
+        // alignItems: 'center',
         shadowColor: '#000',
         shadowOpacity: 0.05,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 4,
-        elevation: 3,
-        borderBottomWidth: 1,
+        // elevation: 3,
+        // borderBottomWidth: 1,
         borderColor: '#eee',
-        position: 'relative',
+        alignItems:'flex-end',
       },
       searchInput: {
         flex: 1,
         backgroundColor: '#f2f2f2',
         borderRadius: 20,
-        paddingVertical: 8,
+        // paddingVertical: 8,
         paddingHorizontal: 16,
         fontSize: 14,
       },
@@ -108,9 +105,6 @@ const styles = StyleSheet.create({
       outIcon: {
         marginLeft: 12,
       },
-      outIconImg: {
-        tintColor: '#fff',
-      },
       contentRow: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -131,11 +125,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginLeft: 8,
       },
-      scanOverlay: {
-        position: 'absolute',
-        bottom: -20, // đẩy ra khỏi header khoảng 20px
-        left: 10,
-        right: 10,
-        zIndex: 10,
-      },
+      // scanOverlay: {
+      //   position: 'absolute',
+      //   bottom: -20, // đẩy ra khỏi header khoảng 20px
+      //   left: 10,
+      //   right: 10,
+      //   zIndex: 10,
+      // },
 });

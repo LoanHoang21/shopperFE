@@ -15,6 +15,7 @@ import ProductCard from '../components/ProductCard';
 import { Dimensions } from 'react-native';
 import { Product } from '../components/ProductCard';
 import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
 
@@ -29,7 +30,7 @@ const ProductDetailScreen = () => {
     React.useEffect(() => {
         const fetchRelatedProducts = async () => {
             try {
-                const res = await axios.get(`http://10.0.2.2:3001/api/product/${product._id}/related`);
+                const res = await axios.get(`${API_BASE_URL}/product/${product._id}/related`);
                 const related = (res.data.data || []).map((p: any) => ({
                     ...p,
                     shop_name: p.category_id?.shop_id?.name ?? 'Không rõ',
@@ -143,10 +144,6 @@ const ProductDetailScreen = () => {
                         scrollEnabled={false}
                     />
                 </View>
-
-
-
-
             </ScrollView>
 
             <View style={styles.fixedBottomBar}>

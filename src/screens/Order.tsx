@@ -72,12 +72,12 @@ const Order = () => {
       />
 
       <Text>{tabIndex}</Text>
-{/* 
+
       {orderList.map((order, index) => (
         <OrderItem key={index} {...order} />
-      ))} */}
+      ))}
 
-      <EmptyOrder />
+      {/* <EmptyOrder /> */}
     </ScrollView>
   );
 };

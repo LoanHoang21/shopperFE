@@ -1,7 +1,5 @@
 import {Image, StyleSheet, Text, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-// import ImageLoading from '../assets/images/imageLoading.png';
-// import nameApp from '../assets/images/nameApp.png';
 
 const Loading = () => {
   return (
@@ -19,7 +17,6 @@ const Loading = () => {
           </View>
 
           <View style={styles.imageLoading}>
-            {/* <Image source={ImageLoading}/> */}
             <Image source={require('../assets/images/imageLoading.png')}/>
           </View>
         </View>

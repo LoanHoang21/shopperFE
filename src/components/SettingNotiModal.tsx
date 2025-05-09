@@ -1,53 +1,72 @@
-import React from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  StyleSheet,
-} from 'react-native';
-  import FontAwesome from '@react-native-vector-icons/fontawesome';
+import React, { useEffect, useState } from 'react';
+import { Modal, View, Text, TouchableOpacity, TouchableWithoutFeedback, StyleSheet } from 'react-native';
+import FontAwesome from '@react-native-vector-icons/fontawesome';
+import { getAllSettingNoti } from '../apis/SettingNoti';
+import { useNotification } from '../context/NotiContext';
+import { updateSettingNoti } from '../apis/User';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onSelect: (option: string) => void;
+  onSelect: (settingId: string) => void;
+  selectedSettingId: string | null;
+  status: string | null;
 };
 
-const options = [
-  'Trong 30 phút',
-  'Trong 1 giờ',
-  'Trong 12 giờ',
-  'Trong 24 giờ',
-  'Cho đến khi tôi bật lại',
-];
+const SettingModal = ({ visible, onClose, onSelect, selectedSettingId, status }: Props) => {
+  const [options, setOptions] = useState<any[]>([]);
+  const { setStatusNoti } = useNotification();
 
-const SettingModal = ({ visible, onClose, onSelect }: Props) => {
+  useEffect(() => {
+    const fetchOptions = async () => {
+      const res = await getAllSettingNoti();
+      setOptions(res.data.DT || []);
+    };
+    if (visible) {
+      fetchOptions();
+    }
+  }, [visible, status]);
+
+  // Gọi API để cập nhật trạng thái thông báo
+  const handleOptionAction = async (option: any) => {
+    console.log(option);
+    const storedUser = await AsyncStorage.getItem('user');
+    if (!storedUser) {
+      return;
+    }
+
+    const user = JSON.parse(storedUser);
+
+    // Gửi request cập nhật trạng thái thông báo
+    const response = await updateSettingNoti(user._id, option._id);
+    if (response.data.EC === 0) {
+      setStatusNoti(response.data.DT.setting_noti_id.status);  // Cập nhật trạng thái trong context
+      onSelect(option._id);
+    } else {
+      console.error('Failed to update notification setting');
+    }
+  };
+
   return (
-    <Modal
-      visible={visible}
-      animationType="fade"
-      transparent
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} animationType="fade" transparent onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
-          <TouchableWithoutFeedback onPress={() => {}}>
+          <TouchableWithoutFeedback>
             <View style={styles.modalContainer}>
-              <Text style={styles.modalTitle}>Tắt thông báo cho ứng dụng</Text>
+              <Text style={styles.modalTitle}>Cài đặt thông báo cho ứng dụng</Text>
 
-              {options.map((option, index) => (
+              {options.map((option) => (
                 <TouchableOpacity
-                  key={index}
+                  key={option._id}
                   style={styles.optionButton}
-                  onPress={() => {
-                    onSelect(option);
-                  }}
+                  onPress={() => handleOptionAction(option)}
                 >
-                  {/* <View style={{}}> */}
-                    <Text style={styles.optionText}>{option}</Text>
-                    <FontAwesome name='circle-o' size={18}/>
-                  {/* </View> */}
+                  <Text style={styles.optionText}>{option.name}</Text>
+                  <FontAwesome
+                    name={option._id === selectedSettingId ? 'dot-circle-o' : 'circle-o'}
+                    size={18}
+                  />
                 </TouchableOpacity>
               ))}
             </View>
@@ -64,9 +83,8 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.3)',
-    // justifyContent: 'center',
     alignItems: 'center',
-    justifyContent:"flex-end"
+    justifyContent: 'flex-end',
   },
   modalContainer: {
     width: '100%',
@@ -88,15 +106,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 6,
     marginBottom: 10,
-    // borderWidth: 1,
-    // borderColor: 'green',
   },
   optionText: {
     color: 'black',
     width: '90%',
     fontSize: 16,
     fontWeight: '500',
-    // borderWidth: 1,
-    // borderColor: 'green',
   },
 });

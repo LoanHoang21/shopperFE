@@ -13,6 +13,7 @@ import {
 import Icon from '@react-native-vector-icons/ant-design';
 import { useNavigation } from '@react-navigation/native';
 import { Product } from '../components/ProductCard';
+import { API_BASE_URL } from '../utils/const';
 
 const keywordSuggestions = [
     'Chăn ga gối đệm', 'Chăn ga', 'Chăn', 'Quạt',
@@ -28,7 +29,7 @@ const SearchScreen = () => {
     const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
 
     useEffect(() => {
-        fetch('http://10.0.2.2:3001/api/product/suggested/ml-trending')
+        fetch(`${API_BASE_URL}/product/suggested/ml-trending`)
             .then(res => res.json())
             .then(json => {
                 if (json.status === 'OK') {
@@ -40,7 +41,7 @@ const SearchScreen = () => {
 
     const handleSearch = async (keyword: string) => {
         try {
-            const res = await fetch(`http://10.0.2.2:3001/api/product/search?query=${encodeURIComponent(keyword)}`);
+            const res = await fetch(`${API_BASE_URL}/product/search?query=${encodeURIComponent(keyword)}`);
             const json = await res.json();
 
             if (json.status === 'OK') {

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { API_BASE_URL } from '../utils/const';
 
 export interface CartItemI {
   id: string;
@@ -70,7 +71,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const fetchCartItems = async () => {
       try {
-        const res = await fetch('http://10.0.2.2:3001/api/cartitems'); // ⚡ Sửa lại URL theo server bạn
+        const res = await fetch(`${API_BASE_URL}/cartitems`); // ⚡ Sửa lại URL theo server bạn
         const data = await res.json();
 
         if (Array.isArray(data)) {

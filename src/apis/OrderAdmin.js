@@ -1,22 +1,22 @@
-import axios from "axios";
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
 const getAllOrderById = (customerId) => {
-    return axios.get(`http://192.168.0.116:3001/api/orderAdmin/getAll/${customerId}`);
-}
+    return axios.get(`${API_BASE_URL}/orderAdmin/getAll/${customerId}`);
+};
 
 const updateStatusOrder = (orderId, nextStatus) => {
-    return axios.post(`http://192.168.0.116:3001/api/orderAdmin/updateStatus/${orderId}`, {
+    return axios.post(`${API_BASE_URL}/orderAdmin/updateStatus/${orderId}`, {
         status: nextStatus,
     });
-}
+};
 
-// const userLogin = (valueLogin, password) => {
-//     return axios.post('http://10.0.2.2:3001/api/auth/login', {
-//         valueLogin, password
-//       })
-// }
+const getAllOrder = () => {
+    return axios.get(`${API_BASE_URL}/orderAdmin/getAllOrder/`);
+};
 
 export {
     getAllOrderById,
     updateStatusOrder,
+    getAllOrder,
 };

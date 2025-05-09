@@ -1,15 +1,7 @@
 import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ActivityIndicator,
-  Alert,
-} from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import {getAllVoucher} from '../apis/Voucher';
+import { useNavigation } from '@react-navigation/native';
 
 interface Voucher {
   _id: string;
@@ -48,6 +40,7 @@ const isExpiringSoon = (startDate: string, endDate: string) => {
 };
 
 const VoucherScreen = () => {
+  const navigation = useNavigation();
   const [selectedTab, setSelectedTab] = useState('Tất cả');
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
@@ -73,8 +66,8 @@ const VoucherScreen = () => {
 
   const filterVouchers = () => {
     return vouchers.filter(v => {
-      if (selectedTab === 'Tất cả') return true;
-      if (selectedTab === 'Sắp hết hạn') return isExpiringSoon(v.start_date, v.end_date);
+      if (selectedTab === 'Tất cả') {return true;}
+      if (selectedTab === 'Sắp hết hạn') {return isExpiringSoon(v.start_date, v.end_date);}
       return v.type_voucher === selectedTab;
     });
   };
@@ -123,7 +116,9 @@ const VoucherScreen = () => {
         </View>
         <TouchableOpacity
           style={[styles.button, {backgroundColor: actionColor}]}
-          disabled={isExpired || isFull}>
+          disabled={isExpired || isFull}
+          onPress={() => navigation.navigate('home')}
+        >
           <Text style={styles.buttonText}>{actionLabel}</Text>
         </TouchableOpacity>
       </View>
