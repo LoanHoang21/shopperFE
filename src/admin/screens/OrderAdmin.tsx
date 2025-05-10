@@ -108,7 +108,7 @@ const OrderAdmin = () => {
         const orderRes = await getAllOrder();
         const orders = orderRes?.data?.DT || [];
         const currentOrder = orders.find((o: any) => o._id === orderId);
-        const image = currentOrder?.products?.[0]?.product_id.images[0] || '';
+        const image = currentOrder?.products?.[0]?.product_id.images || '';
         const receiverId = currentOrder.customer_id || '';
         const receiverRes = await getDetailUser(receiverId);
         const receiver = receiverRes.data.DT;
@@ -213,7 +213,7 @@ const OrderAdmin = () => {
   
       return (
         <View key={i} style={styles.productItem}>
-          <Image source={{uri: product.images[0]}} style={styles.productImage} />
+          <Image source={{uri: product.image}} style={styles.productImage} />
           <View style={styles.productInfo}>
             <View style={styles.rowBetween}>
               <Text style={styles.productName} numberOfLines={2}>
@@ -227,7 +227,7 @@ const OrderAdmin = () => {
                 <Text style={styles.oldPrice}>₫{price?.toLocaleString()}</Text>
               )}
               <Text style={styles.salePrice}>₫{Math.round(salePrice).toLocaleString()}</Text> */}
-              <Text>Mã sản phẩm: {product._id}</Text>
+              <Text>Mã sản phẩm: {product.product_id}</Text>
             </View>
           </View>
         </View>

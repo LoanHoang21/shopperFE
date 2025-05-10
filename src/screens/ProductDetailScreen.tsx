@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -15,9 +15,23 @@ import ProductCard from '../components/ProductCard';
 import { Dimensions } from 'react-native';
 import { Product } from '../components/ProductCard';
 import axios from 'axios';
+import AddToCartModal from '../components/AddToCartModal';
 import { API_BASE_URL } from '../utils/const';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
+type ProductVariant = {
+    _id: string;
+    attributes: {
+      category: string;
+      value: string;
+    }[];
+    attribution_ids: Array<string>;
+    price: number;
+    discount: number;
+    quantity: number;
+    sale_quantity: number;
+    image: string;
+  };
 
 
 const ProductDetailScreen = () => {
@@ -26,6 +40,36 @@ const ProductDetailScreen = () => {
     const route = useRoute<ProductDetailRouteProp>();
     const { product } = route.params;
     const [relatedProducts, setRelatedProducts] = React.useState<Product[]>([]);
+    const [modalVisible, setModalVisible] = React.useState(false);
+    const [productOptions, setProductOptions] = React.useState<string[]>([]);
+    const [productAttributes, setProductAttributes] = React.useState<
+    { category: string; values: string[] }[]
+    >([]);
+    const [variants, setVariants] = useState<ProductVariant[]>([]);
+   
+
+
+    console.log('product',product);
+
+    const fetchProductAttributions = async () => {
+        try {
+          const res = await axios.get(`${API_BASE_URL}/product/${product._id}/attributions`);
+          setProductAttributes(res.data.data || []);
+        } catch (error) {
+          console.error('Lỗi khi lấy thuộc tính sản phẩm:', error);
+        }
+    };
+
+    const fetchProductVariants = async () => {
+        try {
+          const res = await axios.get(`${API_BASE_URL}/product/${product._id}/variants`);
+          const data = res.data?.data?.variants || [];
+          setVariants(data);
+        } catch (error) {
+          console.error('Lỗi khi lấy biến thể sản phẩm:', error);
+        }
+      };
+      
 
     React.useEffect(() => {
         const fetchRelatedProducts = async () => {
@@ -46,16 +90,20 @@ const ProductDetailScreen = () => {
             fetchRelatedProducts();
         }
     }, [product]);
+
     React.useEffect(() => {
+        if (product?._id) {
+            fetchProductVariants();
+          }
         scrollRef.current?.scrollTo({ y: 0, animated: true });
     }, [product]);
 
     const navigation = useNavigation();
     const [showAlert, setShowAlert] = React.useState(false);
 
-    const handleAddToCart = () => {
-        setShowAlert(true);
-        setTimeout(() => setShowAlert(false), 2000);
+    const handleAddToCart = async () => {
+        await fetchProductAttributions();
+        setModalVisible(true);
     };
 
     const handleCompare = () => {
@@ -76,7 +124,7 @@ const ProductDetailScreen = () => {
                     keyExtractor={(item, index) => index.toString()}
                     renderItem={({ item }) => (
                         <Image
-                            source={{ uri: item || 'https://via.placeholder.com/300' }}
+                            source={{ uri: item || 'https://res.cloudinary.com/dr0ncakbs/image/upload/v1746369375/default_pyru0w.png' }}
                             style={styles.image}
                         />
                     )}
@@ -166,6 +214,28 @@ const ProductDetailScreen = () => {
                     </View>
                 </View>
             )}
+            <AddToCartModal
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                product={{
+                    id: product._id,
+                    image: Array.isArray(product.images) && product.images.length > 0
+                ? product.images[0] ?? 'https://via.placeholder.com/300'
+                : product.image ?? 'https://via.placeholder.com/300',
+                    name: product.name,
+                    discountPrice: product.price,
+                    price: originalPrice,
+                    stock: (product.quantity && product.sale_quantity)? (product.quantity - product.sale_quantity) : 0,
+                    options:productAttributes,
+                    variants: variants 
+                }}
+                onAddToCart={(item) => {
+                    console.log('Đã thêm giỏ:', item);
+                    setShowAlert(true);
+                    setTimeout(() => setShowAlert(false), 2000);
+                }}
+            />
+
         </View>
     );
 };
@@ -200,7 +270,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 10,
+        paddingHorizontal: 10,
+        paddingBottom:30,
+        paddingTop:20,
         backgroundColor: 'white',
         borderTopWidth: 1,
         borderColor: '#ddd',

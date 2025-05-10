@@ -2,12 +2,13 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { CartItemI as ItemType, useCart } from '../context/CartContext';
 
-const CartItem: React.FC<{ item: ItemType; onOutOfStock: () => void }> = ({ item, onOutOfStock }) => {
+const CartItem: React.FC<{ item: ItemType; onOutOfStock: (stock: number) => void }> = ({ item, onOutOfStock }) => {
     const { toggleItem, changeQty } = useCart();
 
     const handleIncrease = () => {
+      console.log(item.stock)
       if (item.quantity >= item.stock) {
-        onOutOfStock(); // 🔥 gọi khi vượt quá tồn kho
+        onOutOfStock(item.stock); 
       } else {
         changeQty(item.id, 1);
       }
@@ -114,9 +115,9 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   qtyRow: {
+    marginLeft:4,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
     marginTop: 4,
   },
   qtyBtn: {
