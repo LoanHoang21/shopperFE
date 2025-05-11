@@ -13,6 +13,7 @@ const statusMap: Record<string, string> = {
   delivered: 'Đã giao hàng',
   completed: 'Đã hoàn thành',
   cancelled: 'Đã hủy đơn',
+  unpaid: 'Chưa thanh toán',
 };
 
 const statusFlow: Record<string, string> = {
@@ -31,6 +32,7 @@ const tabs = [
   {label: 'Đã giao hàng', value: 'delivered'},
   {label: 'Đã hoàn thành', value: 'completed'},
   {label: 'Đã hủy đơn', value: 'cancelled'},
+  {label: 'Chưa thanh toán', value: 'unpaid'},
 ];
 
 const OrderAdmin = () => {
@@ -178,7 +180,6 @@ const OrderAdmin = () => {
 
         for (const noti of notifications) {
           await createNotiOrder(user._id, receiverId, orderId,noti.name,noti.image,noti.description,receiver.fcm_token);
-          console.log()
         }
         Alert.alert(
           'Thành công',
@@ -197,6 +198,7 @@ const OrderAdmin = () => {
     const isDisabled =
       item.status === 'delivered' ||
       item.status === 'completed' ||
+      item.status === 'unpaid' ||
       item.status === 'cancelled';
     const buttonColor = isDisabled ? '#4CAF50' : '#F1215A'; // xanh hoặc đỏ
 
@@ -212,14 +214,13 @@ const OrderAdmin = () => {
       // const salePrice = hasDiscount ? price * (1 - discount / 100) : price;
       // const totalProduct = salePrice * quantity;
       // totalAmount += totalProduct;
-  
       return (
         <View key={i} style={styles.productItem}>
           <Image source={{uri: product.image}} style={styles.productImage} />
           <View style={styles.productInfo}>
             <View style={styles.rowBetween}>
               <Text style={styles.productName} numberOfLines={2}>
-                {product.product_id.name}
+                {product?.product_id?.name}
               </Text>
               <Text style={styles.quantityText}>x{quantity}</Text>
             </View>
@@ -281,7 +282,7 @@ const OrderAdmin = () => {
             <Text style={styles.totalAmount}>₫{Math.round(item.total_price).toLocaleString()}</Text>
           </View>
         </View>
-  
+
         <TouchableOpacity
           style={[styles.statusButton, {backgroundColor: buttonColor}]}
           onPress={() => {

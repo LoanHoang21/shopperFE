@@ -14,6 +14,7 @@ const statusMap: Record<string, string> = {
   delivered: 'Đã giao hàng',
   completed: 'Đã hoàn thành',
   cancelled: 'Đã hủy đơn',
+  unpaid: 'Chưa thanh toán',
 };
 
 const statusFlow: Record<string, string> = {
@@ -32,6 +33,7 @@ const tabs = [
   {label: 'Đã giao hàng', value: 'delivered'},
   {label: 'Đã hoàn thành', value: 'completed'},
   {label: 'Đã hủy đơn', value: 'cancelled'},
+  {label: 'Chưa thanh toán', value: 'unpaid'},
 ];
 
 const OrderShop = () => {
@@ -197,6 +199,7 @@ const OrderShop = () => {
     const isDisabled =
       item.status === 'delivered' ||
       item.status === 'completed' ||
+      item.status === 'unpaid' ||
       item.status === 'cancelled';
     const buttonColor = isDisabled ? '#4CAF50' : '#F1215A'; // xanh hoặc đỏ
 
@@ -212,14 +215,14 @@ const OrderShop = () => {
       // const salePrice = hasDiscount ? price * (1 - discount / 100) : price;
       // const totalProduct = salePrice * quantity;
       // totalAmount += totalProduct;
-  
+      // console.log(">>>>>>test shop:", product.product_id);
       return (
         <View key={i} style={styles.productItem}>
           <Image source={{uri: product.image}} style={styles.productImage} />
           <View style={styles.productInfo}>
             <View style={styles.rowBetween}>
               <Text style={styles.productName} numberOfLines={2}>
-                {product.product_id.name}
+                {product?.product_id?.name}
               </Text>
               <Text style={styles.quantityText}>x{quantity}</Text>
             </View>

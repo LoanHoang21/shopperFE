@@ -109,6 +109,7 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
         }, 0) || 0;
 
         setExistingCartItemQty(existingCartQty)
+        console.log('existingCartQty',existingCartQty)
     }
   }, [selectedVariant]);
 

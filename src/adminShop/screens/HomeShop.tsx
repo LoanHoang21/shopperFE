@@ -48,11 +48,12 @@ const HomeShop = () => {
         let delivered = 0;
         let completed = 0;
         let cancelled = 0;
+        let unpaid = 0;
         let totalRevenue = 0;
         let totalProductSale = 0;
 
         orderList.forEach((order: any) => {
-          if (order.status !== 'cancelled') {
+          if (order.status === 'completed') {
             totalRevenue += order.total_price || 0;
             totalProductSale += order.quantity || 0;
           }
@@ -74,6 +75,9 @@ const HomeShop = () => {
               break;
             case 'cancelled':
               cancelled++;
+              break;
+            case 'unpaid':
+              unpaid++;
               break;
           }
         });
@@ -120,6 +124,13 @@ const HomeShop = () => {
             name: 'Đã hủy đơn',
             population: cancelled,
             color: 'red',
+            legendFontColor: '#333',
+            legendFontSize: 14,
+          },
+          {
+            name: 'Chưa thanh toán',
+            population: unpaid,
+            color: 'black',
             legendFontColor: '#333',
             legendFontSize: 14,
           },

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { use } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import OrderProduct from './OrderProduct';
 import { CartProductItem } from '../screens/payment/Payment';
@@ -7,6 +7,9 @@ import { Alert } from 'react-native';
 import axios from 'axios';
 import { Modal, Pressable } from 'react-native';
 import { API_BASE_URL } from '../utils/const';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createNotiOrder } from '../apis/Noti';
+import { getDetailUser } from '../apis/User';
 
 type OrderItemProps = {
   // shopName: string;
@@ -20,12 +23,28 @@ type OrderItemProps = {
 
 const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: OrderItemProps) => {
   const [showModal, setShowModal] = React.useState(false);
-  
+
   const handleCancelOrder = async () => {
     try {
       const res = await axios.put(`${API_BASE_URL}/order/${orderId}/status`, {
         status: 'cancelled',
       });
+
+      // Tạo thông báo cho Shop
+      // senderId, receiverId, orderId, name, image, description, fcmToken
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const res1 = await getDetailUser(products[0]?.product_id?.product_id?.category_id.shop_id.user_id);
+        await createNotiOrder(user._id,
+          products[0]?.product_id?.product_id?.category_id.shop_id,
+          orderId,
+          'Thông báo hủy đơn hàng',
+          products[0]?.product_id?.image || '',
+          `Đơn hàng ${orderId} đã hủy bởi người mua`,
+          res1.data.DT.fcm_token
+        );
+      }
 
       if (res.data?.status === 'OK') {
         Alert.alert('Thành công', 'Đơn hàng đã được hủy');
@@ -38,6 +57,30 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: 
       Alert.alert('Lỗi', 'Đã xảy ra lỗi khi hủy đơn');
     }
   };
+
+  const handleConfirmReceiveOrder = async () => {
+    try {
+      // Tạo thông báo cho Shop - Xác nhận đã nhận được hàng
+      // senderId, receiverId, orderId, name, image, description, fcmToken
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const res1 = await getDetailUser(products[0]?.product_id?.product_id?.category_id.shop_id.user_id);
+        await createNotiOrder(user._id,
+          products[0]?.product_id?.product_id?.category_id.shop_id,
+          orderId,
+          'Thông báo đơn hàng hoàn thành',
+          products[0]?.product_id?.image || '',
+          `Đơn hàng ${orderId} đã được người mua xác nhận đã nhận được hàng`,
+          res1.data.DT.fcm_token
+        );
+      }
+    } catch (err) {
+      console.error('Tạo thông báo cho shop lỗi:', err);
+      // Alert.alert('Lỗi', 'Đã xảy ra lỗi khi hủy đơn');
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -116,7 +159,7 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: 
             </TouchableOpacity>
           )}
 
-          {status === 'Đang giao' && (
+          {status === 'Đang vận chuyển' && (
             <>
               <TouchableOpacity style={styles.contactButton}>
                 <Text>Liên hệ shop</Text>
@@ -127,7 +170,18 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: 
             </>
           )}
 
-          {status === 'Đã nhận' && (
+          {status === 'Đã giao hàng' && (
+            <>
+              <TouchableOpacity style={styles.contactButton}>
+                <Text>Liên hệ shop</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => {handleConfirmReceiveOrder()}}>
+                <Text style={styles.cancelText}>Đã nhận hàng</Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          {status === 'Đã hoàn thành' && (
             <>
               <TouchableOpacity style={styles.contactButton}>
                 <Text>Đánh giá</Text>

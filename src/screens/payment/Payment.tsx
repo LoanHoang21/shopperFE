@@ -31,6 +31,7 @@ export interface Shop {
     image?: string;
     phone?: string;
     location?: string;
+    user_id?: string;
 }
 
 export interface Category {

@@ -17,7 +17,7 @@ import { CartProductItem } from './payment/Payment';
 
 export type OrderType = {
   _id: string;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'unpaid';
+  status: 'pending' | 'confirmed' | 'shipping' | 'delivered' | 'completed' |'cancelled' | 'unpaid';
   products: CartProductItem[];
   quantity: number;
   total_price: number;
@@ -78,10 +78,12 @@ const Order = () => {
         return 'pending';
       case 'Đã xác nhận':
         return 'confirmed';
-      case 'Đang giao':
-        return 'shipped';
-      case 'Đã nhận':
+      case 'Đang vận chuyển':
+        return 'shipping';
+      case 'Đã giao hàng':
         return 'delivered';
+      case 'Đã hoàn thành':
+        return 'completed';
       case 'Hủy':
         return 'cancelled';
       case 'Chưa thanh toán':
