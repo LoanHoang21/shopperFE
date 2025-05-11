@@ -38,19 +38,20 @@ const CartScreen: React.FC = () => {
   console.log(selectedItems)
 
   const transformedProducts = selectedItems
-    .filter(item => !!item.variantId) // chỉ giữ lại item có variantId
+    .filter(item => !!item.variantId)
     .map(item => {
       const type = item.attributes?.length
         ? item.attributes.map(attr => `${attr.label}: ${attr.value}`).join(', ')
         : undefined;
 
       return {
-        product_id: item.variantId!, // hoặc item.variantId vì đã filter
+        product_id: item.variantId?._id!,
         quantity: item.quantity,
         ...(type && { type }),
       };
     });
 
+    console.log('transformedProducts', transformedProducts)
 
   console.log('transformedProducts', transformedProducts)
   const grouped = items.reduce((acc, item) => {
