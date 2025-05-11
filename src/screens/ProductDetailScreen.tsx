@@ -18,7 +18,7 @@ import axios from 'axios';
 import AddToCartModal from '../components/AddToCartModal';
 import { API_BASE_URL } from '../utils/const';
 import AddToPaymentModal from '../components/AddToPaymentModal';
-
+import { getPriceRange } from '../utils/productHelpers';
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
 type ProductVariant = {
     _id: string;
@@ -140,12 +140,12 @@ const ProductDetailScreen = () => {
 
                 <View style={styles.infoContainer}>
                     <View style={styles.priceRow}>
-                        <Text style={styles.salePrice}>đ{product.price.toLocaleString()}</Text>
-                        {(product.discount ?? 0) > 0 && (
+                        <Text style={styles.salePrice}>{getPriceRange(product)}</Text>
+                        {/* {(product.discount ?? 0) > 0 && (
                             <Text style={styles.oldPrice}>
                                 đ{Math.floor(product.price / (1 - (product.discount ?? 0) / 100)).toLocaleString()}
                             </Text>
-                        )}
+                        )} */}
 
                     </View>
 

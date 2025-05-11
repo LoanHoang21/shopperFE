@@ -3,15 +3,16 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { API_BASE_URL } from '../utils/const';
+import { getMinPrice } from '../utils/productHelpers';
 
 export interface Product {
   _id: string;
   name: string;
-  images?: string[];        
+  images?: string[];
   image?: string;
   price: number;
   discount?: number;
-  shop_id?: string;    
+  shop_id?: string;
   rating_avg?: number;
   short_description?: string;
   description: string;
@@ -27,7 +28,7 @@ export interface Product {
   sale_quantity?: number;
   review_count_7d?: number;
   quantity?: number;
-  variants?: any ;
+  variants?: any;
 }
 
 
@@ -43,10 +44,10 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
     try {
       // ✅ Gửi request tăng view trước
       await axios.post(`${API_BASE_URL}/product/view/${item._id}`);
-     } catch (err) {
+    } catch (err) {
       console.error((err as Error).message);
     }
-    
+
 
     // ✅ Sau đó mới điều hướng đến chi tiết sản phẩm
     if (onPress) {
@@ -66,7 +67,9 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
 
       <Text numberOfLines={2} style={styles.title}>{item.name}</Text>
       <View style={styles.priceRow}>
-        <Text style={styles.price}>{item.price.toLocaleString()}₫</Text>
+        <Text style={styles.price}>
+          {getMinPrice(item)}
+        </Text>
         {item.discount ? (
           <Text style={styles.oldPrice}>
             {Math.ceil(item.price / (1 - item.discount / 100)).toLocaleString()}₫
@@ -75,7 +78,7 @@ const ProductCard: React.FC<Props> = ({ item, onPress }) => {
         ) : null}
       </View>
 
-     
+
       <View style={styles.metaRow}>
         <Text style={styles.shopName}>{item.shop_name}</Text>
 
