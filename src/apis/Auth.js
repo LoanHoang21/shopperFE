@@ -1,5 +1,5 @@
-import axios from "axios";
-import { API_BASE_URL } from "../utils/const";
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
 const registerNewUser = (username, email, phone, password) => {
     return axios.post(`${API_BASE_URL}/auth/register`, {

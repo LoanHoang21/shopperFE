@@ -4,10 +4,10 @@ import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../../types/data';
 
-type NotiRouteProp = RouteProp<RootStackParamList, 'notiTypeDetails'>;
+type NotiRouteProp = RouteProp<RootStackParamList, 'notiShop'>;
 type NavigationType = NativeStackNavigationProp<RootStackParamList>;
 
-const HeaderNotificationAdmin = () => {
+const HeaderNotificationShop = () => {
   const navigation = useNavigation<NavigationType>();
   const route = useRoute<NotiRouteProp>();
   const _id = route.params?._id;
@@ -20,8 +20,8 @@ const HeaderNotificationAdmin = () => {
         color="#ff3366"
         onPress={() => {
           _id === undefined
-            ? navigation.navigate('homeAdmin')
-            : navigation.navigate('notiTypeAdmin');
+            ? navigation.navigate('homeShop')
+            : navigation.navigate('notiTypeShop');
         }}
       />
       <Text style={styles.headerTitle}>
@@ -30,7 +30,7 @@ const HeaderNotificationAdmin = () => {
     </View>
   );
 };
-export default HeaderNotificationAdmin;
+export default HeaderNotificationShop;
 
 const styles = StyleSheet.create({
   header: {

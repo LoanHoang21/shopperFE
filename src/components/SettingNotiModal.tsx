@@ -17,7 +17,6 @@ type Props = {
 const SettingModal = ({ visible, onClose, onSelect, selectedSettingId, status }: Props) => {
   const [options, setOptions] = useState<any[]>([]);
   const { setStatusNoti } = useNotification();
-
   useEffect(() => {
     const fetchOptions = async () => {
       const res = await getAllSettingNoti();

@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, Alert, StyleSheet, TextInput, ScrollView, SafeAreaView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {getAllOrder, updateStatusOrder} from '../../apis/OrderAdmin';
+import {getAllOrder, updateStatusOrder} from '../../apis/OrderShop';
 import { createNotiOrder } from '../../apis/Noti';
 import { getDetailUser } from '../../apis/User';
 import { image_default } from '../../utils/const';
+import { getShopByUserId } from '../../apis/Shop';
 
 const statusMap: Record<string, string> = {
   pending: 'Chờ xác nhận',
@@ -33,7 +34,7 @@ const tabs = [
   {label: 'Đã hủy đơn', value: 'cancelled'},
 ];
 
-const OrderAdmin = () => {
+const OrderShop = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,18 +43,19 @@ const OrderAdmin = () => {
 
   const fetchOrders = async () => {
     try {
-    //   const userData = await AsyncStorage.getItem('user');
-    //   if (userData) {
-        // const user = JSON.parse(userData);
+      const userData = await AsyncStorage.getItem('user');
+      if (userData) {
+        const user = JSON.parse(userData);
+        const shop = await getShopByUserId(user._id);
         // const res = await getAllOrderById(user._id);
-        const res = await getAllOrder();
+        const res = await getAllOrder(shop.data.DT._id);
         if (res?.data?.EC === 0) {
           setOrders(res.data.DT);
           setFilteredOrders(res.data.DT);
         } else {
           Alert.alert('Lỗi', res.data.EM);
         }
-      // }
+      }
     } catch (e) {
       Alert.alert('Lỗi', 'Không thể lấy danh sách đơn hàng.');
     }
@@ -105,12 +107,11 @@ const OrderAdmin = () => {
       if (res?.data?.EC === 0) {
         const userData = await AsyncStorage.getItem('user');
         const user = JSON.parse(userData || '{}');
-        // const orderRes = await getAllOrderById(user._id);
-        const orderRes = await getAllOrder();
-        const orders = orderRes?.data?.DT || [];
-        const currentOrder = orders.find((o: any) => o._id === orderId);
+        const shop = await getShopByUserId(user._id);
+        const orderRes = await getAllOrder(shop.data.DT._id);
+        const orderss = orderRes?.data?.DT || [];
+        const currentOrder = orderss.find((o: any) => o._id === orderId);
         const image = currentOrder?.products?.[0]?.product_id.image || image_default;
-        // console.log("Ảnh hiển thị ", image);
         const receiverId = currentOrder.customer_id || '';
         const receiverRes = await getDetailUser(receiverId);
         const receiver = receiverRes.data.DT;
@@ -178,7 +179,6 @@ const OrderAdmin = () => {
 
         for (const noti of notifications) {
           await createNotiOrder(user._id, receiverId, orderId,noti.name,noti.image,noti.description,receiver.fcm_token);
-          console.log()
         }
         Alert.alert(
           'Thành công',
@@ -354,7 +354,7 @@ const OrderAdmin = () => {
   );
 };
 
-export default OrderAdmin;
+export default OrderShop;
 
 const styles = StyleSheet.create({
   orderItem: {

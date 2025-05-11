@@ -14,11 +14,20 @@ const createNotiVoucher = ( receiveId, name, image, description, fcmToken ) => {
 };
 
 const getAllNotiByReceiveId = (receiveId) => {
-    return axios.get(`${API_BASE_URL}/noti/getAllNotiByReceiveId/${receiveId}`);
+    return axios.get(`${API_BASE_URL}/noti/getAllNotiByReceiveId`,{
+        params: {
+            receiver_id: receiveId,
+        },
+    });
 };
 
 const getAllNotiByNotiType = (receiveId, notiTypeId) => {
-    return axios.get(`${API_BASE_URL}/noti/getAllNotiByNotiType/${receiveId}?notitype_id=${notiTypeId}`);
+    return axios.get(`${API_BASE_URL}/noti/getAllNotiByNotiType`,{
+        params: {
+            receiver_id: receiveId,
+            notitype_id: notiTypeId,
+        },
+    });
 };
 
 const updateStatusNoti = (notiId, status) => {
@@ -28,15 +37,39 @@ const updateStatusNoti = (notiId, status) => {
 };
 
 const getNotiUpdateOrder = (receiveId, notiTypeId) => {
-    return axios.get(`${API_BASE_URL}/noti/getNotiUpdateOrder/${receiveId}?notitype_id=${notiTypeId}`);
+    return axios.get(`${API_BASE_URL}/noti/getNotiUpdateOrder`, {
+        params: {
+            receiver_id: receiveId,
+            notitype_id: notiTypeId,
+        },
+    });
 };
 
 const getTwoNotiUpdateOrderLastest = (receiveId, notiTypeId) => {
-    return axios.get(`${API_BASE_URL}/noti/getTwoNotiUpdateOrderLastest/${receiveId}?notitype_id=${notiTypeId}`);
+    return axios.get(`${API_BASE_URL}/noti/getTwoNotiUpdateOrderLastest`, {
+        params: {
+            receiver_id: receiveId,
+            notitype_id: notiTypeId,
+        },
+    });
+};
+
+const getAllNotiByAdminAndNotiType = (senderId, notiTypeId) => {
+    return axios.get(`${API_BASE_URL}/noti/getAllNotiByAdminAndNotiType`,{
+        params: {
+            sender_id: senderId,
+            notitype_id: notiTypeId,
+        },
+    });
 };
 
 const getAllNotiBySenderIdAndNotiType = (senderId, notiTypeId) => {
-    return axios.get(`${API_BASE_URL}/noti/getAllNotiBySenderIdAndNotiType/${senderId}?notitype_id=${notiTypeId}`);
+    return axios.get(`${API_BASE_URL}/noti/getAllNotiBySenderIdAndNotiType`,{
+        params: {
+            sender_id: senderId,
+            notitype_id: notiTypeId,
+        },
+    });
 };
 
 const createNotiByAdmin = ( image, name, description, receiver_id, sender_id, notitype_id ) => {
@@ -53,7 +86,7 @@ const updateNotiByAdmin = ( notiId, image, name, description, receiver_id, sende
 
 const deleteNotiByAdmin = (notiIdDelete) => {
     return axios.post(`${API_BASE_URL}/noti/deleteNotiByAdmin/${notiIdDelete}`);
-}
+};
 
 export {
     createNotiOrder,
@@ -63,6 +96,7 @@ export {
     updateStatusNoti,
     getNotiUpdateOrder,
     getTwoNotiUpdateOrderLastest,
+    getAllNotiByAdminAndNotiType,
     getAllNotiBySenderIdAndNotiType,
     createNotiByAdmin,
     updateNotiByAdmin,

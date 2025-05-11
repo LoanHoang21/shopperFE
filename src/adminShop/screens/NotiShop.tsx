@@ -6,9 +6,9 @@ import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {Dropdown} from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { deleteNotiByAdmin, getAllNotiByAdminAndNotiType } from '../../apis/Noti';
+import { deleteNotiByAdmin, getAllNotiBySenderIdAndNotiType} from '../../apis/Noti';
 import { RootStackParamList } from '../../types/data';
-import HeaderNotificationAdmin from '../components/headers/HeaderNotificationAdmin';
+import HeaderNotificationShop from '../components/headers/HeaderNotificationShop';
 import NotiModel from './NotiModel';
 import DeleteConfirmModal from '../components/DeleteConfirmModel';
 
@@ -27,14 +27,14 @@ export interface INoti {
     updatedAt: string;
   }
 
-const NotiAdmin = () => {
+const NotiShop = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedNoti, setSelectedNoti] = useState<INoti | null>(
         null,
     );
     const [refreshing, setRefreshing] = useState(false);
     const [notis, setNotis] = useState<INoti[]>([]);
-    type NotiRouteProp = RouteProp<RootStackParamList, 'notiAdmin'>;
+    type NotiRouteProp = RouteProp<RootStackParamList, 'notiShop'>;
     type NavigationType = NativeStackNavigationProp<RootStackParamList>;
     const navigation = useNavigation<NavigationType>();
     const route = useRoute<NotiRouteProp>();
@@ -59,7 +59,7 @@ const NotiAdmin = () => {
             const uid = await fetchUserId();
             if (!uid) {return;}
 
-            const res = await getAllNotiByAdminAndNotiType(uid, notiTypeId);
+            const res = await getAllNotiBySenderIdAndNotiType(uid, notiTypeId);
             if (res?.data?.DT) {
                 setNotis(res.data.DT);
             }
@@ -138,6 +138,10 @@ const handleRefresh = async () => {
                     today.getMonth() === notiDate.getMonth() &&
                     today.getFullYear() === notiDate.getFullYear()
                 );
+            case 'read':
+                return noti.is_read;
+            case 'unread':
+                return !noti.is_read;
             case 'all':
             default:
                 return true;
@@ -154,6 +158,8 @@ const handleRefresh = async () => {
         { label: 'Thông báo hôm nay', value: 'today' },
         { label: 'Thông báo tuần này', value: 'this_week' },
         { label: 'Thông báo tháng này', value: 'this_month' },
+        { label: 'Thông báo đã đọc', value: 'read' },
+        { label: 'Thông báo chưa đọc', value: 'unread' },
     ];
 
     const renderItem = ({ item }: { item: INoti }) => {
@@ -192,7 +198,7 @@ const handleRefresh = async () => {
 
     useLayoutEffect(() => {
         navigation.setOptions({
-            header: () => <HeaderNotificationAdmin/>,
+            header: () => <HeaderNotificationShop/>,
         });
     }, []);
 
@@ -244,7 +250,7 @@ const handleRefresh = async () => {
     );
 };
 
-export default NotiAdmin;
+export default NotiShop;
 
 const styles = StyleSheet.create({
     container: {

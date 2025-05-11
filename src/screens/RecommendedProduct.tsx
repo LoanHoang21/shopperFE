@@ -25,10 +25,8 @@ const RecommendedProduct = () => {
             const userInfo = await AsyncStorage.getItem('user');
             if (userInfo) {
                 const user = JSON.parse(userInfo);
-                // const res = await getAllProduct();
             const res = await getRecommendedProductByOrders(user._id);
             setProducts(res.data.DT || []);
-            // console.log("res.data.DT",res.data.DT);
             }
         };
 

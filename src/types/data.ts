@@ -28,6 +28,12 @@ export type RootStackParamList = {
     orderAdmin: { id: number } | undefined;
     recommendedProduct: undefined;
     notiAdmin: {_id: string, name: string} | undefined;
+    homeShop: undefined;
+    notiTypeShop: undefined;
+    orderShop: { id: number } | undefined;
+    notiShop: {_id: string, name: string} | undefined;
+    notiTypeOfShop: undefined;
+    notiTypeDetailsOfShop: {_id: string, name: string} | undefined;
 };
 
 declare global {

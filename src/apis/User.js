@@ -1,5 +1,5 @@
-import axios from "axios";
-import { API_BASE_URL } from "../utils/const";
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/const';
 
 const updateFcmToken = (userId, fcmToken) => {
     return axios.post(`${API_BASE_URL}/user/updateFcmToken/${userId}`, {
@@ -8,7 +8,6 @@ const updateFcmToken = (userId, fcmToken) => {
 };
 
 const updateSettingNoti = (userId, settingNotiId) => {
-    console.log("File api user");
     return axios.post(`${API_BASE_URL}/user/updateSettingNoti/${userId}`, {
         setting_noti_id: settingNotiId,
     });

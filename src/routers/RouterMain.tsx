@@ -34,6 +34,15 @@ import HeaderNotificationAdmin from '../admin/components/headers/HeaderNotificat
 import RecommendedProduct from '../screens/RecommendedProduct';
 import NotiAdmin from '../admin/screens/NotiAdmin';
 import NotiTypeAdmin from '../admin/screens/NotiTypeAdmin';
+import HomeShop from '../adminShop/screens/HomeShop';
+import HeaderHomeShop from '../adminShop/components/headers/HeaderHomeShop';
+import NotiTypeShop from '../adminShop/screens/NotiTypeShop';
+import HeaderNotificationShop from '../adminShop/components/headers/HeaderNotificationShop';
+import NotiShop from '../adminShop/screens/NotiShop';
+import OrderShop from '../adminShop/screens/OrderShop';
+import NotiTypeOfShop from '../adminShop/screens/NotiTypeOfShop';
+import NotiTypeDetailsOfShop from '../adminShop/screens/NotiTypeDetailsOfShop';
+import HeaderNotificationOfShop from '../adminShop/components/headers/HeaderNotificationOfShop';
 
 const RouterMain = () => {
     const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -215,6 +224,36 @@ const RouterMain = () => {
             <Stack.Screen
                 name="notiAdmin"
                 component={NotiAdmin}
+            />
+            <Stack.Screen
+                name="homeShop"
+                component={HomeShop}
+                // options={{headerShown: false}}
+                options={{ header: () =>  <HeaderHomeShop /> }}
+            />
+            <Stack.Screen
+                name="notiTypeShop"
+                component={NotiTypeShop}
+                options={{ header: () => <HeaderNotificationShop /> }}
+            />
+            <Stack.Screen
+                name="notiShop"
+                component={NotiShop}
+            />
+            <Stack.Screen
+                name="orderShop"
+                component={OrderShop}
+                options={{ title: 'Quản lý đơn hàng' }}
+            />
+            <Stack.Screen
+                name="notiTypeOfShop"
+                component={NotiTypeOfShop}
+                options={{ header: () => <HeaderNotificationOfShop/> }}
+            />
+            <Stack.Screen
+                name="notiTypeDetailsOfShop"
+                component={NotiTypeDetailsOfShop}
+                // options={{ header: () => <HeaderNotification/> }}
             />
         </Stack.Navigator>
     );

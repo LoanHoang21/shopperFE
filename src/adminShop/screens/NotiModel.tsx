@@ -149,7 +149,6 @@ const NotiModel: React.FC<Props> = ({
           form.sender_id,
           form.notitype_id,
         );
-        // console.log(">>>>>>Debug: ", form);
         Alert.alert(
           'Thông báo',
           'Chỉnh sửa thông báo cho người dùng thành công',
@@ -169,7 +168,7 @@ const NotiModel: React.FC<Props> = ({
           'Tạo thông báo và gửi thông báo thành công cho người dùng',
         );
       }
-      onSuccess(form); // Cập nhật lại danh sách thông báo trong NotiAdmin
+      onSuccess(form); // Cập nhật lại danh sách thông báo trong NotiShop
       onClose();
     } catch (err) {
       Alert.alert('Lỗi', 'Có lỗi xảy ra, vui lòng thử lại.');

@@ -55,7 +55,9 @@ const Login = () => {
           const user = JSON.parse(userData);
           if (user.role === 1) {
             navigation.navigate('homeAdmin');
-          } else {
+          } else if (user.role === 2){
+            navigation.navigate('homeShop');
+          }else {
             navigation.navigate('home');
           }
         }

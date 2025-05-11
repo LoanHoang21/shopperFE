@@ -11,6 +11,7 @@ import axios from 'axios';
 import { Product } from './src/components/ProductCard';
 import { RootStackParamList } from './src/types/data';
 import { NotificationProvider } from './src/context/NotiContext';
+import { API_BASE_URL } from './src/utils/const';
 
 const toastConfig = {
   success: (props : any) => (
@@ -70,7 +71,7 @@ const App = () => {
       const productId = match?.[1];
       if (productId) {
         try {
-          const res = await axios.get(`http://192.168.79.11:3001/api/product/get-details/${productId}`);
+          const res = await axios.get(`${API_BASE_URL}/product/get-details/${productId}`);
           const product: Product = res.data.data;
           navigationRef.current?.navigate('productDetail', { product });
           setNotFoundModal(false);

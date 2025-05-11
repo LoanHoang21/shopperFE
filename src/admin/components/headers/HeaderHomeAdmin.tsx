@@ -2,7 +2,7 @@ import React from 'react';
 import { View, TextInput, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-import IconFontawesome from '@react-native-vector-icons/fontawesome';
+// import IconFontawesome from '@react-native-vector-icons/fontawesome';
 import IconAntDesign from '@react-native-vector-icons/ant-design';
 
 const HeaderHomeAdmin: React.FC = () => {
@@ -33,12 +33,12 @@ const HeaderHomeAdmin: React.FC = () => {
 
         {/* 2 icon bên ngoài */}
         <View style={styles.rightIcons}>
-          <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
+          {/* <TouchableOpacity  onPress={() => navigation.navigate('cart')} >
             <IconAntDesign name="shopping-cart" size={30} color={'white'}/>
           </TouchableOpacity>
           <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('notiTypeAdmin')}>
             <IconFontawesome name="bell-o" size={25} color={'white'}/>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.outIcon} onPress={() => navigation.navigate('profile')}>
             <IconAntDesign name="user" size={25} color={'white'}/>
           </TouchableOpacity>
