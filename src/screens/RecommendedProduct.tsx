@@ -8,6 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 import { getRecommendedProductByOrders } from '../apis/Product';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+
 const RecommendedProduct = () => {
     const navigation = useNavigation();
     const [products, setProducts] = useState<any[]>([]);
