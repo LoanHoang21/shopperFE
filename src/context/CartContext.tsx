@@ -16,7 +16,7 @@ export interface CartItemI {
   stock: number;
   checked: boolean;
   attributes?: { label: string; value: string }[];
-  variantId?: string;
+  variantId?: any;
 }
 
 interface CartContextType {
