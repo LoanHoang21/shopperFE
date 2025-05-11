@@ -101,12 +101,18 @@ const AddToCartModal: React.FC<Props> = ({ visible, onClose, product, onAddToCar
             setoutOfStock(false)
         }
 
+        console.log('item',items)
+
         const existingCartQty = items?.reduce((acc, item) => {
-          if (item.variantId === selectedVariant?._id) {
+          console.log('item.variantId?._id','selectedVariant?._id')
+          if (item.variantId?._id === selectedVariant?._id) {
+            console.log('item.quantity',item.quantity)
             return acc + item.quantity;
           }
           return acc;
         }, 0) || 0;
+
+        console.log('existingCartQty',existingCartQty)
 
         setExistingCartItemQty(existingCartQty)
         console.log('existingCartQty',existingCartQty)
