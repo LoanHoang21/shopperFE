@@ -14,6 +14,7 @@ import { RootStackParamList } from '../types/data';
 import ProductCardCompare from '../components/ProductCardCompare';
 import { Product } from '../components/ProductCard';
 import { API_BASE_URL } from '../utils/const';
+import { getPriceRange } from '../utils/productHelpers';
 
 const screenWidth = Dimensions.get('window').width;
 const CARD_MARGIN = 8;
@@ -25,7 +26,17 @@ const CompareResultScreen = () => {
     const navigation = useNavigation();
     const { products, related } = route.params;
 
-    const sorted = [...products].sort((a, b) => a.price - b.price);
+    const sorted = [...products].sort((a, b) => {
+        const minA = Array.isArray(a.variants) && a.variants.length > 0
+            ? Math.min(...a.variants.map(v => v.price))
+            : a.price;
+
+        const minB = Array.isArray(b.variants) && b.variants.length > 0
+            ? Math.min(...b.variants.map(v => v.price))
+            : b.price;
+
+        return minA - minB;
+    });
 
     const CARD_WIDTH = sorted.length <= 2
         ? (screenWidth - CARD_MARGIN * (sorted.length + 1)) / sorted.length
@@ -162,7 +173,7 @@ const CompareResultScreen = () => {
                                 style={styles.image}
                             />
                             <Text style={styles.suggestName} numberOfLines={1}>{item.name}</Text>
-                            <Text style={styles.suggestPrice}>đ{item.price.toLocaleString('vi-VN')}</Text>
+                            <Text style={styles.suggestPrice}>{getPriceRange(products)}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>

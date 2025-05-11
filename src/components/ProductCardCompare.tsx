@@ -4,6 +4,7 @@ import { Product } from './ProductCard';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/data'; // đường dẫn đúng với dự án bạn
+import { getPriceRange } from '../utils/productHelpers';
 
 type NavigationProp = StackNavigationProp<RootStackParamList, 'compareResult'>;
 
@@ -39,12 +40,12 @@ const ProductCardCompare: React.FC<Props> = ({ item, isCheapest = false, onPress
             </View>
 
             <Text style={styles.title} numberOfLines={1}>{item.name}</Text>
-            <Text style={styles.price}>{item.price.toLocaleString()}₫</Text>
-            {item.discount && (
+            <Text style={styles.price}>{getPriceRange(item)}</Text>
+            {/* {item.discount && (
                 <Text style={styles.oldPrice}>
                     {(Math.ceil(item.price / (1 - item.discount / 100))).toLocaleString()}₫
                 </Text>
-            )}
+            )} */}
             <Text style={styles.shop}>{item.short_description || 'Chăn ga Pre'}</Text>
             <Text style={styles.rating}>⭐ {item.rating_avg?.toFixed(1) || '0.0'}/5</Text>
 

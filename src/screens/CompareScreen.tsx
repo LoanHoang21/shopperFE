@@ -14,6 +14,8 @@ import Icon from '@react-native-vector-icons/ant-design';
 import { Product } from '../components/ProductCard';
 import axios from 'axios';
 import { API_BASE_URL } from '../utils/const';
+import { getMinPrice } from '../utils/productHelpers';
+
 const screenWidth = Dimensions.get('window').width;
 const itemWidth = (screenWidth - 48) / 2;
 
@@ -75,7 +77,7 @@ const CompareScreen = () => {
                     <View style={styles.card}>
                         <Image source={{ uri: (item.images?.[0] || item.image) ?? 'https://via.placeholder.com/150' }} style={styles.image} />
                         <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-                        <Text style={styles.price}>đ{item.price}</Text>
+                        <Text style={styles.price}>{getMinPrice(item)}</Text>
                         <Text style={styles.shop}>{item.shop_name}</Text>
                         <TouchableOpacity
                             style={[styles.checkbox, selected.includes(item.name) && styles.checked]}
