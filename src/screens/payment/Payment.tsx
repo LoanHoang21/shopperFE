@@ -4,17 +4,17 @@ import {
     View,
     TouchableOpacity,
     ActivityIndicator,
+    Image,
 } from 'react-native';
+import ConfirmModal from '../../components/ConfirmModal';
 import OrderPayment from '../../components/OrderPayment';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/data';
-import RadioList from '../../components/RadioList';
 import { AddressData } from '../../components/AddressModal';
 import AddressModal from '../../components/AddressModal';
 import {
     getAddressByCustomerId,
     createOrUpdateAddress,
-    updateAddress,
 } from '../../apis/Address';
 import { getVoucherById } from '../../apis/Voucher';
 import { useState, useEffect, useRef } from 'react';
@@ -99,6 +99,8 @@ const Payment = () => {
     const { paymentMethodId, product, voucherId } = route.params;
     console.log('PaymentMethodId:', product);
     const [showModal, setShowModal] = useState(false);
+    const [showModalPayment, setShowModalPayment] = useState(false);
+
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>();
     const customerIdRef = useRef<string | null>(null);
     const [selectedAddress, setSelectedAddress] = useState<AddressData | null>(
@@ -221,8 +223,8 @@ const Payment = () => {
 
         // return totalPrice - discount;
         return {
-            totalPrice: totalPrice - discount,
-            voucherDiscount: discount,
+            totalPrice: totalPrice - discount * groupedByShop.length,
+            voucherDiscount: discount * groupedByShop.length,
         }
     };
 
@@ -311,43 +313,73 @@ const Payment = () => {
         }
     };
 
-    const handleAddOrder = async () => {
+    const handlePay1 = async () => {
         try {
             const user = await getUserInfo();
             if (!user || !selectedAddress || !paymentMethodId) return;
 
-            const body = {
-                products: product,
-                quantity: orderSummary.totalQuantity,
-                total_price: voucher
-                    ? calculateDiscountedPrice(totalFinal, voucher).totalPrice
-                    : totalFinal,
-                customer_id: user._id,
-                address_id: selectedAddress._id,
-                voucher_id: voucher?._id,
-                shipment_id: "68186d9f77fc0c5eca6dbf50",
-                payment_method_id: paymentMethodId,
-                status: 'pending',
-            };
+            // Tính giá trị tổng cần thanh toán của từng shop
+            for (const group of groupedByShop) {
+                const shopTotal = group.items.reduce((acc, item) => {
+                    const price = item.product_id.price;
+                    const discount = item.product_id.discount || 0;
+                    const finalPrice = price * (1 - discount / 100);
+                    return acc + finalPrice * item.quantity;
+                }, 0);
 
-            
-            const res = await axios.post(`${API_BASE_URL}/order/addOrder`, body);
-            
-            if (res.data?.status === 'OK') {
-                navigation.navigate('paymentSuccess');
-                Toast.show({
-                    type: 'success',
-                    text1: 'Đặt hàng thành công',
-                    position: 'top',
-                    visibilityTime: 1500,
-                });            } else {
-                Toast.show({ type: 'error', text1: 'Lỗi khi đặt hàng' });
+                const quantity = group.items.reduce((acc, item) => acc + item.quantity, 0);
+
+                const orderBody = {
+                    products: group.items,
+                    quantity: quantity,
+                    total_price: voucher
+                        ? calculateDiscountedPrice(shopTotal + 16500, voucher).totalPrice
+                        : shopTotal + 16500,
+                    customer_id: user._id,
+                    address_id: selectedAddress._id,
+                    voucher_id: voucher?._id,
+                    shipment_id: '68186d9f77fc0c5eca6dbf50',
+                    payment_method_id: paymentMethodId,
+                    status: paymentMethod?.type === 'cod' ? 'pending' : 'unpaid',
+                    shop_id: group.shop._id,
+                    payment_status: paymentMethod?.type === 'cod' ? 'offline' : 'online',
+                    payUrl: '',
+                };
+
+                const resOrder = await axios.post(`${API_BASE_URL}/order/addOrder`, orderBody);
+
+                if (resOrder.data?.status === 'OK') {
+
+                    if (paymentMethod?.type !== 'cod') {
+                        const res = await axios.post(`${API_BASE_URL}/order/momo-payment`, {
+                            totalPrice: orderBody.total_price,
+                            orderId: resOrder.data?.data?._id,
+                        });
+
+                        console.log(res);
+
+                        if (res.data?.payUrl) {
+                            //   Linking.openURL(res.data.payUrl);
+                            navigation.navigate('paymentSuccess');
+                        }
+                    }
+                } else {
+                    Toast.show({ type: 'error', text1: resOrder.data?.message || 'Lỗi khi đặt hàng' });
+                }
             }
+            navigation.navigate('paymentSuccess');
+            Toast.show({
+                type: 'success',
+                text1: 'Đặt hàng thành công',
+                position: 'top',
+                visibilityTime: 1500,
+            });
+
         } catch (err) {
             console.error(err);
             Toast.show({ type: 'error', text1: 'Đặt hàng thất bại' });
         }
-    }
+    };
 
     return (
         <ScrollView style={{ flex: 1, paddingHorizontal: 12 }}>
@@ -494,7 +526,22 @@ const Payment = () => {
                         alignItems: 'center',
                         justifyContent: 'space-between',
                     }}>
-                    <Text>{paymentMethod?.name}</Text>
+                    <View>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+                            {paymentMethod?.name === 'MoMo' ? (
+                                <Image
+                                    source={require('../../assets/images/momo.png')}
+                                    style={{ width: 20, height: 20 }}
+                                />
+                            ) : (
+                                <Image
+                                    source={require('../../assets/images/pay.png')}
+                                    style={{ width: 22, height: 22 }}
+                                />
+                            )}
+                            <Text>{paymentMethod?.name}</Text>
+                        </View>
+                    </View>
                     <View
                         style={{
                             width: 20,
@@ -589,7 +636,23 @@ const Payment = () => {
                 {voucher ? (
                     <Text style={{ color: '#F1215A' }}>{`₫${calculateDiscountedPrice(totalFinal, voucher || {}).totalPrice.toLocaleString('vi-VN')}`}</Text>
                 ) : <Text style={{ color: '#F1215A' }}>{`₫${totalFinal.toLocaleString('vi-VN')}`}</Text>}
+                <ConfirmModal
+                    visible={showModalPayment}
+                    onCancel={() => setShowModalPayment(false)}
+                    onConfirm={handlePay1}
+                    title="Xác nhận thanh toán"
+                    message="Bạn có chắc chắn muốn thanh toán đơn hàng này?"
+                />
                 <TouchableOpacity
+                    style={{
+                        backgroundColor: '#e53935',
+                        padding: 13,
+                        borderRadius: 5,
+                    }}
+                    onPress={() => setShowModalPayment(true)}>
+                    <Text style={{ color: 'white' }}>Đặt hàng</Text>
+                </TouchableOpacity>
+                {/* <TouchableOpacity
                     style={{
                         backgroundColor: '#e53935',
                         padding: 13,
@@ -597,7 +660,7 @@ const Payment = () => {
                     }}
                     onPress={handleAddOrder}>
                     <Text style={{ color: 'white' }}>Đặt hàng</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
         </ScrollView>
     );

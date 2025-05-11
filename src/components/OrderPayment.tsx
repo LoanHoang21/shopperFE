@@ -1,15 +1,9 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import OrderProduct from './OrderProduct';
 import { GroupedCartItemsByShop } from '../screens/payment/Payment';
 import Icon from '@react-native-vector-icons/ant-design';
 
 const OrderPayment = ({ shop, items }: GroupedCartItemsByShop) => {
-    // const totalPrice = products.reduce(
-    //     (sum, item) => sum + item.salePrice * item.quantity,
-    //     0,
-    // );
-
-    console.log('items', items, shop);
 
     return (
         <View

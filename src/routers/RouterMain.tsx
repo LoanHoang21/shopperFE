@@ -65,6 +65,27 @@ const RouterMain = () => {
                 name="order"
                 component={Order}
                 // options={{ title: 'Chi tiết Review' }}
+                options={({ navigation }) => ({
+                    headerTitle: '',
+                    headerLeft: () => (
+                        <Icon
+                            name="arrow-left"
+                            size={26}
+                            color="#f50057"
+                            style={{ marginLeft: 16 }}
+                            onPress={() => navigation.navigate('home')}
+                        />
+                    ),
+                    headerRight: () => (
+                        <Icon
+                            name="shopping-cart"
+                            size={28} // 👉 tăng kích thước
+                            color="#f50057"
+                            style={{ marginRight: 0 }}
+                            onPress={() => navigation.navigate('cart')}
+                        />
+                    ),
+                })}
             />
             <Stack.Screen
                 name="cart"

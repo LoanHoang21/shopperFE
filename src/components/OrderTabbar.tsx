@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Scroll } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
-const tabList = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Đã nhận', 'Hủy'];
+const tabList = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Đã nhận', 'Hủy', 'Chưa thanh toán'];
 
 type OrderTabbarProps = {
   onClick?: (tabValue: string, tabIndex: number) => void;
@@ -11,23 +11,28 @@ const OrderTabbar = ({ onClick }: OrderTabbarProps) => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <View style={styles.container}>
-      {tabList.map((tab, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.tab}
-          onPress={() => {
-            setActiveTab(index);
-            onClick?.(tab, index); // gọi callback nếu có
-          }}
-        >
-          <Text style={[styles.tabText, activeTab === index && styles.activeText]}>
-            {tab}
-          </Text>
-          {activeTab === index && <View style={styles.underline} />}
-        </TouchableOpacity>
-      ))}
-    </View>
+    <ScrollView
+      horizontal={true}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      showsHorizontalScrollIndicator={false}
+    >
+    {tabList.map((tab, index) => (
+      <TouchableOpacity
+        key={index}
+        style={styles.tab}
+        onPress={() => {
+          setActiveTab(index);
+          onClick?.(tab, index);
+        }}
+      >
+        <Text style={[styles.tabText, activeTab === index && styles.activeText]}>
+          {tab}
+        </Text>
+        {activeTab === index && <View style={styles.underline} />}
+      </TouchableOpacity>
+    ))}
+    </ScrollView>
   );
 };
 
@@ -35,17 +40,16 @@ export default OrderTabbar;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#f6f6f6',
+  },
+  contentContainer: {
     flexDirection: 'row',
-    backgroundColor: '#f5f5f5',
-    justifyContent: 'space-around',
-    paddingVertical: 10,
-    paddingTop: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    justifyContent: 'flex-start',
   },
   tab: {
     alignItems: 'center',
-    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
   },
   tabText: {
     color: 'black',

@@ -57,9 +57,8 @@ const VoucherScreen = () => {
   const [selectedTab, setSelectedTab] = useState('Tất cả');
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
-const route = useRoute<VoucherRouteProp>();
-const { product, paymentMethodId } = route.params;
-
+  const route = useRoute<VoucherRouteProp>();
+  const { product, paymentMethodId } = route.params || {};
 
   const getAllVouchers = async () => {
     try {
@@ -134,11 +133,13 @@ const { product, paymentMethodId } = route.params;
           style={[styles.button, { backgroundColor: actionColor }]}
           disabled={isExpired || isFull}
           onPress={() => {
-            navigation.navigate('payment', {
-              voucherId: item._id,
-              product,
-              paymentMethodId,
-            });
+            if(product) {
+              navigation.navigate('payment', {
+                voucherId: item._id,
+                product,
+                paymentMethodId,
+              });
+            }
           }}
           >
           <Text style={styles.buttonText}>{actionLabel}</Text>

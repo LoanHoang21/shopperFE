@@ -1,11 +1,12 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import OrderProduct from './OrderProduct';
 import { CartProductItem } from '../screens/payment/Payment';
 import Icon from '@react-native-vector-icons/ant-design';
 import { Alert } from 'react-native';
 import axios from 'axios';
 import { Modal, Pressable } from 'react-native';
+import { API_BASE_URL } from '../utils/const';
 
 type OrderItemProps = {
   // shopName: string;
@@ -14,19 +15,18 @@ type OrderItemProps = {
   totalPrice: number;
   orderId?: string;
   onUpdate: () => void;
+  payUrl?: string;
 };
 
-const OrderItem = ({ status, products, totalPrice, orderId, onUpdate }: OrderItemProps) => {
+const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: OrderItemProps) => {
   const [showModal, setShowModal] = React.useState(false);
-  // console.log('products', products);
-  console.log(orderId)
-
+  
   const handleCancelOrder = async () => {
     try {
       const res = await axios.put(`${API_BASE_URL}/order/${orderId}/status`, {
         status: 'cancelled',
       });
-  
+
       if (res.data?.status === 'OK') {
         Alert.alert('Thành công', 'Đơn hàng đã được hủy');
         onUpdate();
@@ -42,7 +42,7 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate }: OrderIte
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.shopName}><Icon name="shop" size={20} color="#F1215A" />{products[0].product_id.product_id.category_id.shop_id.name}</Text>
+        <Text style={styles.shopName}><Icon name="shop" size={20} color="#F1215A" />{products[0]?.product_id?.product_id?.category_id.shop_id.name}</Text>
         <Text style={styles.status}>{status}</Text>
       </View>
 
@@ -75,39 +75,39 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate }: OrderIte
                 <Text>Liên hệ shop</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.cancelButton} onPress={() => setShowModal(true)}>
-  <Text style={styles.cancelText}>Hủy đơn hàng</Text>
-</TouchableOpacity>
+                <Text style={styles.cancelText}>Hủy đơn hàng</Text>
+              </TouchableOpacity>
 
             </>
           )}
 
-<Modal
-  transparent
-  visible={showModal}
-  animationType="fade"
-  onRequestClose={() => setShowModal(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={styles.modalContent}>
-      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Xác nhận hủy đơn hàng</Text>
-      <Text style={{ marginBottom: 20 }}>Bạn có chắc chắn muốn hủy đơn hàng này không?</Text>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
-        <Pressable onPress={() => setShowModal(false)} style={styles.modalCancel}>
-          <Text>Đóng</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => {
-            setShowModal(false);
-            handleCancelOrder();
-          }}
-          style={styles.modalConfirm}
-        >
-          <Text style={{ color: 'white' }}>Xác nhận</Text>
-        </Pressable>
-      </View>
-    </View>
-  </View>
-</Modal>
+          <Modal
+            transparent
+            visible={showModal}
+            animationType="fade"
+            onRequestClose={() => setShowModal(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Xác nhận hủy đơn hàng</Text>
+                <Text style={{ marginBottom: 20 }}>Bạn có chắc chắn muốn hủy đơn hàng này không?</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+                  <Pressable onPress={() => setShowModal(false)} style={styles.modalCancel}>
+                    <Text>Đóng</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => {
+                      setShowModal(false);
+                      handleCancelOrder();
+                    }}
+                    style={styles.modalConfirm}
+                  >
+                    <Text style={{ color: 'white' }}>Xác nhận</Text>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Modal>
 
 
           {status === 'Đã xác nhận' && (
@@ -141,6 +141,12 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate }: OrderIte
           {status === 'Hủy' && (
             <TouchableOpacity style={styles.contactButton}>
               <Text>Mua lại</Text>
+            </TouchableOpacity>
+          )}
+
+          {status === 'Chưa thanh toán' && (
+            <TouchableOpacity style={styles.contactButton} onPress={() => Linking.openURL(payUrl || '')}>
+              <Text>Thanh toán ngay</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -226,5 +232,5 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#e53935',
   },
-  
+
 });

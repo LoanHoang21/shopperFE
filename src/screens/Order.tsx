@@ -17,7 +17,7 @@ import { CartProductItem } from './payment/Payment';
 
 export type OrderType = {
   _id: string;
-  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled' | 'unpaid';
   products: CartProductItem[];
   quantity: number;
   total_price: number;
@@ -28,6 +28,9 @@ export type OrderType = {
   voucher_id?: any;
   shipment_id?: any;
   payment_method_id?: any;
+  shop_id: string;
+  payment_status: string;
+  payUrl?: string;
 };
 
 const Order = () => {
@@ -81,19 +84,20 @@ const Order = () => {
         return 'delivered';
       case 'Hủy':
         return 'cancelled';
+      case 'Chưa thanh toán':
+        return 'unpaid';
       default:
         return 'pending';
     }
   };
 
-  const filteredOrders = orders.filter(
-    order => order.status === mapTabToStatus(tabIndex)
-  );
-
-  const handleUpdateSuccess = () => {
-    fetchOrders(); // gọi lại API để reload danh sách đơn hàng
-  };
+  const filteredOrders = orders.filter(order => {
+    return order.status === mapTabToStatus(tabIndex);
+  });
   
+  const handleUpdateSuccess = () => {
+    fetchOrders();
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -104,7 +108,7 @@ const Order = () => {
         <EmptyOrder />
       ) : (
         filteredOrders.map((order, index) => {
-          console.log('order', order);
+          // console.log('order', order);
           return (
             <OrderItem
               key={index}
@@ -112,7 +116,8 @@ const Order = () => {
               totalPrice={order.total_price}
               products={order.products}
               orderId={order._id}
-              onUpdate={handleUpdateSuccess} 
+              onUpdate={handleUpdateSuccess}
+              payUrl={order.payUrl}
             />
 
           )

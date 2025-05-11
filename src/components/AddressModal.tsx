@@ -74,12 +74,12 @@ const AddressModal = ({ visible, onClose, onSave, defaultValue }: AddressModalPr
                             />
                         ))}
 
-                        <View style={styles.checkboxContainer}>
+                        {/* <View style={styles.checkboxContainer}>
                             <TouchableOpacity onPress={() => handleChange('isDefault', !form.isDefault)}>
                                 <View style={[styles.checkbox, form.isDefault && styles.checkboxChecked]} />
                             </TouchableOpacity>
                             <Text style={{ marginLeft: 10 }}>Đặt làm địa chỉ mặc định</Text>
-                        </View>
+                        </View> */}
 
                         <View style={styles.buttonGroup}>
                             <TouchableOpacity style={styles.cancel} onPress={onClose}>

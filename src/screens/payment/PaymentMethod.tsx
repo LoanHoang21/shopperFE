@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  Image,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../types/data';
 import { API_BASE_URL } from '../../utils/const';
 
-type PaymentMethodRouteProp = RouteProp<RootStackParamList, 'paymentMethod'>; 
+type PaymentMethodRouteProp = RouteProp<RootStackParamList, 'paymentMethod'>;
 
 const PaymentMethod = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -53,23 +61,47 @@ const PaymentMethod = () => {
     <View style={{ flex: 1, paddingHorizontal: 12 }}>
       <Text style={styles.groupTitle}>Chọn phương thức thanh toán</Text>
 
-      {paymentMethods.map((item) => (
+      {paymentMethods.map(item => (
         <TouchableOpacity
           key={item._id}
           style={styles.radioRow}
-          onPress={() => handleSelect(item._id)}
-        >
-          <Text style={{
-            fontWeight: 'bold',
-            marginBottom: 15,
-            fontSize: 15,
-          }}>{item.name}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={styles.label}>{item.name}</Text>
-          <View style={[styles.circle, selectedId === item._id && styles.circleSelected]}>
-            {selectedId === item._id && <View style={styles.innerCircle} />}
-          </View>
+          onPress={() => handleSelect(item._id)}>
+          <Text
+            style={{
+              fontWeight: 'bold',
+              marginBottom: 15,
+              fontSize: 15,
+            }}>
+            {item.name}
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+              {item.name === 'MoMo' ? (
+                <Image
+                  source={require('../../assets/images/momo.png')}
+                  style={{ width: 20, height: 20 }}
+                />
+              ) : (
+                <Image
+                  source={require('../../assets/images/pay.png')}
+                  style={{ width: 22, height: 22 }}
+                />
+              )}
+              <Text style={styles.label}>{item.name}</Text>
+            </View>
 
+            <View
+              style={[
+                styles.circle,
+                selectedId === item._id && styles.circleSelected,
+              ]}>
+              {selectedId === item._id && <View style={styles.innerCircle} />}
+            </View>
           </View>
         </TouchableOpacity>
       ))}
