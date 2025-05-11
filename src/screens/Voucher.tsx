@@ -1,9 +1,19 @@
-import React, {useState, useEffect} from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
-import {getAllVoucher} from '../apis/Voucher';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+} from 'react-native';
+import { getAllVoucher } from '../apis/Voucher';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { RootStackParamList } from '../types/data';
 
-interface Voucher {
+export interface Voucher {
   _id: string;
   code: string;
   image: string;
@@ -20,10 +30,10 @@ interface Voucher {
 }
 
 const tabs = [
-  {label: 'Tất cả', value: 'Tất cả'},
-  {label: 'Shopper', value: 'Shopper'},
-  {label: 'Shop', value: 'Shop'},
-  {label: 'Sắp hết hạn', value: 'Sắp hết hạn'},
+  { label: 'Tất cả', value: 'Tất cả' },
+  { label: 'Shopper', value: 'Shopper' },
+  { label: 'Shop', value: 'Shop' },
+  { label: 'Sắp hết hạn', value: 'Sắp hết hạn' },
 ];
 
 const formatDate = (dateStr: string) => {
@@ -39,11 +49,16 @@ const isExpiringSoon = (startDate: string, endDate: string) => {
   return diff <= 3 && diff >= 0 && start <= today;
 };
 
+type VoucherRouteProp = RouteProp<RootStackParamList, 'payment'>;
+
+
 const VoucherScreen = () => {
   const navigation = useNavigation();
   const [selectedTab, setSelectedTab] = useState('Tất cả');
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
+  const route = useRoute<VoucherRouteProp>();
+  const { product, paymentMethodId } = route.params || {};
 
   const getAllVouchers = async () => {
     try {
@@ -72,7 +87,7 @@ const VoucherScreen = () => {
     });
   };
 
-  const renderVoucher = ({item}: {item: Voucher}) => {
+  const renderVoucher = ({ item }: { item: Voucher }) => {
     const isExpired = new Date(item.end_date) < new Date();
     const isStarted = new Date(item.start_date) > new Date();
     const isFull = item.user_count >= item.max_user;
@@ -80,10 +95,10 @@ const VoucherScreen = () => {
 
     let actionLabel = 'Dùng ngay';
     let actionColor = '#FF3366';
-    if (isExpired ) {
+    if (isExpired) {
       actionLabel = 'Hết hạn';
       actionColor = '#ccc';
-    } else if(isFull){
+    } else if (isFull) {
       actionLabel = 'Hết mã';
       actionColor = '#ccc';
     }
@@ -94,7 +109,7 @@ const VoucherScreen = () => {
 
     return (
       <View style={styles.card}>
-        <Image source={{uri: item.image}} style={styles.image} />
+        <Image source={{ uri: item.image }} style={styles.image} />
         <View style={styles.content}>
           <Text style={styles.title}>
             {item.discount_type === 'Phần trăm'
@@ -115,17 +130,25 @@ const VoucherScreen = () => {
 
         </View>
         <TouchableOpacity
-          style={[styles.button, {backgroundColor: actionColor}]}
+          style={[styles.button, { backgroundColor: actionColor }]}
           disabled={isExpired || isFull}
-          onPress={() => navigation.navigate('home')}
-        >
+          onPress={() => {
+            if(product) {
+              navigation.navigate('payment', {
+                voucherId: item._id,
+                product,
+                paymentMethodId,
+              });
+            }
+          }}
+          >
           <Text style={styles.buttonText}>{actionLabel}</Text>
         </TouchableOpacity>
       </View>
     );
   };
 
-  const renderTab = (tab: {label: string; value: string}) => {
+  const renderTab = (tab: { label: string; value: string }) => {
     const isActive = selectedTab === tab.value;
     return (
       <TouchableOpacity
@@ -144,15 +167,15 @@ const VoucherScreen = () => {
     <View style={styles.container}>
       <View style={styles.tabContainer}>{tabs.map(renderTab)}</View>
       {loading ? (
-        <ActivityIndicator size="large" color="#FF3366" style={{marginTop: 20}} />
+        <ActivityIndicator size="large" color="#FF3366" style={{ marginTop: 20 }} />
       ) : (
         <FlatList
           data={filterVouchers()}
           keyExtractor={item => item._id}
           renderItem={renderVoucher}
-          contentContainerStyle={{padding: 12}}
+          contentContainerStyle={{ padding: 12 }}
           ListEmptyComponent={
-            <Text style={{textAlign: 'center', marginTop: 40}}>Không có mã nào</Text>
+            <Text style={{ textAlign: 'center', marginTop: 40 }}>Không có mã nào</Text>
           }
         />
       )}
@@ -221,13 +244,13 @@ const styles = StyleSheet.create({
   },
   desc: {
     fontSize: 13,
-    fontStyle:'italic',
-    fontWeight:'bold',
+    fontStyle: 'italic',
+    fontWeight: 'bold',
     color: '#534B4B',
   },
-  subDesc : {
+  subDesc: {
     fontSize: 11,
-    fontStyle:'italic',
+    fontStyle: 'italic',
     color: '#534B4B',
   },
   button: {

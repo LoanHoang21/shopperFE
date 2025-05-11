@@ -1,9 +1,12 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
+const { width } = Dimensions.get('window');
+
 const OrderSuccess = () => {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <Image
@@ -11,66 +14,89 @@ const OrderSuccess = () => {
         style={styles.icon}
       />
 
-      <Text style={styles.title}>Đặt hàng thành công</Text>
+      <Text style={styles.title}>🎉 Đặt hàng thành công!</Text>
 
       <Text style={styles.description}>
-        Vui lòng chỉ nhận hàng và thanh toán khi đơn mua ở trạng thái{' '}
-        <Text style={{ fontWeight: '600' }}>“Đang giao hàng”</Text>
+        Cảm ơn bạn đã mua hàng. Vui lòng chỉ nhận hàng & thanh toán khi đơn ở trạng thái{' '}
+        <Text style={styles.highlight}>“Đang giao hàng”</Text>.
       </Text>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('home')}>
-          <Text style={styles.buttonText}>Trang chủ</Text>
+        <TouchableOpacity style={[styles.button, styles.secondary]} onPress={() => navigation.navigate('home')}>
+          <Text style={styles.secondaryText}>Về trang chủ</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('order')}>
-          <Text style={styles.buttonText}>Đơn mua</Text>
+          <Text style={styles.buttonText}>Xem đơn hàng</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#fff',
-      alignItems: 'center',
-      padding: 20,
-    },
-    icon: {
-      width: 48,
-      height: 48,
-      marginBottom: 16,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      marginBottom: 12,
-      color: '#000',
-    },
-    description: {
-      fontSize: 14,
-      color: '#333',
-      textAlign: 'center',
-      marginBottom: 24,
-      paddingHorizontal: 16,
-    },
-    buttonRow: {
-      flexDirection: 'row',
-      gap: 12,
-    },
-    button: {
-      paddingVertical: 12,
-      paddingHorizontal: 24,
-      borderRadius: 6,
-      backgroundColor: '#F1215A',
-    },
-    buttonText: {
-      color: '#fff',
-      fontWeight: '600',
-    },
-  });
-  
-
 export default OrderSuccess;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  icon: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#F1215A',
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 15,
+    color: '#444',
+    textAlign: 'center',
+    marginBottom: 30,
+    lineHeight: 22,
+  },
+  highlight: {
+    fontWeight: '700',
+    color: '#F1215A',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+  },
+  button: {
+    backgroundColor: '#F1215A',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
+    minWidth: width * 0.4,
+    alignItems: 'center',
+  },
+  secondary: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#F1215A',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  secondaryText: {
+    color: '#F1215A',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+});

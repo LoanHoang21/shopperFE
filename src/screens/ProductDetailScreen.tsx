@@ -17,6 +17,7 @@ import { Product } from '../components/ProductCard';
 import axios from 'axios';
 import AddToCartModal from '../components/AddToCartModal';
 import { API_BASE_URL } from '../utils/const';
+import AddToPaymentModal from '../components/AddToPaymentModal';
 
 type ProductDetailRouteProp = RouteProp<RootStackParamList, 'productDetail'>;
 type ProductVariant = {
@@ -41,6 +42,7 @@ const ProductDetailScreen = () => {
     const { product } = route.params;
     const [relatedProducts, setRelatedProducts] = React.useState<Product[]>([]);
     const [modalVisible, setModalVisible] = React.useState(false);
+    const [modalPaymentVisible, setModalPaymentVisible] = React.useState(false);
     const [productOptions, setProductOptions] = React.useState<string[]>([]);
     const [productAttributes, setProductAttributes] = React.useState<
     { category: string; values: string[] }[]
@@ -106,6 +108,11 @@ const ProductDetailScreen = () => {
         setModalVisible(true);
     };
 
+    const handleAddToPayment = async () => {
+      await fetchProductAttributions();
+      setModalPaymentVisible(true);
+  };
+
     const handleCompare = () => {
         navigation.navigate('compare', { products: [product] });
     };
@@ -114,7 +121,7 @@ const ProductDetailScreen = () => {
         ? Math.floor(product.price / (1 - product.discount / 100))
         : product.price;
 
-    return (
+        return (
         <View style={{ flex: 1 }}>
             <ScrollView ref={scrollRef} style={styles.container} contentContainerStyle={{ paddingBottom: 100 }}>
                 <FlatList
@@ -198,7 +205,7 @@ const ProductDetailScreen = () => {
                 <TouchableOpacity style={styles.buyBtn} onPress={handleCompare}>
                     <Text style={{ color: 'white' }}>So sánh thêm</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.buyBtn}>
+                <TouchableOpacity style={styles.buyBtn} onPress={handleAddToPayment}>
                     <Text style={{ color: 'white' }}>Mua hàng</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.cartIconBtn} onPress={handleAddToCart}>
@@ -235,7 +242,27 @@ const ProductDetailScreen = () => {
                     setTimeout(() => setShowAlert(false), 2000);
                 }}
             />
-
+            <AddToPaymentModal
+                visible={modalPaymentVisible}
+                onClose={() => setModalPaymentVisible(false)}
+                product={{
+                    id: product._id,
+                    image: Array.isArray(product.images) && product.images.length > 0
+                ? product.images[0] ?? 'https://via.placeholder.com/300'
+                : product.image ?? 'https://via.placeholder.com/300',
+                    name: product.name,
+                    discountPrice: product.price,
+                    price: originalPrice,
+                    stock: (product.quantity && product.sale_quantity)? (product.quantity - product.sale_quantity) : 0,
+                    options:productAttributes,
+                    variants: variants 
+                }}
+                onAddToCart={(item) => {
+                    console.log('Đã thêm giỏ:', item);
+                    setShowAlert(true);
+                    setTimeout(() => setShowAlert(false), 2000);
+                }}
+            />
         </View>
     );
 };

@@ -1,17 +1,17 @@
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
-import { Image } from 'react-native';
-
-type OrderItemProps = {
+type OrderProductProps = {
   name: string;
   variant: string;
   quantity: number;
-  originalPrice: number;
-  salePrice: number;
+  originalPrice?: number;
+  salePrice?: number;
   imageUrl: string;
 };
 
-const formatCurrency = (value: number) => {
+const formatCurrency = (value?: number) => {
+  if (typeof value !== 'number' || isNaN(value)) return '₫0';
   return `₫${value.toLocaleString('vi-VN')}`;
 };
 
@@ -22,30 +22,26 @@ const OrderProduct = ({
   originalPrice,
   salePrice,
   imageUrl,
-}: OrderItemProps) => {
+}: OrderProductProps) => {
   return (
-    <>
-      <View style={styles.row}>
-        <Image source={{ uri: imageUrl }} style={styles.image} />
-        <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={1}>
-            {name}
-          </Text>
-          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={styles.variant}>{variant}</Text>
-            <Text style={styles.quantity}>x{quantity}</Text>
-          </View>
-          <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <Text style={styles.originalPrice}>
-              {formatCurrency(originalPrice)}
-            </Text>
-            <Text style={styles.salePrice}>{formatCurrency(salePrice)}</Text>
-          </View>
+    <View style={styles.row}>
+      <Image source={{ uri: imageUrl }} style={styles.image} />
+      <View style={styles.content}>
+        <Text style={styles.title} numberOfLines={1}>{name}</Text>
+        <View style={styles.variantRow}>
+          <Text style={styles.variant}>{variant}</Text>
+          <Text style={styles.quantity}>x{quantity}</Text>
+        </View>
+        <View style={styles.priceRow}>
+          <Text style={styles.originalPrice}>{formatCurrency(originalPrice)}</Text>
+          <Text style={styles.salePrice}>{formatCurrency(salePrice)}</Text>
         </View>
       </View>
-    </>
+    </View>
   );
 };
+
+export default OrderProduct;
 
 const styles = StyleSheet.create({
   row: {
@@ -57,7 +53,6 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 6,
     marginRight: 12,
-    // backgroundColor: '#eee',
   },
   content: {
     flex: 1,
@@ -68,16 +63,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#222',
   },
+  variantRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   variant: {
     fontSize: 13,
     color: '#555',
   },
   quantity: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
     fontSize: 13,
     color: '#333',
+  },
+  priceRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
   originalPrice: {
     fontSize: 13,
@@ -91,5 +91,3 @@ const styles = StyleSheet.create({
     color: '#e53935',
   },
 });
-
-export default OrderProduct;

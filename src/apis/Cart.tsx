@@ -3,6 +3,11 @@ import { API_BASE_URL } from "../utils/const";
 
 const BASE_URL = `${API_BASE_URL}/cart`;
 
+interface Attribute {
+  category: string;
+  value: string;
+}
+
 export const addToCart = (
   userId: string,
   product_id: string,

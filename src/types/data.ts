@@ -16,13 +16,22 @@ export type RootStackParamList = {
     searchResult: {
         query: string;
         products: Product[];
-      };
-    payment: undefined;
-    paymentMethod: undefined;
+    };
+    payment: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+        paymentMethodId?: string;
+        voucherId?: string;
+    };
+    paymentMethod: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+    };
     paymentSuccess: undefined;
     updateOrder: undefined;
     profile: undefined;
-    voucher: undefined;
+    voucher: {
+        product?: { product_id: string, quantity: number, type?: string }[];
+        paymentMethodId?: string;
+    };
     homeAdmin: undefined;
     notiTypeAdmin: undefined;
     orderAdmin: { id: number } | undefined;

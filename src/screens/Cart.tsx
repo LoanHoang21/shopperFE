@@ -22,7 +22,7 @@ const CartScreen: React.FC = () => {
   const [showToast, setShowToast] = React.useState(false);
   const [showOutOfStock, setShowOutOfStock] = React.useState(false);
   const [stockItem, setStockItem] = React.useState<any>();
-  const { reloadCart } = useCart(); 
+  const { reloadCart } = useCart();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -31,18 +31,35 @@ const CartScreen: React.FC = () => {
 
   const selectedItems = items.filter(item => item.checked);
   const totalAmount = selectedItems.reduce(
-  (sum, item) => sum + item.price * item.quantity,
-  0
-);
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  console.log(selectedItems)
+
+  const transformedProducts = selectedItems
+    .filter(item => !!item.variantId) // chỉ giữ lại item có variantId
+    .map(item => {
+      const type = item.attributes?.length
+        ? item.attributes.map(attr => `${attr.label}: ${attr.value}`).join(', ')
+        : undefined;
+
+      return {
+        product_id: item.variantId!, // hoặc item.variantId vì đã filter
+        quantity: item.quantity,
+        ...(type && { type }),
+      };
+    });
 
 
+  console.log('transformedProducts', transformedProducts)
   const grouped = items.reduce((acc, item) => {
     if (!acc[item.brand_id]) acc[item.brand_id] = { brand: item.brand, items: [] };
     acc[item.brand_id].items.push(item);
     return acc;
   }, {} as Record<string, { brand: string; items: CartItemI[] }>);
 
-  console.log('grouped',grouped)
+  console.log('grouped', grouped)
 
   const handleConfirmDelete = () => {
     removeSelected();
@@ -54,30 +71,30 @@ const CartScreen: React.FC = () => {
 
   if (items.length === 0) {
     return (
-        <View style={{ flex: 1 }}>
-            <CartHeader />
-            <View style={styles.containerEmpty}>
-                <Image
-                source={require('../assets/images/cart_large.png')}
-                style={styles.cartImage}
-                resizeMode="contain"
-                />
-                <Text style={styles.emptyText}>Giỏ hàng của bạn còn trống</Text>
+      <View style={{ flex: 1 }}>
+        <CartHeader />
+        <View style={styles.containerEmpty}>
+          <Image
+            source={require('../assets/images/cart_large.png')}
+            style={styles.cartImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.emptyText}>Giỏ hàng của bạn còn trống</Text>
 
-                <LinearGradient
-                colors={['rgba(244, 35, 132, 1)', 'rgba(241, 33, 90, 1)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                >
-                <TouchableOpacity style={styles.button} onPress={()=>{navigation.navigate('home')}}>
-                    <Text style={styles.buttonText}>MUA NGAY</Text>
-                </TouchableOpacity>
-                </LinearGradient>
-            </View>
+          <LinearGradient
+            colors={['rgba(244, 35, 132, 1)', 'rgba(241, 33, 90, 1)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('home')}>
+              <Text style={styles.buttonText}>MUA NGAY</Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
+      </View>
     );
   }
-  
+
 
   return (
     <View style={{ flex: 1 }}>
@@ -115,20 +132,25 @@ const CartScreen: React.FC = () => {
         ))}
       </ScrollView>
       {selectedItems.length > 0 && (
-  <View style={styles.footer}>
-    <Text style={styles.totalText}>
-      Tổng thanh toán: <Text style={styles.totalAmount}>đ{totalAmount.toLocaleString()}</Text>
-    </Text>
-    <TouchableOpacity style={styles.buyButton}>
-      <Text style={styles.buyText}>Mua hàng ({selectedItems.length})</Text>
-    </TouchableOpacity>
-  </View>
-)}
+        <View style={styles.footer}>
+          <Text style={styles.totalText}>
+            Tổng thanh toán: <Text style={styles.totalAmount}>đ{totalAmount.toLocaleString()}</Text>
+          </Text>
+          <TouchableOpacity style={styles.buyButton} onPress={() => {
+              navigation.navigate('payment', {
+                product: transformedProducts,
+                paymentMethodId: "681a1bde3427154ae2166ebd",
+              });
+            }}>
+            <Text style={styles.buyText}>Mua hàng ({selectedItems.length})</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
-      <OutOfStockModal 
-      visible={showOutOfStock} 
-      onClose={() => setShowOutOfStock(false)} 
-      stock={stockItem}
+      <OutOfStockModal
+        visible={showOutOfStock}
+        onClose={() => setShowOutOfStock(false)}
+        stock={stockItem}
       />
     </View>
   );
@@ -222,5 +244,5 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
-  
+
 });

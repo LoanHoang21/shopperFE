@@ -1,26 +1,9 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import OrderProduct from './OrderProduct';
+import { GroupedCartItemsByShop } from '../screens/payment/Payment';
+import Icon from '@react-native-vector-icons/ant-design';
 
-type OrderProduct = {
-    name: string;
-    variant: string;
-    quantity: number;
-    originalPrice: number;
-    salePrice: number;
-    imageUrl: string;
-};
-
-type OrderPaymentProps = {
-    shopName: string;
-    status: string;
-    products: OrderProduct[];
-};
-
-const OrderPayment = ({ shopName, status, products }: OrderPaymentProps) => {
-    const totalPrice = products.reduce(
-        (sum, item) => sum + item.salePrice * item.quantity,
-        0,
-    );
+const OrderPayment = ({ shop, items }: GroupedCartItemsByShop) => {
 
     return (
         <View
@@ -28,38 +11,19 @@ const OrderPayment = ({ shopName, status, products }: OrderPaymentProps) => {
                 backgroundColor: '#fff',
                 paddingHorizontal: 3,
             }}>
-            <Text style={{ color: '#e53935', fontWeight: '600' }}>{shopName}</Text>
+            <Text style={{ color: '#e53935', fontWeight: '600' }}><Icon name="shop" size={20} color="#f50057"/>{shop.name}</Text>
 
-            {products.map((product, index) => (
-                <OrderProduct key={index} {...product} />
-            ))}
+            {items.map((product, index) => (
+                <OrderProduct
+                    key={index}
+                    name={product.product_id.product_id.name}
+                    imageUrl={product.product_id.image}
+                    quantity={product.quantity}
+                    variant={product.type}
+                    originalPrice={product.product_id.price}
+                    salePrice={product.product_id.price * (1 - product.product_id.discount / 100)}
+                />))}
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: 10}}>
-                <Text style={{ fontWeight: '700'}}>Phương thức vận chuyển</Text>
-                <Text>Xem tất cả</Text>
-            </View>
-
-            <View style={{ backgroundColor: '#F0FFE2', padding: 12, marginBottom: 13}}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 7}}>
-                    <Text>Nhanh</Text>
-                    <Text style={{ fontWeight: 700}}>₫16.500</Text>
-                </View>
-                <Text>Đảm bảo nhận hàng từ 3-5 ngày</Text>
-            </View>
-
-            <View style={{ justifyContent: 'flex-end' }}>
-                <View
-                    style={{
-                        flexDirection: 'row',
-                        justifyContent: 'flex-end',
-                        marginBottom: 10,
-                    }}>
-                    <Text>Tổng số tiền ({products.length} sản phẩm): </Text>
-                    <Text style={{ color: '#e53935', fontWeight: '700' }}>
-                        {`₫${totalPrice.toLocaleString('vi-VN')}`}
-                    </Text>
-                </View>
-            </View>
         </View>
     );
 };

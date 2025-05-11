@@ -1,8 +1,8 @@
-import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { deleteCartItems, updateCartItemQuantity } from '../apis/Cart';
 import { API_BASE_URL } from '../utils/const';
+import axios from 'axios';
 
 export interface CartItemI {
   id: string;
@@ -72,7 +72,7 @@ const convertCartItemFromApi = (apiItem: any): CartItemI => {
     stock: ( variant?.quantity - variant?.sale_quantity || 0),
     checked: apiItem.isSelected || false,
     attributes: attributes,
-    variantId: variant?._id,
+    variantId: apiItem.variant_id,
   };
 };
 
