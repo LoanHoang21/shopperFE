@@ -15,6 +15,7 @@ import ProductCardCompare from '../components/ProductCardCompare';
 import { Product } from '../components/ProductCard';
 import { API_BASE_URL } from '../utils/const';
 import { getPriceRange } from '../utils/productHelpers';
+import { getMinPrice } from '../utils/productHelpers';
 
 const screenWidth = Dimensions.get('window').width;
 const CARD_MARGIN = 8;
@@ -173,7 +174,7 @@ const CompareResultScreen = () => {
                                 style={styles.image}
                             />
                             <Text style={styles.suggestName} numberOfLines={1}>{item.name}</Text>
-                            <Text style={styles.suggestPrice}>{getPriceRange(products)}</Text>
+                            <Text style={styles.suggestPrice}>{getMinPrice(item)}</Text>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>

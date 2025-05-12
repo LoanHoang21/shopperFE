@@ -25,6 +25,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from '@react-native-vector-icons/ant-design';
 import { API_BASE_URL } from '../../utils/const';
+import { createNotiOrder } from '../../apis/Noti';
+import { getDetailUser } from '../../apis/User';
 export interface Shop {
     _id: string;
     name: string;
@@ -360,14 +362,33 @@ const Payment = () => {
                         console.log(res);
 
                         if (res.data?.payUrl) {
-                            //   Linking.openURL(res.data.payUrl);
                             navigation.navigate('paymentSuccess');
                         }
                     }
+                    const res2 = await getDetailUser(group.shop._id);
+                    console.log('Tạo thông báo đơn hàng chờ', user._id,
+                        group.shop._id,
+                        resOrder.data?.data?._id,
+                        'Thông báo đơn hàng đang chờ cần xác nhận',
+                        'https://res.cloudinary.com/dr0ncakbs/image/upload/v1746369375/default_pyru0w.png',
+                        `Đơn hàng ${resOrder.data?.data?._id} chờ xác nhận`,
+                        user.fcm_token,);
+                    await createNotiOrder(user._id,
+                        group.shop._id,
+                        resOrder.data?.data?._id,
+                        'Thông báo đơn hàng đang chờ cần xác nhận',
+                        'https://res.cloudinary.com/dr0ncakbs/image/upload/v1746369375/default_pyru0w.png',
+                        `Đơn hàng ${resOrder.data?.data?._id} chờ xác nhận`,
+                        res2.data.DT.fcm_token,
+                    );
+
                 } else {
                     Toast.show({ type: 'error', text1: resOrder.data?.message || 'Lỗi khi đặt hàng' });
                 }
             }
+
+
+
             navigation.navigate('paymentSuccess');
             Toast.show({
                 type: 'success',

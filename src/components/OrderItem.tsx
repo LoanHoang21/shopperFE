@@ -23,6 +23,7 @@ type OrderItemProps = {
 
 const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: OrderItemProps) => {
   const [showModal, setShowModal] = React.useState(false);
+  const [showModalConfirm, setShowModalConfirm] = React.useState(false);
 
   const handleCancelOrder = async () => {
     try {
@@ -36,6 +37,12 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: 
       if (userData) {
         const user = JSON.parse(userData);
         const res1 = await getDetailUser(products[0]?.product_id?.product_id?.category_id.shop_id.user_id);
+        console.log(">>>>> test hủy đơn hàng", products[0]?.product_id?.product_id?.category_id.shop_id,
+          orderId,
+          'Thông báo hủy đơn hàng',
+          products[0]?.product_id?.image || '',
+          `Đơn hàng ${orderId} đã hủy bởi người mua`,
+          res1.data.DT.fcm_token);
         await createNotiOrder(user._id,
           products[0]?.product_id?.product_id?.category_id.shop_id,
           orderId,
@@ -60,23 +67,42 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: 
 
   const handleConfirmReceiveOrder = async () => {
     try {
+      console.log("comppp")
+      const res = await axios.put(`${API_BASE_URL}/order/${orderId}/status`, {
+        status: 'completed',
+      });
+      console.log(res.data);
       // Tạo thông báo cho Shop - Xác nhận đã nhận được hàng
       // senderId, receiverId, orderId, name, image, description, fcmToken
       const userData = await AsyncStorage.getItem('user');
       if (userData) {
         const user = JSON.parse(userData);
-        const res1 = await getDetailUser(products[0]?.product_id?.product_id?.category_id.shop_id.user_id);
+      
+        const res2 = await getDetailUser(products[0]?.product_id?.product_id?.category_id.shop_id.user_id);
+        console.log("Thông tin thông báo người dùng", user._id,
+          products[0]?.product_id?.product_id?.category_id.shop_id,
+          orderId,
+          'Thông báo đơn hàng hoàn thành',
+          products[0]?.product_id?.image || '',
+          `Đơn hàng ${orderId} đã được người mua xác nhận đã nhận được hàng`,
+          res2.data.DT.fcm_token);
         await createNotiOrder(user._id,
           products[0]?.product_id?.product_id?.category_id.shop_id,
           orderId,
           'Thông báo đơn hàng hoàn thành',
           products[0]?.product_id?.image || '',
           `Đơn hàng ${orderId} đã được người mua xác nhận đã nhận được hàng`,
-          res1.data.DT.fcm_token
+          res2.data.DT.fcm_token
         );
       }
+      if (res.data?.status === 'OK') {
+        Alert.alert('Thành công', 'Đơn hàng đã hoàn thành');
+        onUpdate();
+      } else {
+        Alert.alert('Thất bại', 'Không thể xác nhận hoàn thành đơn hàng');
+      }
     } catch (err) {
-      console.error('Tạo thông báo cho shop lỗi:', err);
+      console.error('Tạo thông báo hoàn thành lỗi:', err);
       // Alert.alert('Lỗi', 'Đã xảy ra lỗi khi hủy đơn');
     }
   };
@@ -175,11 +201,39 @@ const OrderItem = ({ status, products, totalPrice, orderId, onUpdate, payUrl }: 
               <TouchableOpacity style={styles.contactButton}>
                 <Text>Liên hệ shop</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.cancelButton} onPress={() => {handleConfirmReceiveOrder()}}>
+              <TouchableOpacity style={styles.cancelButton} onPress={() => {setShowModalConfirm(true)}}>
                 <Text style={styles.cancelText}>Đã nhận hàng</Text>
               </TouchableOpacity>
             </>
           )}
+
+          <Modal
+            transparent
+            visible={showModalConfirm}
+            animationType="fade"
+            onRequestClose={() => setShowModalConfirm(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Xác nhận nhận đơn hàng</Text>
+                <Text style={{ marginBottom: 20 }}>Bạn có chắc chắn muốn xác nhận đơn hàng này không?</Text>
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 10 }}>
+                  <Pressable onPress={() => setShowModalConfirm(false)} style={styles.modalCancel}>
+                    <Text>Đóng</Text>
+                  </Pressable>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setShowModalConfirm(false);
+                      handleConfirmReceiveOrder();
+                    }}
+                    style={styles.modalConfirm}
+                  >
+                    <Text style={{ color: 'white' }}>Xác nhận</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
 
           {status === 'Đã hoàn thành' && (
             <>

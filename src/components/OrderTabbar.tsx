@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 
-const tabList = ['Chờ xác nhận', 'Đã xác nhận', 'Đang giao', 'Đã nhận', 'Hủy', 'Chưa thanh toán'];
+const tabList = ['Chờ xác nhận', 'Đã xác nhận', 'Đang vận chuyển', 'Đã giao hàng', 'Đã hoàn thành', 'Hủy', 'Chưa thanh toán'];
 
 type OrderTabbarProps = {
   onClick?: (tabValue: string, tabIndex: number) => void;

@@ -6,6 +6,7 @@ const { width } = Dimensions.get('window');
 
 const OrderSuccess = () => {
   const navigation = useNavigation();
+  
 
   return (
     <View style={styles.container}>

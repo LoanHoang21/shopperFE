@@ -10,7 +10,7 @@ export const globalStyles = StyleSheet.create({
 
 // export const API_BASE_URL = 'http://192.168.79.163:3001/api';
 // export const API_BASE_URL = 'http://192.168.1.164:3001/api';
-// export const API_BASE_URL = 'http://192.168.1.164:3001/api';
-export const API_BASE_URL = 'http://192.168.24.103:3001/api';
+export const API_BASE_URL = 'http://192.168.224.163:3001/api';
+// export const API_BASE_URL = 'http://192.168.24.103:3001/api';
 
 export const image_default = 'https://res.cloudinary.com/dr0ncakbs/image/upload/v1746369375/default_pyru0w.png';
